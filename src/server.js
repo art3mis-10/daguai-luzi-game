@@ -2,193 +2,760 @@ import express from 'express';
 import { createServer } from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'fs';
 import { randomUUID } from 'crypto';
 import { Server } from 'socket.io';
 
-import { createNewDeal, sortCards } from './game/deck.js';
+import {
+  createNewDeal,
+  sortCards,
+} from './game/deck.js';
 
-import { validatePlay } from './game/rules.js';
+import {
+  validatePlay,
+} from './game/rules.js';
 
 /* =========================================================
    PATHS
    ========================================================= */
 
-const __filename = fileURLToPath(import.meta.url);
+const __filename =
+  fileURLToPath(import.meta.url);
 
-const __dirname = path.dirname(__filename);
+const __dirname =
+  path.dirname(__filename);
 
-const publicDir = path.join(__dirname, 'public');
+const publicDir =
+  path.join(
+    __dirname,
+    'public'
+  );
 
-const gameDir = path.join(__dirname, 'game');
+const gameDir =
+  path.join(
+    __dirname,
+    'game'
+  );
 
-const dataDir = path.join(__dirname, '..', 'data');
+const dataDir =
+  path.join(
+    __dirname,
+    '..',
+    'data'
+  );
 
-const historyFile = path.join(dataDir, 'game-history.json');
+const historyFile =
+  path.join(
+    dataDir,
+    'game-history.json'
+  );
 
 /* =========================================================
-   DATA DIRECTORY / HISTORY FILE
+   GITHUB CONFIG
+   ========================================================= */
+
+const GITHUB_TOKEN =
+  process.env.GITHUB_TOKEN || '';
+
+const GITHUB_OWNER =
+  process.env.GITHUB_OWNER ||
+  'art3mis-10';
+
+const GITHUB_REPO =
+  process.env.GITHUB_REPO ||
+  'Daguai_Luzi';
+
+const GITHUB_BRANCH =
+  process.env.GITHUB_BRANCH ||
+  'main';
+
+const GITHUB_HISTORY_PATH =
+  process.env.GITHUB_HISTORY_PATH ||
+  'data/game-history.json';
+
+const githubSyncEnabled =
+  Boolean(
+    GITHUB_TOKEN &&
+    GITHUB_OWNER &&
+    GITHUB_REPO
+  );
+
+/* =========================================================
+   LOCAL DATA FILE
    ========================================================= */
 
 if (!existsSync(dataDir)) {
-  mkdirSync(dataDir, {
-    recursive: true,
-  });
+  mkdirSync(
+    dataDir,
+    {
+      recursive: true,
+    }
+  );
 }
 
 function createEmptyHistory() {
   return {
     schemaVersion: 1,
+
+    lastUpdatedAt: null,
+
     games: [],
   };
 }
 
-function loadHistory() {
+function loadLocalHistory() {
   if (!existsSync(historyFile)) {
-    const emptyHistory = createEmptyHistory();
-
-    writeFileSync(historyFile, JSON.stringify(emptyHistory, null, 2), 'utf8');
-
-    return emptyHistory;
+    return createEmptyHistory();
   }
 
   try {
-    const raw = readFileSync(historyFile, 'utf8');
+    const raw =
+      readFileSync(
+        historyFile,
+        'utf8'
+      );
 
-    const parsed = JSON.parse(raw);
+    const parsed =
+      JSON.parse(raw);
 
-    if (!parsed || !Array.isArray(parsed.games)) {
+    if (
+      !parsed ||
+      !Array.isArray(parsed.games)
+    ) {
       return createEmptyHistory();
     }
 
     return parsed;
   } catch (error) {
-    console.error('Could not read game history:', error);
+    console.error(
+      'Could not load local history:',
+      error
+    );
 
     return createEmptyHistory();
   }
 }
 
-let gameHistory = loadHistory();
+function writeLocalHistory(
+  history
+) {
+  writeFileSync(
+    historyFile,
+
+    JSON.stringify(
+      history,
+      null,
+      2
+    ),
+
+    'utf8'
+  );
+}
+
+/* =========================================================
+   GITHUB API
+   ========================================================= */
+
+function getGitHubApiUrl() {
+  return (
+    `https://api.github.com/repos/` +
+    `${encodeURIComponent(GITHUB_OWNER)}/` +
+    `${encodeURIComponent(GITHUB_REPO)}/` +
+    `contents/` +
+    `${GITHUB_HISTORY_PATH}` +
+    `?ref=${encodeURIComponent(GITHUB_BRANCH)}`
+  );
+}
+
+function getGitHubHeaders() {
+  return {
+    Accept:
+      'application/vnd.github+json',
+
+    Authorization:
+      `Bearer ${GITHUB_TOKEN}`,
+
+    'X-GitHub-Api-Version':
+      '2022-11-28',
+
+    'User-Agent':
+      'daguai-luzi-server',
+  };
+}
+
+async function readHistoryFromGitHub() {
+  if (!githubSyncEnabled) {
+    return null;
+  }
+
+  try {
+    const response =
+      await fetch(
+        getGitHubApiUrl(),
+        {
+          headers:
+            getGitHubHeaders(),
+        }
+      );
+
+    if (response.status === 404) {
+      return null;
+    }
+
+    if (!response.ok) {
+      const text =
+        await response.text();
+
+      throw new Error(
+        `GitHub GET failed: ` +
+        `${response.status} ${text}`
+      );
+    }
+
+    const data =
+      await response.json();
+
+    if (!data.content) {
+      return null;
+    }
+
+    const decoded =
+      Buffer
+        .from(
+          data.content,
+          'base64'
+        )
+        .toString(
+          'utf8'
+        );
+
+    const parsed =
+      JSON.parse(decoded);
+
+    if (
+      !parsed ||
+      !Array.isArray(parsed.games)
+    ) {
+      return null;
+    }
+
+    return {
+      history: parsed,
+      sha: data.sha,
+    };
+  } catch (error) {
+    console.error(
+      'Could not read history from GitHub:',
+      error
+    );
+
+    return null;
+  }
+}
+
+async function pushHistoryToGitHub(
+  history
+) {
+  if (!githubSyncEnabled) {
+    return;
+  }
+
+  try {
+    let existingSha = null;
+
+    const existingResponse =
+      await fetch(
+        getGitHubApiUrl(),
+        {
+          headers:
+            getGitHubHeaders(),
+        }
+      );
+
+    if (
+      existingResponse.ok
+    ) {
+      const existingData =
+        await existingResponse.json();
+
+      existingSha =
+        existingData.sha;
+    } else if (
+      existingResponse.status !==
+      404
+    ) {
+      const text =
+        await existingResponse.text();
+
+      throw new Error(
+        `Could not fetch current GitHub file: ` +
+        `${existingResponse.status} ${text}`
+      );
+    }
+
+    const jsonText =
+      JSON.stringify(
+        history,
+        null,
+        2
+      );
+
+    const content =
+      Buffer
+        .from(
+          jsonText,
+          'utf8'
+        )
+        .toString(
+          'base64'
+        );
+
+    const body = {
+      message:
+        `Update game history ` +
+        new Date()
+          .toISOString(),
+
+      content,
+
+      branch:
+        GITHUB_BRANCH,
+    };
+
+    if (existingSha) {
+      body.sha =
+        existingSha;
+    }
+
+    const putUrl =
+      `https://api.github.com/repos/` +
+      `${encodeURIComponent(GITHUB_OWNER)}/` +
+      `${encodeURIComponent(GITHUB_REPO)}/` +
+      `contents/` +
+      `${GITHUB_HISTORY_PATH}`;
+
+    const response =
+      await fetch(
+        putUrl,
+        {
+          method: 'PUT',
+
+          headers: {
+            ...getGitHubHeaders(),
+
+            'Content-Type':
+              'application/json',
+          },
+
+          body:
+            JSON.stringify(
+              body
+            ),
+        }
+      );
+
+    if (!response.ok) {
+      const text =
+        await response.text();
+
+      throw new Error(
+        `GitHub PUT failed: ` +
+        `${response.status} ${text}`
+      );
+    }
+
+    console.log(
+      'Game history synced to GitHub.'
+    );
+  } catch (error) {
+    console.error(
+      'Could not sync history to GitHub:',
+      error
+    );
+  }
+}
+
+/* =========================================================
+   HISTORY INITIALIZATION
+   ========================================================= */
+
+let gameHistory =
+  loadLocalHistory();
+
+/*
+  Render filesystem may reset.
+
+  Therefore, when server starts,
+  prefer the latest GitHub copy
+  if one exists.
+*/
+async function initializeHistory() {
+  if (!githubSyncEnabled) {
+    console.log(
+      'GitHub history sync disabled.'
+    );
+
+    writeLocalHistory(
+      gameHistory
+    );
+
+    return;
+  }
+
+  const remote =
+    await readHistoryFromGitHub();
+
+  if (
+    remote?.history
+  ) {
+    gameHistory =
+      remote.history;
+
+    writeLocalHistory(
+      gameHistory
+    );
+
+    console.log(
+      `Loaded ${gameHistory.games.length} game(s) from GitHub.`
+    );
+  } else {
+    writeLocalHistory(
+      gameHistory
+    );
+
+    await pushHistoryToGitHub(
+      gameHistory
+    );
+  }
+}
+
+/* =========================================================
+   SAFE GITHUB SYNC QUEUE
+   ========================================================= */
+
+/*
+  Multiple game events can occur
+  close together.
+
+  We serialize GitHub writes so
+  two commits never race each other.
+*/
+let githubSyncChain =
+  Promise.resolve();
+
+let syncTimer = null;
+
+function queueGitHubSync() {
+  if (!githubSyncEnabled) {
+    return;
+  }
+
+  /*
+    Wait briefly so closely-spaced
+    state changes can be combined.
+  */
+  clearTimeout(syncTimer);
+
+  syncTimer =
+    setTimeout(
+      () => {
+        const snapshot =
+          JSON.parse(
+            JSON.stringify(
+              gameHistory
+            )
+          );
+
+        githubSyncChain =
+          githubSyncChain
+            .then(
+              () =>
+                pushHistoryToGitHub(
+                  snapshot
+                )
+            )
+            .catch(
+              (error) => {
+                console.error(
+                  'GitHub sync queue error:',
+                  error
+                );
+              }
+            );
+      },
+      800
+    );
+}
 
 function saveHistory() {
-  writeFileSync(historyFile, JSON.stringify(gameHistory, null, 2), 'utf8');
+  gameHistory.lastUpdatedAt =
+    new Date().toISOString();
+
+  writeLocalHistory(
+    gameHistory
+  );
+
+  queueGitHubSync();
 }
 
 /* =========================================================
    APP / SOCKET.IO
    ========================================================= */
 
-const app = express();
+const app =
+  express();
 
-const httpServer = createServer(app);
+const httpServer =
+  createServer(app);
 
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*',
-  },
-});
+const io =
+  new Server(
+    httpServer,
+    {
+      cors: {
+        origin: '*',
+      },
+    }
+  );
+
+app.use(
+  express.static(
+    publicDir
+  )
+);
+
+app.use(
+  '/game',
+  express.static(
+    gameDir
+  )
+);
+
+app.get(
+  '/',
+  (_req, res) => {
+    res.sendFile(
+      path.join(
+        publicDir,
+        'index.html'
+      )
+    );
+  }
+);
+
+/* =========================================================
+   OPTIONAL HISTORY CHECK ENDPOINT
+   ========================================================= */
 
 /*
-  Browser files:
-    /
-    /main.js
-    /style.css
+  This is intentionally NOT the
+  full hidden-card history endpoint.
 
-  Shared browser-safe game utility:
-    /game/deck.js
+  It simply confirms whether logging
+  is working without exposing hands.
 */
-app.use(express.static(publicDir));
+app.get(
+  '/api/history-status',
+  (_req, res) => {
+    res.json({
+      logging: true,
 
-app.use('/game', express.static(gameDir));
+      githubSync:
+        githubSyncEnabled,
 
-app.get('/', (_req, res) => {
-  res.sendFile(path.join(publicDir, 'index.html'));
-});
+      gameCount:
+        gameHistory.games.length,
+
+      lastUpdatedAt:
+        gameHistory.lastUpdatedAt,
+
+      githubRepository:
+        `${GITHUB_OWNER}/${GITHUB_REPO}`,
+
+      githubPath:
+        GITHUB_HISTORY_PATH,
+    });
+  }
+);
 
 /* =========================================================
    ROOM STORAGE
    ========================================================= */
 
-const rooms = new Map();
+const rooms =
+  new Map();
 
 /* =========================================================
    GENERAL HELPERS
    ========================================================= */
 
 function nowIso() {
-  return new Date().toISOString();
+  return (
+    new Date().toISOString()
+  );
 }
 
-function minuteIso(timestamp) {
-  return timestamp.slice(0, 16) + 'Z';
+function minuteIso(
+  timestamp
+) {
+  return (
+    timestamp.slice(
+      0,
+      16
+    ) + 'Z'
+  );
 }
 
 function generateRoomCode() {
   let roomCode;
 
   do {
-    roomCode = Math.random().toString(36).slice(2, 8).toUpperCase();
-  } while (rooms.has(roomCode));
+    roomCode =
+      Math
+        .random()
+        .toString(36)
+        .slice(2, 8)
+        .toUpperCase();
+  } while (
+    rooms.has(roomCode)
+  );
 
   return roomCode;
 }
 
-function serializeCard(card) {
+function serializeCard(
+  card
+) {
   return {
-    id: card.id,
-    deckNumber: card.deckNumber,
-    rank: card.rank,
-    displayRank: card.displayRank ?? null,
-    suit: card.suit,
-    symbol: card.symbol,
-    color: card.color,
-    isJoker: card.isJoker,
-    jokerType: card.jokerType ?? null,
+    id:
+      card.id,
+
+    deckNumber:
+      card.deckNumber,
+
+    rank:
+      card.rank,
+
+    displayRank:
+      card.displayRank ??
+      null,
+
+    suit:
+      card.suit,
+
+    symbol:
+      card.symbol,
+
+    color:
+      card.color,
+
+    isJoker:
+      card.isJoker,
+
+    jokerType:
+      card.jokerType ??
+      null,
   };
 }
 
-function serializeCombination(combination) {
+function serializeCombination(
+  combination
+) {
   if (!combination) {
     return null;
   }
 
   return {
-    type: combination.type ?? null,
+    type:
+      combination.type ??
+      null,
 
-    subtype: combination.subtype ?? null,
+    subtype:
+      combination.subtype ??
+      null,
 
-    cardCount: combination.cardCount ?? null,
+    cardCount:
+      combination.cardCount ??
+      null,
 
-    primaryRank: combination.primaryRank ?? null,
+    primaryRank:
+      combination.primaryRank ??
+      null,
 
-    strength: combination.strength ?? null,
+    strength:
+      combination.strength ??
+      null,
 
-    categoryStrength: combination.categoryStrength ?? null,
+    categoryStrength:
+      combination.categoryStrength ??
+      null,
 
-    label: combination.label ?? null,
+    label:
+      combination.label ??
+      null,
 
-    wildAssignments: combination.wildAssignments ?? [],
+    wildAssignments:
+      combination.wildAssignments ??
+      [],
   };
 }
 
-function getConnectedPlayerCount(room) {
-  return room.players.filter((player) => Boolean(player.socketId)).length;
+function getConnectedPlayerCount(
+  room
+) {
+  return (
+    room.players.filter(
+      (player) =>
+        Boolean(
+          player.socketId
+        )
+    ).length
+  );
 }
 
-function getActivePlayerCount(room) {
-  return room.players.filter(
-    (player) => Boolean(player.socketId) && !player.hasFinished
-  ).length;
+function getActivePlayerCount(
+  room
+) {
+  return (
+    room.players.filter(
+      (player) =>
+        Boolean(
+          player.socketId
+        ) &&
+        !player.hasFinished
+    ).length
+  );
 }
 
-function findNextActivePlayerIndex(room, fromIndex) {
-  for (let offset = 1; offset <= 6; offset += 1) {
-    const candidateIndex = (fromIndex + offset) % 6;
+function findNextActivePlayerIndex(
+  room,
+  fromIndex
+) {
+  for (
+    let offset = 1;
+    offset <= 6;
+    offset += 1
+  ) {
+    const candidateIndex =
+      (
+        fromIndex +
+        offset
+      ) % 6;
 
-    const candidate = room.players[candidateIndex];
+    const candidate =
+      room.players[
+        candidateIndex
+      ];
 
-    if (candidate.socketId && !candidate.hasFinished) {
+    if (
+      candidate.socketId &&
+      !candidate.hasFinished
+    ) {
       return candidateIndex;
     }
   }
@@ -196,23 +763,50 @@ function findNextActivePlayerIndex(room, fromIndex) {
   return null;
 }
 
-function getPassesNeeded(room) {
-  if (!room.state.currentLead) {
+function getPassesNeeded(
+  room
+) {
+  if (
+    !room.state.currentLead
+  ) {
     return 0;
   }
 
-  const leaderIndex = room.state.currentLead.playerIndex;
+  const leaderIndex =
+    room.state.currentLead
+      .playerIndex;
 
-  const leader = room.players[leaderIndex];
+  const leader =
+    room.players[
+      leaderIndex
+    ];
 
-  const leaderStillActive = Boolean(leader.socketId) && !leader.hasFinished;
+  const leaderStillActive =
+    Boolean(
+      leader.socketId
+    ) &&
+    !leader.hasFinished;
 
-  const activePlayerCount = getActivePlayerCount(room);
+  const activePlayerCount =
+    getActivePlayerCount(
+      room
+    );
 
-  return Math.max(1, activePlayerCount - (leaderStillActive ? 1 : 0));
+  return Math.max(
+    1,
+
+    activePlayerCount -
+      (
+        leaderStillActive
+          ? 1
+          : 0
+      )
+  );
 }
 
-function touchRoom(room) {
+function touchRoom(
+  room
+) {
   room.state.revision += 1;
 }
 
@@ -220,48 +814,91 @@ function touchRoom(room) {
    GAME LOGGING
    ========================================================= */
 
-function getGameLog(gameId) {
-  return gameHistory.games.find((game) => game.gameId === gameId);
+function getGameLog(
+  gameId
+) {
+  return (
+    gameHistory.games.find(
+      (game) =>
+        game.gameId ===
+        gameId
+    )
+  );
 }
 
-function createGameLog(room) {
-  const dealtAt = nowIso();
+function createGameLog(
+  room
+) {
+  const dealtAt =
+    nowIso();
 
-  const gameId = `${room.code}-` + randomUUID();
+  const gameId =
+    `${room.code}-` +
+    randomUUID();
 
-  room.state.gameId = gameId;
-  room.state.dealtAt = dealtAt;
+  room.state.gameId =
+    gameId;
+
+  room.state.dealtAt =
+    dealtAt;
 
   const gameLog = {
     gameId,
 
-    roomCode: room.code,
+    roomCode:
+      room.code,
 
-    status: 'ongoing',
+    status:
+      'ongoing',
 
     dealtAt,
 
-    dealtAtMinute: minuteIso(dealtAt),
+    dealtAtMinute:
+      minuteIso(
+        dealtAt
+      ),
 
-    trumpRank: room.state.trumpRank,
+    trumpRank:
+      room.state.trumpRank,
 
-    players: room.players.map((player, seatIndex) => ({
-      seatIndex,
+    players:
+      room.players.map(
+        (
+          player,
+          seatIndex
+        ) => ({
+          seatIndex,
 
-      playerId: player.id,
+          playerId:
+            player.id,
 
-      name: player.name,
+          name:
+            player.name,
 
-      team: player.team,
-    })),
+          team:
+            player.team,
+        })
+      ),
 
-    initialHands: room.state.hands.map((hand, seatIndex) => ({
-      seatIndex,
+    initialHands:
+      room.state.hands.map(
+        (
+          hand,
+          seatIndex
+        ) => ({
+          seatIndex,
 
-      playerId: room.players[seatIndex].id,
+          playerId:
+            room.players[
+              seatIndex
+            ].id,
 
-      cards: hand.map(serializeCard),
-    })),
+          cards:
+            hand.map(
+              serializeCard
+            ),
+        })
+      ),
 
     events: [],
 
@@ -274,75 +911,138 @@ function createGameLog(room) {
     finalHands: null,
   };
 
-  gameHistory.games.push(gameLog);
+  gameHistory.games.push(
+    gameLog
+  );
 
   saveHistory();
 
-  appendGameEvent(room, 'deal', {
-    dealtAt,
+  appendGameEvent(
+    room,
+    'deal',
+    {
+      dealtAt,
 
-    trumpRank: room.state.trumpRank,
+      trumpRank:
+        room.state
+          .trumpRank,
 
-    startingPlayerId: room.players[room.state.currentPlayerIndex].id,
-  });
+      startingPlayerId:
+        room.players[
+          room.state
+            .currentPlayerIndex
+        ].id,
+    }
+  );
 }
 
-function appendGameEvent(room, type, details = {}) {
-  if (!room.state.gameId) {
+function appendGameEvent(
+  room,
+  type,
+  details = {}
+) {
+  if (
+    !room.state.gameId
+  ) {
     return;
   }
 
-  const gameLog = getGameLog(room.state.gameId);
+  const gameLog =
+    getGameLog(
+      room.state.gameId
+    );
 
   if (!gameLog) {
     return;
   }
 
-  const timestamp = nowIso();
+  const timestamp =
+    nowIso();
 
   gameLog.events.push({
-    sequence: gameLog.events.length + 1,
+    sequence:
+      gameLog.events.length +
+      1,
 
     timestamp,
 
-    timestampMinute: minuteIso(timestamp),
+    timestampMinute:
+      minuteIso(
+        timestamp
+      ),
 
     type,
 
     ...details,
   });
 
-  gameLog.finishOrder = [...room.state.finishOrder];
+  gameLog.finishOrder =
+    [
+      ...room.state
+        .finishOrder,
+    ];
 
   saveHistory();
 }
 
-function finalizeGameLog(room, status, reason) {
-  if (!room.state.gameId) {
+function finalizeGameLog(
+  room,
+  status,
+  reason
+) {
+  if (
+    !room.state.gameId
+  ) {
     return;
   }
 
-  const gameLog = getGameLog(room.state.gameId);
+  const gameLog =
+    getGameLog(
+      room.state.gameId
+    );
 
-  if (!gameLog || gameLog.status !== 'ongoing') {
+  if (
+    !gameLog ||
+    gameLog.status !==
+      'ongoing'
+  ) {
     return;
   }
 
-  gameLog.status = status;
+  gameLog.status =
+    status;
 
-  gameLog.endedAt = nowIso();
+  gameLog.endedAt =
+    nowIso();
 
-  gameLog.endedReason = reason;
+  gameLog.endedReason =
+    reason;
 
-  gameLog.finishOrder = [...room.state.finishOrder];
+  gameLog.finishOrder =
+    [
+      ...room.state
+        .finishOrder,
+    ];
 
-  gameLog.finalHands = room.state.hands.map((hand, seatIndex) => ({
-    seatIndex,
+  gameLog.finalHands =
+    room.state.hands.map(
+      (
+        hand,
+        seatIndex
+      ) => ({
+        seatIndex,
 
-    playerId: room.players[seatIndex].id,
+        playerId:
+          room.players[
+            seatIndex
+          ].id,
 
-    cards: hand.map(serializeCard),
-  }));
+        cards:
+          hand.map(
+            serializeCard
+          ),
+      })
+    );
 
   saveHistory();
 }
@@ -351,19 +1051,33 @@ function finalizeGameLog(room, status, reason) {
    ROOM CREATION
    ========================================================= */
 
-function createEmptyRoom(roomCode, hostName, hostSocketId) {
+function createEmptyRoom(
+  roomCode,
+  hostName,
+  hostSocketId
+) {
   return {
-    code: roomCode,
+    code:
+      roomCode,
 
-    advanceTimer: null,
+    advanceTimer:
+      null,
 
     players: [
       {
         id: 1,
-        name: hostName || 'Player 1',
+
+        name:
+          hostName ||
+          'Player 1',
+
         team: 'A',
-        socketId: hostSocketId,
-        hasFinished: false,
+
+        socketId:
+          hostSocketId,
+
+        hasFinished:
+          false,
       },
 
       {
@@ -408,33 +1122,53 @@ function createEmptyRoom(roomCode, hostName, hostSocketId) {
     ],
 
     state: {
-      hands: [[], [], [], [], [], []],
+      hands: [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+      ],
 
-      currentPlayerIndex: 0,
+      currentPlayerIndex:
+        0,
 
-      trumpRank: '2',
+      trumpRank:
+        '2',
 
-      currentLead: null,
+      currentLead:
+        null,
 
-      lastSuccessfulPlayerIndex: null,
+      lastSuccessfulPlayerIndex:
+        null,
 
-      consecutivePasses: 0,
+      consecutivePasses:
+        0,
 
-      finishOrder: [],
+      finishOrder:
+        [],
 
-      hasStarted: false,
+      hasStarted:
+        false,
 
-      paused: false,
+      paused:
+        false,
 
-      phase: 'waiting',
+      phase:
+        'waiting',
 
-      turnLockedUntil: null,
+      turnLockedUntil:
+        null,
 
-      revision: 0,
+      revision:
+        0,
 
-      gameId: null,
+      gameId:
+        null,
 
-      dealtAt: null,
+      dealtAt:
+        null,
     },
   };
 }
@@ -443,783 +1177,1490 @@ function createEmptyRoom(roomCode, hostName, hostSocketId) {
    CLIENT-SAFE STATE
    ========================================================= */
 
-function buildClientRoomState(room, viewerSeatIndex) {
+function buildClientRoomState(
+  room,
+  viewerSeatIndex
+) {
   return {
-    code: room.code,
+    code:
+      room.code,
 
-    players: room.players.map((player) => ({
-      id: player.id,
+    players:
+      room.players.map(
+        (player) => ({
+          id:
+            player.id,
 
-      name: player.name,
+          name:
+            player.name,
 
-      team: player.team,
+          team:
+            player.team,
 
-      connected: Boolean(player.socketId),
+          connected:
+            Boolean(
+              player.socketId
+            ),
 
-      hasFinished: player.hasFinished,
-    })),
+          hasFinished:
+            player.hasFinished,
+        })
+      ),
 
     state: {
       /*
-        CRITICAL:
-
-        Only send the viewer's own
-        hand to that viewer.
+        Only the local player
+        receives their own hand.
       */
-      hands: room.state.hands.map((hand, index) =>
-        index === viewerSeatIndex ? hand : []
-      ),
+      hands:
+        room.state.hands.map(
+          (
+            hand,
+            index
+          ) =>
+            index ===
+            viewerSeatIndex
+              ? hand
+              : []
+        ),
 
-      currentPlayerIndex: room.state.currentPlayerIndex,
+      currentPlayerIndex:
+        room.state
+          .currentPlayerIndex,
 
-      trumpRank: room.state.trumpRank,
+      trumpRank:
+        room.state
+          .trumpRank,
 
-      currentLead: room.state.currentLead,
+      currentLead:
+        room.state
+          .currentLead,
 
-      lastSuccessfulPlayerIndex: room.state.lastSuccessfulPlayerIndex,
+      lastSuccessfulPlayerIndex:
+        room.state
+          .lastSuccessfulPlayerIndex,
 
-      consecutivePasses: room.state.consecutivePasses,
+      consecutivePasses:
+        room.state
+          .consecutivePasses,
 
-      finishOrder: [...room.state.finishOrder],
+      finishOrder:
+        [
+          ...room.state
+            .finishOrder,
+        ],
 
-      hasStarted: room.state.hasStarted,
+      hasStarted:
+        room.state
+          .hasStarted,
 
-      paused: room.state.paused,
+      paused:
+        room.state
+          .paused,
 
-      phase: room.state.phase,
+      phase:
+        room.state
+          .phase,
 
-      turnLockedUntil: room.state.turnLockedUntil,
+      turnLockedUntil:
+        room.state
+          .turnLockedUntil,
 
-      revision: room.state.revision,
+      revision:
+        room.state
+          .revision,
 
-      gameId: room.state.gameId,
+      gameId:
+        room.state
+          .gameId,
 
-      dealtAt: room.state.dealtAt,
+      dealtAt:
+        room.state
+          .dealtAt,
     },
   };
 }
 
-function emitRoomState(room, eventName = 'roomStateUpdate') {
-  room.players.forEach((player, seatIndex) => {
-    if (!player.socketId) {
-      return;
+function emitRoomState(
+  room,
+  eventName =
+    'roomStateUpdate'
+) {
+  room.players.forEach(
+    (
+      player,
+      seatIndex
+    ) => {
+      if (
+        !player.socketId
+      ) {
+        return;
+      }
+
+      const clientState =
+        buildClientRoomState(
+          room,
+          seatIndex
+        );
+
+      io
+        .to(
+          player.socketId
+        )
+        .emit(
+          eventName,
+          clientState
+        );
     }
-
-    const clientState = buildClientRoomState(room, seatIndex);
-
-    io.to(player.socketId).emit(eventName, clientState);
-  });
+  );
 }
 
 /* =========================================================
    DESTROY ROOM
    ========================================================= */
 
-function destroyRoom(room, reason) {
-  if (room.advanceTimer) {
-    clearTimeout(room.advanceTimer);
+function destroyRoom(
+  room,
+  reason
+) {
+  if (
+    room.advanceTimer
+  ) {
+    clearTimeout(
+      room.advanceTimer
+    );
 
-    room.advanceTimer = null;
+    room.advanceTimer =
+      null;
   }
 
-  if (room.state.gameId) {
-    appendGameEvent(room, 'room_closed', {
-      reason,
-    });
+  if (
+    room.state.gameId
+  ) {
+    appendGameEvent(
+      room,
+      'room_closed',
+      {
+        reason,
+      }
+    );
 
-    finalizeGameLog(room, 'aborted', reason);
+    finalizeGameLog(
+      room,
+      'aborted',
+      reason
+    );
   }
 
-  io.to(room.code).emit('roomClosed', {
-    reason,
-  });
+  io
+    .to(
+      room.code
+    )
+    .emit(
+      'roomClosed',
+      {
+        reason,
+      }
+    );
 
-  io.in(room.code).socketsLeave(room.code);
+  io
+    .in(
+      room.code
+    )
+    .socketsLeave(
+      room.code
+    );
 
-  rooms.delete(room.code);
+  rooms.delete(
+    room.code
+  );
 }
 
 /* =========================================================
-   PLAY DELAY / ADVANCE
+   TWO-SECOND PLAY DISPLAY
    ========================================================= */
 
-function scheduleAdvanceAfterPlay(room, playerSeatIndex) {
-  if (room.advanceTimer) {
-    clearTimeout(room.advanceTimer);
+function scheduleAdvanceAfterPlay(
+  room,
+  playerSeatIndex
+) {
+  if (
+    room.advanceTimer
+  ) {
+    clearTimeout(
+      room.advanceTimer
+    );
   }
 
-  const gameId = room.state.gameId;
+  const gameId =
+    room.state.gameId;
 
-  room.advanceTimer = setTimeout(() => {
-    const currentRoom = rooms.get(room.code);
+  room.advanceTimer =
+    setTimeout(
+      () => {
+        const currentRoom =
+          rooms.get(
+            room.code
+          );
 
-    if (!currentRoom || currentRoom.state.gameId !== gameId) {
-      return;
-    }
+        if (
+          !currentRoom ||
+          currentRoom.state
+            .gameId !==
+            gameId
+        ) {
+          return;
+        }
 
-    currentRoom.advanceTimer = null;
+        currentRoom.advanceTimer =
+          null;
 
-    currentRoom.state.turnLockedUntil = null;
+        currentRoom.state
+          .turnLockedUntil =
+          null;
 
-    /*
-          If only one active player
-          remains, finish the game.
-        */
-    if (getActivePlayerCount(currentRoom) <= 1) {
-      currentRoom.state.hasStarted = false;
+        if (
+          getActivePlayerCount(
+            currentRoom
+          ) <= 1
+        ) {
+          currentRoom.state
+            .hasStarted =
+            false;
 
-      currentRoom.state.phase = 'finished';
+          currentRoom.state
+            .phase =
+            'finished';
 
-      appendGameEvent(currentRoom, 'game_finished', {
-        reason: 'one_player_remaining',
-      });
+          appendGameEvent(
+            currentRoom,
+            'game_finished',
+            {
+              reason:
+                'one_player_remaining',
+            }
+          );
 
-      finalizeGameLog(currentRoom, 'completed', 'one_player_remaining');
+          finalizeGameLog(
+            currentRoom,
+            'completed',
+            'one_player_remaining'
+          );
 
-      touchRoom(currentRoom);
+          touchRoom(
+            currentRoom
+          );
 
-      emitRoomState(currentRoom, 'gameStateUpdate');
+          emitRoomState(
+            currentRoom,
+            'gameStateUpdate'
+          );
 
-      io.to(currentRoom.code).emit('toast', 'Game finished.');
+          io
+            .to(
+              currentRoom.code
+            )
+            .emit(
+              'toast',
+              'Game finished.'
+            );
 
-      return;
-    }
+          return;
+        }
 
-    const nextPlayerIndex = findNextActivePlayerIndex(
-      currentRoom,
-      playerSeatIndex
+        const nextPlayerIndex =
+          findNextActivePlayerIndex(
+            currentRoom,
+            playerSeatIndex
+          );
+
+        if (
+          nextPlayerIndex ===
+          null
+        ) {
+          currentRoom.state
+            .hasStarted =
+            false;
+
+          currentRoom.state
+            .phase =
+            'finished';
+
+          finalizeGameLog(
+            currentRoom,
+            'completed',
+            'no_active_next_player'
+          );
+
+          touchRoom(
+            currentRoom
+          );
+
+          emitRoomState(
+            currentRoom,
+            'gameStateUpdate'
+          );
+
+          return;
+        }
+
+        currentRoom.state
+          .currentPlayerIndex =
+          nextPlayerIndex;
+
+        currentRoom.state
+          .phase =
+          'turn';
+
+        appendGameEvent(
+          currentRoom,
+          'turn_advance',
+          {
+            fromPlayerId:
+              currentRoom
+                .players[
+                  playerSeatIndex
+                ].id,
+
+            toPlayerId:
+              currentRoom
+                .players[
+                  nextPlayerIndex
+                ].id,
+          }
+        );
+
+        touchRoom(
+          currentRoom
+        );
+
+        emitRoomState(
+          currentRoom,
+          'gameStateUpdate'
+        );
+      },
+
+      2000
     );
-
-    if (nextPlayerIndex === null) {
-      currentRoom.state.hasStarted = false;
-
-      currentRoom.state.phase = 'finished';
-
-      finalizeGameLog(currentRoom, 'completed', 'no_active_next_player');
-
-      touchRoom(currentRoom);
-
-      emitRoomState(currentRoom, 'gameStateUpdate');
-
-      return;
-    }
-
-    currentRoom.state.currentPlayerIndex = nextPlayerIndex;
-
-    currentRoom.state.phase = 'turn';
-
-    appendGameEvent(currentRoom, 'turn_advance', {
-      fromPlayerId: currentRoom.players[playerSeatIndex].id,
-
-      toPlayerId: currentRoom.players[nextPlayerIndex].id,
-    });
-
-    touchRoom(currentRoom);
-
-    emitRoomState(currentRoom, 'gameStateUpdate');
-  }, 2000);
 }
 
 /* =========================================================
    SOCKET CONNECTION
    ========================================================= */
 
-io.on('connection', (socket) => {
-  let currentRoomCode = null;
+io.on(
+  'connection',
+  (socket) => {
+    let currentRoomCode =
+      null;
 
-  let playerSeatIndex = null;
+    let playerSeatIndex =
+      null;
 
-  /* =====================================================
+    /* =====================================================
        CREATE ROOM
        ===================================================== */
 
-  socket.on('createRoom', ({ name } = {}, callback = () => {}) => {
-    const roomCode = generateRoomCode();
+    socket.on(
+      'createRoom',
 
-    const cleanName = typeof name === 'string' ? name.trim().slice(0, 24) : '';
+      (
+        { name } = {},
 
-    const room = createEmptyRoom(roomCode, cleanName, socket.id);
+        callback =
+          () => {}
+      ) => {
+        const roomCode =
+          generateRoomCode();
 
-    rooms.set(roomCode, room);
+        const cleanName =
+          typeof name ===
+          'string'
+            ? name
+                .trim()
+                .slice(
+                  0,
+                  24
+                )
+            : '';
 
-    currentRoomCode = roomCode;
+        const room =
+          createEmptyRoom(
+            roomCode,
+            cleanName,
+            socket.id
+          );
 
-    playerSeatIndex = 0;
+        rooms.set(
+          roomCode,
+          room
+        );
 
-    socket.join(roomCode);
+        currentRoomCode =
+          roomCode;
 
-    touchRoom(room);
+        playerSeatIndex =
+          0;
 
-    callback({
-      success: true,
-      roomCode,
-      seatIndex: 0,
-    });
+        socket.join(
+          roomCode
+        );
 
-    emitRoomState(room);
-  });
+        touchRoom(
+          room
+        );
 
-  /* =====================================================
-       JOIN / REJOIN ROOM
+        callback({
+          success:
+            true,
+
+          roomCode,
+
+          seatIndex:
+            0,
+        });
+
+        emitRoomState(
+          room
+        );
+      }
+    );
+
+    /* =====================================================
+       JOIN ROOM
        ===================================================== */
 
-  socket.on(
-    'joinRoom',
-    ({ roomCode, seatIndex, name } = {}, callback = () => {}) => {
-      const code = String(roomCode ?? '')
-        .trim()
-        .toUpperCase();
+    socket.on(
+      'joinRoom',
 
-      const parsedSeatIndex = Number(seatIndex);
+      (
+        {
+          roomCode,
+          seatIndex,
+          name,
+        } = {},
 
-      const room = rooms.get(code);
+        callback =
+          () => {}
+      ) => {
+        const code =
+          String(
+            roomCode ??
+            ''
+          )
+            .trim()
+            .toUpperCase();
 
-      if (!room) {
+        const parsedSeatIndex =
+          Number(
+            seatIndex
+          );
+
+        const room =
+          rooms.get(
+            code
+          );
+
+        if (!room) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Room not found.',
+          });
+
+          return;
+        }
+
+        if (
+          !Number
+            .isInteger(
+              parsedSeatIndex
+            ) ||
+          parsedSeatIndex <
+            1 ||
+          parsedSeatIndex >
+            5
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Choose Player 2 to Player 6.',
+          });
+
+          return;
+        }
+
+        const seat =
+          room.players[
+            parsedSeatIndex
+          ];
+
+        if (
+          seat.socketId
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'That seat is already occupied.',
+          });
+
+          return;
+        }
+
+        const cleanName =
+          typeof name ===
+          'string'
+            ? name
+                .trim()
+                .slice(
+                  0,
+                  24
+                )
+            : '';
+
+        if (cleanName) {
+          seat.name =
+            cleanName;
+        } else if (
+          seat.name ===
+          'Empty'
+        ) {
+          seat.name =
+            `Player ${
+              parsedSeatIndex +
+              1
+            }`;
+        }
+
+        seat.socketId =
+          socket.id;
+
+        currentRoomCode =
+          code;
+
+        playerSeatIndex =
+          parsedSeatIndex;
+
+        socket.join(
+          code
+        );
+
+        if (
+          room.state
+            .hasStarted &&
+          getConnectedPlayerCount(
+            room
+          ) === 6
+        ) {
+          room.state.paused =
+            false;
+
+          appendGameEvent(
+            room,
+            'game_resumed',
+            {
+              rejoinedPlayerId:
+                seat.id,
+            }
+          );
+        } else if (
+          room.state
+            .gameId
+        ) {
+          appendGameEvent(
+            room,
+            'player_rejoined',
+            {
+              playerId:
+                seat.id,
+            }
+          );
+        }
+
+        touchRoom(
+          room
+        );
+
         callback({
-          success: false,
-          message: 'Room not found.',
+          success:
+            true,
+
+          roomCode:
+            code,
+
+          seatIndex:
+            parsedSeatIndex,
         });
 
-        return;
+        emitRoomState(
+          room
+        );
       }
+    );
 
-      if (
-        !Number.isInteger(parsedSeatIndex) ||
-        parsedSeatIndex < 1 ||
-        parsedSeatIndex > 5
-      ) {
-        callback({
-          success: false,
-          message: 'Choose Player 2 to Player 6.',
-        });
-
-        return;
-      }
-
-      const seat = room.players[parsedSeatIndex];
-
-      if (seat.socketId) {
-        callback({
-          success: false,
-          message: 'That seat is already occupied.',
-        });
-
-        return;
-      }
-
-      const cleanName =
-        typeof name === 'string' ? name.trim().slice(0, 24) : '';
-
-      /*
-          If this is a reconnect,
-          preserve the old name
-          unless a new one is supplied.
-        */
-      if (cleanName) {
-        seat.name = cleanName;
-      } else if (seat.name === 'Empty') {
-        seat.name = `Player ${parsedSeatIndex + 1}`;
-      }
-
-      seat.socketId = socket.id;
-
-      currentRoomCode = code;
-
-      playerSeatIndex = parsedSeatIndex;
-
-      socket.join(code);
-
-      /*
-          Resume if all six players
-          are connected again.
-        */
-      if (room.state.hasStarted && getConnectedPlayerCount(room) === 6) {
-        room.state.paused = false;
-
-        appendGameEvent(room, 'game_resumed', {
-          rejoinedPlayerId: seat.id,
-        });
-      } else if (room.state.gameId) {
-        appendGameEvent(room, 'player_rejoined', {
-          playerId: seat.id,
-        });
-      }
-
-      touchRoom(room);
-
-      callback({
-        success: true,
-        roomCode: code,
-        seatIndex: parsedSeatIndex,
-      });
-
-      emitRoomState(room);
-    }
-  );
-
-  /* =====================================================
+    /* =====================================================
        DEAL
        ===================================================== */
 
-  socket.on('dealCards', (callback = () => {}) => {
-    if (!currentRoomCode || playerSeatIndex !== 0) {
-      callback({
-        success: false,
-        message: 'Only Player 1 can deal.',
-      });
+    socket.on(
+      'dealCards',
 
-      return;
-    }
+      (
+        callback =
+          () => {}
+      ) => {
+        if (
+          !currentRoomCode ||
+          playerSeatIndex !==
+            0
+        ) {
+          callback({
+            success:
+              false,
 
-    const room = rooms.get(currentRoomCode);
+            message:
+              'Only Player 1 can deal.',
+          });
 
-    if (!room) {
-      callback({
-        success: false,
-        message: 'Room not found.',
-      });
+          return;
+        }
 
-      return;
-    }
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
 
-    if (getConnectedPlayerCount(room) !== 6) {
-      callback({
-        success: false,
-        message: 'All 6 players must be connected before dealing.',
-      });
+        if (!room) {
+          callback({
+            success:
+              false,
 
-      return;
-    }
+            message:
+              'Room not found.',
+          });
 
-    /*
-          If host redeals during an
-          existing game, preserve the
-          previous game in history.
-        */
-    if (room.state.gameId && room.state.hasStarted) {
-      appendGameEvent(room, 'game_aborted', {
-        reason: 'host_redeal',
-      });
+          return;
+        }
 
-      finalizeGameLog(room, 'aborted', 'host_redeal');
-    }
+        if (
+          getConnectedPlayerCount(
+            room
+          ) !== 6
+        ) {
+          callback({
+            success:
+              false,
 
-    if (room.advanceTimer) {
-      clearTimeout(room.advanceTimer);
+            message:
+              'All 6 players must be connected before dealing.',
+          });
 
-      room.advanceTimer = null;
-    }
+          return;
+        }
 
-    const newDeal = createNewDeal();
+        if (
+          room.state
+            .gameId &&
+          room.state
+            .hasStarted
+        ) {
+          appendGameEvent(
+            room,
+            'game_aborted',
+            {
+              reason:
+                'host_redeal',
+            }
+          );
 
-    room.state.hands = newDeal.hands.map((hand) => sortCards(hand));
+          finalizeGameLog(
+            room,
+            'aborted',
+            'host_redeal'
+          );
+        }
 
-    room.state.currentPlayerIndex = 0;
+        if (
+          room.advanceTimer
+        ) {
+          clearTimeout(
+            room.advanceTimer
+          );
 
-    room.state.currentLead = null;
+          room.advanceTimer =
+            null;
+        }
 
-    room.state.lastSuccessfulPlayerIndex = null;
+        const newDeal =
+          createNewDeal();
 
-    room.state.consecutivePasses = 0;
+        room.state.hands =
+          newDeal.hands.map(
+            (hand) =>
+              sortCards(
+                hand
+              )
+          );
 
-    room.state.finishOrder = [];
+        room.state
+          .currentPlayerIndex =
+          0;
 
-    room.state.hasStarted = true;
+        room.state
+          .currentLead =
+          null;
 
-    room.state.paused = false;
+        room.state
+          .lastSuccessfulPlayerIndex =
+          null;
 
-    room.state.phase = 'turn';
+        room.state
+          .consecutivePasses =
+          0;
 
-    room.state.turnLockedUntil = null;
+        room.state
+          .finishOrder =
+          [];
 
-    room.players.forEach((player) => {
-      player.hasFinished = false;
-    });
+        room.state
+          .hasStarted =
+          true;
 
-    createGameLog(room);
+        room.state
+          .paused =
+          false;
 
-    touchRoom(room);
+        room.state
+          .phase =
+          'turn';
 
-    callback({
-      success: true,
-      gameId: room.state.gameId,
-      dealtAt: room.state.dealtAt,
-    });
+        room.state
+          .turnLockedUntil =
+          null;
 
-    emitRoomState(room, 'gameStateUpdate');
-  });
+        room.players.forEach(
+          (player) => {
+            player.hasFinished =
+              false;
+          }
+        );
 
-  /* =====================================================
+        createGameLog(
+          room
+        );
+
+        touchRoom(
+          room
+        );
+
+        callback({
+          success:
+            true,
+
+          gameId:
+            room.state
+              .gameId,
+
+          dealtAt:
+            room.state
+              .dealtAt,
+        });
+
+        emitRoomState(
+          room,
+          'gameStateUpdate'
+        );
+      }
+    );
+
+    /* =====================================================
        PLAY CARDS
        ===================================================== */
 
-  socket.on('playCards', ({ cardIds } = {}, callback = () => {}) => {
-    const room = rooms.get(currentRoomCode);
+    socket.on(
+      'playCards',
 
-    if (!room || !room.state.hasStarted) {
-      callback({
-        success: false,
-        message: 'No active game.',
-      });
+      (
+        {
+          cardIds,
+        } = {},
 
-      return;
-    }
+        callback =
+          () => {}
+      ) => {
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
 
-    if (room.state.paused) {
-      callback({
-        success: false,
-        message: 'Game is paused because a player is disconnected.',
-      });
+        if (
+          !room ||
+          !room.state
+            .hasStarted
+        ) {
+          callback({
+            success:
+              false,
 
-      return;
-    }
+            message:
+              'No active game.',
+          });
 
-    if (room.state.phase !== 'turn') {
-      callback({
-        success: false,
-        message: 'Wait for the current play to finish displaying.',
-      });
+          return;
+        }
 
-      return;
-    }
+        if (
+          room.state.paused
+        ) {
+          callback({
+            success:
+              false,
 
-    if (room.state.currentPlayerIndex !== playerSeatIndex) {
-      callback({
-        success: false,
-        message: "It's not your turn.",
-      });
+            message:
+              'Game is paused because a player is disconnected.',
+          });
 
-      return;
-    }
+          return;
+        }
 
-    if (!Array.isArray(cardIds) || cardIds.length === 0) {
-      callback({
-        success: false,
-        message: 'Select at least one card.',
-      });
+        if (
+          room.state.phase !==
+          'turn'
+        ) {
+          callback({
+            success:
+              false,
 
-      return;
-    }
+            message:
+              'Wait for the current play to finish displaying.',
+          });
 
-    const uniqueCardIds = [...new Set(cardIds)];
+          return;
+        }
 
-    const currentHand = room.state.hands[playerSeatIndex];
+        if (
+          room.state
+            .currentPlayerIndex !==
+          playerSeatIndex
+        ) {
+          callback({
+            success:
+              false,
 
-    const selectedCards = currentHand.filter((card) =>
-      uniqueCardIds.includes(card.id)
-    );
+            message:
+              "It's not your turn.",
+          });
 
-    if (selectedCards.length !== uniqueCardIds.length) {
-      callback({
-        success: false,
-        message: 'One or more selected cards are not in your hand.',
-      });
+          return;
+        }
 
-      return;
-    }
+        if (
+          !Array.isArray(
+            cardIds
+          ) ||
+          cardIds.length ===
+            0
+        ) {
+          callback({
+            success:
+              false,
 
-    const validation = validatePlay(
-      selectedCards,
-      room.state.trumpRank,
-      room.state.currentLead?.combination ?? null
-    );
+            message:
+              'Select at least one card.',
+          });
 
-    if (!validation.valid) {
-      callback({
-        success: false,
-        message: validation.reason,
-      });
+          return;
+        }
 
-      return;
-    }
+        const uniqueCardIds =
+          [
+            ...new Set(
+              cardIds
+            ),
+          ];
 
-    const handCountBefore = currentHand.length;
+        const currentHand =
+          room.state.hands[
+            playerSeatIndex
+          ];
 
-    room.state.hands[playerSeatIndex] = currentHand.filter(
-      (card) => !uniqueCardIds.includes(card.id)
-    );
+        const selectedCards =
+          currentHand.filter(
+            (card) =>
+              uniqueCardIds
+                .includes(
+                  card.id
+                )
+          );
 
-    const handCountAfter = room.state.hands[playerSeatIndex].length;
+        if (
+          selectedCards.length !==
+          uniqueCardIds.length
+        ) {
+          callback({
+            success:
+              false,
 
-    room.state.currentLead = {
-      playerIndex: playerSeatIndex,
+            message:
+              'One or more selected cards are not in your hand.',
+          });
 
-      combination: validation.combination,
+          return;
+        }
 
-      cards: selectedCards,
-    };
+        const validation =
+          validatePlay(
+            selectedCards,
 
-    room.state.lastSuccessfulPlayerIndex = playerSeatIndex;
+            room.state
+              .trumpRank,
 
-    room.state.consecutivePasses = 0;
+            room.state
+              .currentLead
+              ?.combination ??
+              null
+          );
 
-    let finished = false;
+        if (
+          !validation.valid
+        ) {
+          callback({
+            success:
+              false,
 
-    if (handCountAfter === 0) {
-      finished = true;
+            message:
+              validation.reason,
+          });
 
-      room.players[playerSeatIndex].hasFinished = true;
+          return;
+        }
 
-      const playerId = room.players[playerSeatIndex].id;
+        const handCountBefore =
+          currentHand.length;
 
-      if (!room.state.finishOrder.includes(playerId)) {
-        room.state.finishOrder.push(playerId);
+        room.state.hands[
+          playerSeatIndex
+        ] =
+          currentHand.filter(
+            (card) =>
+              !uniqueCardIds
+                .includes(
+                  card.id
+                )
+          );
+
+        const handCountAfter =
+          room.state.hands[
+            playerSeatIndex
+          ].length;
+
+        room.state.currentLead =
+          {
+            playerIndex:
+              playerSeatIndex,
+
+            combination:
+              validation
+                .combination,
+
+            cards:
+              selectedCards,
+          };
+
+        room.state
+          .lastSuccessfulPlayerIndex =
+          playerSeatIndex;
+
+        room.state
+          .consecutivePasses =
+          0;
+
+        let finished =
+          false;
+
+        if (
+          handCountAfter ===
+          0
+        ) {
+          finished =
+            true;
+
+          room.players[
+            playerSeatIndex
+          ].hasFinished =
+            true;
+
+          const playerId =
+            room.players[
+              playerSeatIndex
+            ].id;
+
+          if (
+            !room.state
+              .finishOrder
+              .includes(
+                playerId
+              )
+          ) {
+            room.state
+              .finishOrder
+              .push(
+                playerId
+              );
+          }
+        }
+
+        room.state.phase =
+          'showing-play';
+
+        room.state
+          .turnLockedUntil =
+          Date.now() +
+          2000;
+
+        appendGameEvent(
+          room,
+          'play',
+          {
+            playerId:
+              room.players[
+                playerSeatIndex
+              ].id,
+
+            seatIndex:
+              playerSeatIndex,
+
+            team:
+              room.players[
+                playerSeatIndex
+              ].team,
+
+            cards:
+              selectedCards.map(
+                serializeCard
+              ),
+
+            combination:
+              serializeCombination(
+                validation
+                  .combination
+              ),
+
+            handCountBefore,
+
+            handCountAfter,
+
+            finished,
+
+            currentFinishOrder:
+              [
+                ...room.state
+                  .finishOrder,
+              ],
+          }
+        );
+
+        touchRoom(
+          room
+        );
+
+        callback({
+          success:
+            true,
+        });
+
+        emitRoomState(
+          room,
+          'gameStateUpdate'
+        );
+
+        scheduleAdvanceAfterPlay(
+          room,
+          playerSeatIndex
+        );
       }
-    }
+    );
 
-    /*
-          Two-second synchronized
-          display period.
-        */
-    room.state.phase = 'showing-play';
-
-    room.state.turnLockedUntil = Date.now() + 2000;
-
-    appendGameEvent(room, 'play', {
-      playerId: room.players[playerSeatIndex].id,
-
-      seatIndex: playerSeatIndex,
-
-      team: room.players[playerSeatIndex].team,
-
-      cards: selectedCards.map(serializeCard),
-
-      combination: serializeCombination(validation.combination),
-
-      handCountBefore,
-
-      handCountAfter,
-
-      finished,
-
-      currentFinishOrder: [...room.state.finishOrder],
-    });
-
-    touchRoom(room);
-
-    callback({
-      success: true,
-    });
-
-    /*
-          Everyone sees the cards
-          immediately.
-        */
-    emitRoomState(room, 'gameStateUpdate');
-
-    /*
-          Server — not the browsers —
-          advances the turn after 2s.
-        */
-    scheduleAdvanceAfterPlay(room, playerSeatIndex);
-  });
-
-  /* =====================================================
+    /* =====================================================
        PASS
        ===================================================== */
 
-  socket.on('passTurn', (callback = () => {}) => {
-    const room = rooms.get(currentRoomCode);
+    socket.on(
+      'passTurn',
 
-    if (!room || !room.state.hasStarted) {
-      callback({
-        success: false,
-        message: 'No active game.',
-      });
+      (
+        callback =
+          () => {}
+      ) => {
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
 
-      return;
-    }
+        if (
+          !room ||
+          !room.state
+            .hasStarted
+        ) {
+          callback({
+            success:
+              false,
 
-    if (room.state.paused) {
-      callback({
-        success: false,
-        message: 'Game is paused because a player is disconnected.',
-      });
+            message:
+              'No active game.',
+          });
 
-      return;
-    }
+          return;
+        }
 
-    if (room.state.phase !== 'turn') {
-      callback({
-        success: false,
-        message: 'Wait for the current play to finish displaying.',
-      });
+        if (
+          room.state.paused
+        ) {
+          callback({
+            success:
+              false,
 
-      return;
-    }
+            message:
+              'Game is paused because a player is disconnected.',
+          });
 
-    if (room.state.currentPlayerIndex !== playerSeatIndex) {
-      callback({
-        success: false,
-        message: "It's not your turn.",
-      });
+          return;
+        }
 
-      return;
-    }
+        if (
+          room.state.phase !==
+          'turn'
+        ) {
+          callback({
+            success:
+              false,
 
-    if (!room.state.currentLead) {
-      callback({
-        success: false,
-        message: 'The leading player cannot pass.',
-      });
+            message:
+              'Wait for the current play to finish displaying.',
+          });
 
-      return;
-    }
+          return;
+        }
 
-    const leadBeforePass = {
-      playerIndex: room.state.currentLead.playerIndex,
+        if (
+          room.state
+            .currentPlayerIndex !==
+          playerSeatIndex
+        ) {
+          callback({
+            success:
+              false,
 
-      combination: serializeCombination(room.state.currentLead.combination),
+            message:
+              "It's not your turn.",
+          });
 
-      cards: room.state.currentLead.cards.map(serializeCard),
-    };
+          return;
+        }
 
-    room.state.consecutivePasses += 1;
+        if (
+          !room.state
+            .currentLead
+        ) {
+          callback({
+            success:
+              false,
 
-    const passesNeeded = getPassesNeeded(room);
+            message:
+              'The leading player cannot pass.',
+          });
 
-    let trickEnded = false;
+          return;
+        }
 
-    let nextPlayerIndex = null;
+        const leadBeforePass =
+          {
+            playerIndex:
+              room.state
+                .currentLead
+                .playerIndex,
 
-    if (room.state.consecutivePasses >= passesNeeded) {
-      trickEnded = true;
+            combination:
+              serializeCombination(
+                room.state
+                  .currentLead
+                  .combination
+              ),
 
-      const previousLeader = room.state.lastSuccessfulPlayerIndex;
+            cards:
+              room.state
+                .currentLead
+                .cards
+                .map(
+                  serializeCard
+                ),
+          };
 
-      room.state.currentLead = null;
+        room.state
+          .consecutivePasses +=
+          1;
 
-      room.state.consecutivePasses = 0;
+        const passesNeeded =
+          getPassesNeeded(
+            room
+          );
 
-      if (
-        previousLeader !== null &&
-        room.players[previousLeader].socketId &&
-        !room.players[previousLeader].hasFinished
-      ) {
-        nextPlayerIndex = previousLeader;
-      } else {
-        nextPlayerIndex = findNextActivePlayerIndex(
+        let trickEnded =
+          false;
+
+        let nextPlayerIndex =
+          null;
+
+        if (
+          room.state
+            .consecutivePasses >=
+          passesNeeded
+        ) {
+          trickEnded =
+            true;
+
+          const previousLeader =
+            room.state
+              .lastSuccessfulPlayerIndex;
+
+          room.state
+            .currentLead =
+            null;
+
+          room.state
+            .consecutivePasses =
+            0;
+
+          if (
+            previousLeader !==
+              null &&
+            room.players[
+              previousLeader
+            ].socketId &&
+            !room.players[
+              previousLeader
+            ].hasFinished
+          ) {
+            nextPlayerIndex =
+              previousLeader;
+          } else {
+            nextPlayerIndex =
+              findNextActivePlayerIndex(
+                room,
+
+                previousLeader ??
+                  playerSeatIndex
+              );
+          }
+        } else {
+          nextPlayerIndex =
+            findNextActivePlayerIndex(
+              room,
+              playerSeatIndex
+            );
+        }
+
+        if (
+          nextPlayerIndex ===
+          null
+        ) {
+          room.state
+            .hasStarted =
+            false;
+
+          room.state.phase =
+            'finished';
+        } else {
+          room.state
+            .currentPlayerIndex =
+            nextPlayerIndex;
+
+          room.state.phase =
+            'turn';
+        }
+
+        appendGameEvent(
           room,
-          previousLeader ?? playerSeatIndex
+          'pass',
+          {
+            playerId:
+              room.players[
+                playerSeatIndex
+              ].id,
+
+            seatIndex:
+              playerSeatIndex,
+
+            passSource:
+              'manual',
+
+            leadAtPass:
+              leadBeforePass,
+
+            trickEnded,
+
+            nextPlayerId:
+              nextPlayerIndex ===
+              null
+                ? null
+                : room.players[
+                    nextPlayerIndex
+                  ].id,
+          }
+        );
+
+        if (
+          !room.state
+            .hasStarted
+        ) {
+          finalizeGameLog(
+            room,
+            'completed',
+            'no_active_next_player'
+          );
+        }
+
+        touchRoom(
+          room
+        );
+
+        callback({
+          success:
+            true,
+        });
+
+        emitRoomState(
+          room,
+          'gameStateUpdate'
         );
       }
-    } else {
-      nextPlayerIndex = findNextActivePlayerIndex(room, playerSeatIndex);
-    }
+    );
 
-    if (nextPlayerIndex === null) {
-      room.state.hasStarted = false;
-
-      room.state.phase = 'finished';
-    } else {
-      room.state.currentPlayerIndex = nextPlayerIndex;
-
-      room.state.phase = 'turn';
-    }
-
-    appendGameEvent(room, 'pass', {
-      playerId: room.players[playerSeatIndex].id,
-
-      seatIndex: playerSeatIndex,
-
-      /*
-              We only know that the
-              browser/user manually
-              pressed Pass.
-
-              We deliberately do NOT
-              claim forced/voluntary
-              until the legal-response
-              generator exists.
-            */
-      passSource: 'manual',
-
-      leadAtPass: leadBeforePass,
-
-      trickEnded,
-
-      nextPlayerId:
-        nextPlayerIndex === null ? null : room.players[nextPlayerIndex].id,
-    });
-
-    if (!room.state.hasStarted) {
-      finalizeGameLog(room, 'completed', 'no_active_next_player');
-    }
-
-    touchRoom(room);
-
-    callback({
-      success: true,
-    });
-
-    emitRoomState(room, 'gameStateUpdate');
-  });
-
-  /* =====================================================
+    /* =====================================================
        DISCONNECT
        ===================================================== */
 
-  socket.on('disconnect', () => {
-    if (!currentRoomCode || playerSeatIndex === null) {
-      return;
-    }
+    socket.on(
+      'disconnect',
 
-    const room = rooms.get(currentRoomCode);
+      () => {
+        if (
+          !currentRoomCode ||
+          playerSeatIndex ===
+            null
+        ) {
+          return;
+        }
 
-    if (!room) {
-      return;
-    }
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
 
-    /*
-          PLAYER 1 IS HOST.
+        if (!room) {
+          return;
+        }
 
-          Host closes tab/window,
-          room immediately disappears.
+        /*
+          HOST LEFT:
+          destroy whole room.
         */
-    if (playerSeatIndex === 0) {
-      destroyRoom(room, 'host_disconnected');
+        if (
+          playerSeatIndex ===
+          0
+        ) {
+          destroyRoom(
+            room,
+            'host_disconnected'
+          );
 
-      return;
-    }
+          return;
+        }
 
-    const player = room.players[playerSeatIndex];
+        const player =
+          room.players[
+            playerSeatIndex
+          ];
 
-    player.socketId = null;
+        player.socketId =
+          null;
 
-    /*
-          Preserve their name and hand
-          so they can rejoin the same
-          seat later.
-        */
-    if (room.state.hasStarted) {
-      room.state.paused = true;
+        if (
+          room.state
+            .hasStarted
+        ) {
+          room.state.paused =
+            true;
 
-      appendGameEvent(room, 'player_disconnected', {
-        playerId: player.id,
+          appendGameEvent(
+            room,
+            'player_disconnected',
+            {
+              playerId:
+                player.id,
 
-        seatIndex: playerSeatIndex,
-      });
+              seatIndex:
+                playerSeatIndex,
+            }
+          );
 
-      io.to(room.code).emit(
-        'toast',
-        `${player.name} disconnected. Game paused.`
-      );
-    }
+          io
+            .to(
+              room.code
+            )
+            .emit(
+              'toast',
 
-    touchRoom(room);
+              `${player.name} disconnected. Game paused.`
+            );
+        }
 
-    emitRoomState(room);
-  });
-});
+        touchRoom(
+          room
+        );
+
+        emitRoomState(
+          room
+        );
+      }
+    );
+  }
+);
 
 /* =========================================================
    START SERVER
    ========================================================= */
 
-const PORT = Number(process.env.PORT) || 3000;
+await initializeHistory();
 
-httpServer.listen(PORT, '0.0.0.0', () => {
-  console.log(`Daguai Luzi server running on port ${PORT}`);
+const PORT =
+  Number(
+    process.env.PORT
+  ) || 3000;
 
-  console.log(`Game history: ${historyFile}`);
-});
+httpServer.listen(
+  PORT,
+  '0.0.0.0',
+
+  () => {
+    console.log(
+      `Daguai Luzi server running on port ${PORT}`
+    );
+
+    console.log(
+      `Local game history: ${historyFile}`
+    );
+
+    console.log(
+      githubSyncEnabled
+        ? `GitHub history sync enabled: ${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_HISTORY_PATH}`
+        : 'GitHub history sync is disabled.'
+    );
+  }
+);
