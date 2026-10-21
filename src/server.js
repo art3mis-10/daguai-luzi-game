@@ -13,6 +13,7 @@ import { Server } from 'socket.io';
 
 import {
   createNewDeal,
+  createThreeDecks,
   sortCards,
 } from './game/deck.js';
 
@@ -86,7 +87,7 @@ const githubSyncEnabled =
   );
 
 /* =========================================================
-   LOCAL DATA FILE
+   LOCAL HISTORY
    ========================================================= */
 
 if (!existsSync(dataDir)) {
@@ -100,10 +101,8 @@ if (!existsSync(dataDir)) {
 
 function createEmptyHistory() {
   return {
-    schemaVersion: 1,
-
+    schemaVersion: 2,
     lastUpdatedAt: null,
-
     games: [],
   };
 }
@@ -161,14 +160,22 @@ function writeLocalHistory(
    GITHUB API
    ========================================================= */
 
-function getGitHubApiUrl() {
+function getGitHubReadUrl() {
   return (
     `https://api.github.com/repos/` +
     `${encodeURIComponent(GITHUB_OWNER)}/` +
     `${encodeURIComponent(GITHUB_REPO)}/` +
-    `contents/` +
-    `${GITHUB_HISTORY_PATH}` +
+    `contents/${GITHUB_HISTORY_PATH}` +
     `?ref=${encodeURIComponent(GITHUB_BRANCH)}`
+  );
+}
+
+function getGitHubWriteUrl() {
+  return (
+    `https://api.github.com/repos/` +
+    `${encodeURIComponent(GITHUB_OWNER)}/` +
+    `${encodeURIComponent(GITHUB_REPO)}/` +
+    `contents/${GITHUB_HISTORY_PATH}`
   );
 }
 
@@ -196,7 +203,7 @@ async function readHistoryFromGitHub() {
   try {
     const response =
       await fetch(
-        getGitHubApiUrl(),
+        getGitHubReadUrl(),
         {
           headers:
             getGitHubHeaders(),
@@ -220,19 +227,13 @@ async function readHistoryFromGitHub() {
     const data =
       await response.json();
 
-    if (!data.content) {
-      return null;
-    }
-
     const decoded =
       Buffer
         .from(
           data.content,
           'base64'
         )
-        .toString(
-          'utf8'
-        );
+        .toString('utf8');
 
     const parsed =
       JSON.parse(decoded);
@@ -244,10 +245,7 @@ async function readHistoryFromGitHub() {
       return null;
     }
 
-    return {
-      history: parsed,
-      sha: data.sha,
-    };
+    return parsed;
   } catch (error) {
     console.error(
       'Could not read history from GitHub:',
@@ -266,34 +264,31 @@ async function pushHistoryToGitHub(
   }
 
   try {
-    let existingSha = null;
+    let sha = null;
 
     const existingResponse =
       await fetch(
-        getGitHubApiUrl(),
+        getGitHubReadUrl(),
         {
           headers:
             getGitHubHeaders(),
         }
       );
 
-    if (
-      existingResponse.ok
-    ) {
-      const existingData =
+    if (existingResponse.ok) {
+      const existing =
         await existingResponse.json();
 
-      existingSha =
-        existingData.sha;
+      sha =
+        existing.sha;
     } else if (
-      existingResponse.status !==
-      404
+      existingResponse.status !== 404
     ) {
       const text =
         await existingResponse.text();
 
       throw new Error(
-        `Could not fetch current GitHub file: ` +
+        `GitHub read-before-write failed: ` +
         `${existingResponse.status} ${text}`
       );
     }
@@ -311,15 +306,11 @@ async function pushHistoryToGitHub(
           jsonText,
           'utf8'
         )
-        .toString(
-          'base64'
-        );
+        .toString('base64');
 
     const body = {
       message:
-        `Update game history ` +
-        new Date()
-          .toISOString(),
+        `Update Daguai game history ${new Date().toISOString()}`,
 
       content,
 
@@ -327,21 +318,13 @@ async function pushHistoryToGitHub(
         GITHUB_BRANCH,
     };
 
-    if (existingSha) {
-      body.sha =
-        existingSha;
+    if (sha) {
+      body.sha = sha;
     }
-
-    const putUrl =
-      `https://api.github.com/repos/` +
-      `${encodeURIComponent(GITHUB_OWNER)}/` +
-      `${encodeURIComponent(GITHUB_REPO)}/` +
-      `contents/` +
-      `${GITHUB_HISTORY_PATH}`;
 
     const response =
       await fetch(
-        putUrl,
+        getGitHubWriteUrl(),
         {
           method: 'PUT',
 
@@ -353,9 +336,7 @@ async function pushHistoryToGitHub(
           },
 
           body:
-            JSON.stringify(
-              body
-            ),
+            JSON.stringify(body),
         }
       );
 
@@ -387,21 +368,14 @@ async function pushHistoryToGitHub(
 let gameHistory =
   loadLocalHistory();
 
-/*
-  Render filesystem may reset.
-
-  Therefore, when server starts,
-  prefer the latest GitHub copy
-  if one exists.
-*/
 async function initializeHistory() {
   if (!githubSyncEnabled) {
-    console.log(
-      'GitHub history sync disabled.'
-    );
-
     writeLocalHistory(
       gameHistory
+    );
+
+    console.log(
+      'GitHub history sync disabled.'
     );
 
     return;
@@ -410,11 +384,8 @@ async function initializeHistory() {
   const remote =
     await readHistoryFromGitHub();
 
-  if (
-    remote?.history
-  ) {
-    gameHistory =
-      remote.history;
+  if (remote) {
+    gameHistory = remote;
 
     writeLocalHistory(
       gameHistory
@@ -435,16 +406,9 @@ async function initializeHistory() {
 }
 
 /* =========================================================
-   SAFE GITHUB SYNC QUEUE
+   GITHUB SYNC QUEUE
    ========================================================= */
 
-/*
-  Multiple game events can occur
-  close together.
-
-  We serialize GitHub writes so
-  two commits never race each other.
-*/
 let githubSyncChain =
   Promise.resolve();
 
@@ -455,10 +419,6 @@ function queueGitHubSync() {
     return;
   }
 
-  /*
-    Wait briefly so closely-spaced
-    state changes can be combined.
-  */
   clearTimeout(syncTimer);
 
   syncTimer =
@@ -488,7 +448,7 @@ function queueGitHubSync() {
               }
             );
       },
-      800
+      700
     );
 }
 
@@ -504,7 +464,7 @@ function saveHistory() {
 }
 
 /* =========================================================
-   APP / SOCKET.IO
+   EXPRESS / SOCKET.IO
    ========================================================= */
 
 const app =
@@ -548,17 +508,6 @@ app.get(
   }
 );
 
-/* =========================================================
-   OPTIONAL HISTORY CHECK ENDPOINT
-   ========================================================= */
-
-/*
-  This is intentionally NOT the
-  full hidden-card history endpoint.
-
-  It simply confirms whether logging
-  is working without exposing hands.
-*/
 app.get(
   '/api/history-status',
   (_req, res) => {
@@ -595,9 +544,7 @@ const rooms =
    ========================================================= */
 
 function nowIso() {
-  return (
-    new Date().toISOString()
-  );
+  return new Date().toISOString();
 }
 
 function minuteIso(
@@ -787,7 +734,7 @@ function getPassesNeeded(
     ) &&
     !leader.hasFinished;
 
-  const activePlayerCount =
+  const activeCount =
     getActivePlayerCount(
       room
     );
@@ -795,7 +742,7 @@ function getPassesNeeded(
   return Math.max(
     1,
 
-    activePlayerCount -
+    activeCount -
       (
         leaderStillActive
           ? 1
@@ -811,7 +758,428 @@ function touchRoom(
 }
 
 /* =========================================================
-   GAME LOGGING
+   CUSTOM DEAL PARSING
+   ========================================================= */
+
+/*
+  Supported examples:
+
+  AS
+  AH
+  AC
+  AD
+
+  10S
+  10H
+
+  SJ = Small Joker
+  BJ = Big Joker
+
+  Duplicate tokens use duplicate
+  physical copies from the 3 decks.
+*/
+
+function normalizeCardToken(
+  rawToken
+) {
+  let token =
+    String(rawToken)
+      .trim()
+      .toUpperCase();
+
+  token =
+    token
+      .replaceAll('♠', 'S')
+      .replaceAll('♥', 'H')
+      .replaceAll('♣', 'C')
+      .replaceAll('♦', 'D')
+      .replaceAll('-', '')
+      .replaceAll('_', '');
+
+  if (
+    token === 'BIGJOKER' ||
+    token === 'BIG' ||
+    token === '大怪'
+  ) {
+    return 'BJ';
+  }
+
+  if (
+    token === 'SMALLJOKER' ||
+    token === 'SMALL' ||
+    token === '小怪'
+  ) {
+    return 'SJ';
+  }
+
+  return token;
+}
+
+function tokenizeHandText(
+  text
+) {
+  const normalized =
+    String(text ?? '')
+      .replace(
+        /BIG\s+JOKER/gi,
+        'BJ'
+      )
+      .replace(
+        /SMALL\s+JOKER/gi,
+        'SJ'
+      )
+      .replace(
+        /[,;\n\r\t]+/g,
+        ' '
+      );
+
+  return normalized
+    .split(/\s+/)
+    .map(
+      normalizeCardToken
+    )
+    .filter(Boolean);
+}
+
+function parseCardToken(
+  token
+) {
+  if (token === 'BJ') {
+    return {
+      kind: 'big-joker',
+    };
+  }
+
+  if (token === 'SJ') {
+    return {
+      kind: 'small-joker',
+    };
+  }
+
+  let match =
+    token.match(
+      /^(10|[2-9JQKA])([SHCD])$/
+    );
+
+  if (match) {
+    return {
+      kind: 'ordinary',
+
+      rank:
+        match[1],
+
+      suitCode:
+        match[2],
+    };
+  }
+
+  /*
+    Also accept SA instead of AS.
+  */
+  match =
+    token.match(
+      /^([SHCD])(10|[2-9JQKA])$/
+    );
+
+  if (match) {
+    return {
+      kind: 'ordinary',
+
+      rank:
+        match[2],
+
+      suitCode:
+        match[1],
+    };
+  }
+
+  throw new Error(
+    `Invalid card token "${token}". ` +
+    `Use examples such as AS, 10H, QC, BJ, or SJ.`
+  );
+}
+
+function suitCodeToName(
+  suitCode
+) {
+  const suits = {
+    S: 'spades',
+    H: 'hearts',
+    C: 'clubs',
+    D: 'diamonds',
+  };
+
+  return suits[suitCode];
+}
+
+function cardMatchesRequest(
+  card,
+  request
+) {
+  if (
+    request.kind ===
+    'big-joker'
+  ) {
+    return (
+      card.rank ===
+      'big-joker'
+    );
+  }
+
+  if (
+    request.kind ===
+    'small-joker'
+  ) {
+    return (
+      card.rank ===
+      'small-joker'
+    );
+  }
+
+  return (
+    card.rank ===
+      request.rank &&
+    card.suit ===
+      suitCodeToName(
+        request.suitCode
+      )
+  );
+}
+
+function buildCustomHands(
+  handTexts
+) {
+  if (
+    !Array.isArray(
+      handTexts
+    ) ||
+    handTexts.length !== 6
+  ) {
+    throw new Error(
+      'Custom deal must contain exactly 6 player hands.'
+    );
+  }
+
+  const fullDeck =
+    createThreeDecks();
+
+  const usedCardIds =
+    new Set();
+
+  const hands =
+    Array.from(
+      {
+        length: 6,
+      },
+      () => []
+    );
+
+  for (
+    let seatIndex = 0;
+    seatIndex < 6;
+    seatIndex += 1
+  ) {
+    const tokens =
+      tokenizeHandText(
+        handTexts[
+          seatIndex
+        ]
+      );
+
+    for (
+      const token of tokens
+    ) {
+      const request =
+        parseCardToken(
+          token
+        );
+
+      const card =
+        fullDeck.find(
+          (candidate) =>
+            !usedCardIds.has(
+              candidate.id
+            ) &&
+            cardMatchesRequest(
+              candidate,
+              request
+            )
+        );
+
+      if (!card) {
+        throw new Error(
+          `Player ${seatIndex + 1}: ` +
+          `"${token}" is unavailable. ` +
+          `You may have used more physical copies than exist in the 3 decks.`
+        );
+      }
+
+      usedCardIds.add(
+        card.id
+      );
+
+      hands[
+        seatIndex
+      ].push(card);
+    }
+  }
+
+  const sortedHands =
+    hands.map(
+      (hand) =>
+        sortCards(hand)
+    );
+
+  const unassignedCards =
+    fullDeck.filter(
+      (card) =>
+        !usedCardIds.has(
+          card.id
+        )
+    );
+
+  return {
+    hands:
+      sortedHands,
+
+    unassignedCards,
+  };
+}
+
+function parseFinishOrder(
+  rawValue
+) {
+  const text =
+    String(
+      rawValue ?? ''
+    ).trim();
+
+  if (!text) {
+    return [];
+  }
+
+  const values =
+    text
+      .split(
+        /[\s,;]+/
+      )
+      .filter(Boolean)
+      .map(
+        (value) =>
+          Number(value)
+      );
+
+  for (
+    const playerId of values
+  ) {
+    if (
+      !Number.isInteger(
+        playerId
+      ) ||
+      playerId < 1 ||
+      playerId > 6
+    ) {
+      throw new Error(
+        'Finished order must only contain player numbers 1 to 6.'
+      );
+    }
+  }
+
+  if (
+    new Set(values).size !==
+    values.length
+  ) {
+    throw new Error(
+      'A player cannot appear twice in the finished order.'
+    );
+  }
+
+  return values;
+}
+
+/* =========================================================
+   PUBLIC CARD-COUNT REPORTS
+   ========================================================= */
+
+function createEmptyPublicReports() {
+  return [
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+  ];
+}
+
+function makeReportedCount(
+  count,
+  askedByPlayerId = null
+) {
+  return {
+    status:
+      'reported',
+
+    count,
+
+    askedAt:
+      nowIso(),
+
+    askedByPlayerId,
+  };
+}
+
+function updateKnownPublicCountAfterPlay(
+  room,
+  seatIndex,
+  newCount
+) {
+  const existing =
+    room.state.publicReports[
+      seatIndex
+    ];
+
+  /*
+    If a concrete number was
+    already public, everybody can
+    count cards played afterwards.
+  */
+  if (
+    existing?.status ===
+    'reported'
+  ) {
+    room.state.publicReports[
+      seatIndex
+    ] = {
+      ...existing,
+
+      count:
+        newCount,
+
+      updatedAt:
+        nowIso(),
+    };
+  }
+
+  /*
+    A finished player obviously
+    has zero cards.
+  */
+  if (newCount === 0) {
+    room.state.publicReports[
+      seatIndex
+    ] =
+      makeReportedCount(
+        0,
+        existing
+          ?.askedByPlayerId ??
+          null
+      );
+  }
+}
+
+/* =========================================================
+   GAME HISTORY
    ========================================================= */
 
 function getGameLog(
@@ -827,7 +1195,11 @@ function getGameLog(
 }
 
 function createGameLog(
-  room
+  room,
+  {
+    dealSource,
+    unassignedCards = [],
+  }
 ) {
   const dealtAt =
     nowIso();
@@ -842,6 +1214,9 @@ function createGameLog(
   room.state.dealtAt =
     dealtAt;
 
+  room.state.dealSource =
+    dealSource;
+
   const gameLog = {
     gameId,
 
@@ -850,6 +1225,8 @@ function createGameLog(
 
     status:
       'ongoing',
+
+    dealSource,
 
     dealtAt,
 
@@ -860,6 +1237,12 @@ function createGameLog(
 
     trumpRank:
       room.state.trumpRank,
+
+    startingPlayerId:
+      room.players[
+        room.state
+          .currentPlayerIndex
+      ].id,
 
     players:
       room.players.map(
@@ -900,15 +1283,33 @@ function createGameLog(
         })
       ),
 
+    unassignedCards:
+      unassignedCards.map(
+        serializeCard
+      ),
+
+    startingFinishOrder:
+      [
+        ...room.state
+          .finishOrder,
+      ],
+
     events: [],
 
-    finishOrder: [],
+    finishOrder:
+      [
+        ...room.state
+          .finishOrder,
+      ],
 
-    endedAt: null,
+    endedAt:
+      null,
 
-    endedReason: null,
+    endedReason:
+      null,
 
-    finalHands: null,
+    finalHands:
+      null,
   };
 
   gameHistory.games.push(
@@ -921,6 +1322,8 @@ function createGameLog(
     room,
     'deal',
     {
+      dealSource,
+
       dealtAt,
 
       trumpRank:
@@ -932,6 +1335,15 @@ function createGameLog(
           room.state
             .currentPlayerIndex
         ].id,
+
+      initialFinishOrder:
+        [
+          ...room.state
+            .finishOrder,
+        ],
+
+      unassignedCardCount:
+        unassignedCards.length,
     }
   );
 }
@@ -1066,16 +1478,12 @@ function createEmptyRoom(
     players: [
       {
         id: 1,
-
         name:
           hostName ||
           'Player 1',
-
         team: 'A',
-
         socketId:
           hostSocketId,
-
         hasFinished:
           false,
       },
@@ -1169,12 +1577,21 @@ function createEmptyRoom(
 
       dealtAt:
         null,
+
+      dealSource:
+        null,
+
+      publicReports:
+        createEmptyPublicReports(),
+
+      customUnassignedCards:
+        [],
     },
   };
 }
 
 /* =========================================================
-   CLIENT-SAFE STATE
+   CLIENT SAFE STATE
    ========================================================= */
 
 function buildClientRoomState(
@@ -1209,8 +1626,8 @@ function buildClientRoomState(
 
     state: {
       /*
-        Only the local player
-        receives their own hand.
+        A client receives only
+        its own private hand.
       */
       hands:
         room.state.hands.map(
@@ -1277,6 +1694,26 @@ function buildClientRoomState(
       dealtAt:
         room.state
           .dealtAt,
+
+      dealSource:
+        room.state
+          .dealSource,
+
+      /*
+        Public information.
+        Safe to send to everyone.
+      */
+      publicReports:
+        room.state
+          .publicReports
+          .map(
+            (report) =>
+              report
+                ? {
+                    ...report,
+                  }
+                : null
+          ),
     },
   };
 }
@@ -1297,21 +1734,155 @@ function emitRoomState(
         return;
       }
 
-      const clientState =
-        buildClientRoomState(
-          room,
-          seatIndex
-        );
-
       io
         .to(
           player.socketId
         )
         .emit(
           eventName,
-          clientState
+
+          buildClientRoomState(
+            room,
+            seatIndex
+          )
         );
     }
+  );
+}
+
+/* =========================================================
+   GAME SETUP
+   ========================================================= */
+
+function abortCurrentGameIfNeeded(
+  room,
+  reason
+) {
+  if (
+    room.state.gameId &&
+    room.state.hasStarted
+  ) {
+    appendGameEvent(
+      room,
+      'game_aborted',
+      {
+        reason,
+      }
+    );
+
+    finalizeGameLog(
+      room,
+      'aborted',
+      reason
+    );
+  }
+
+  if (
+    room.advanceTimer
+  ) {
+    clearTimeout(
+      room.advanceTimer
+    );
+
+    room.advanceTimer =
+      null;
+  }
+}
+
+function startGameWithHands(
+  room,
+  {
+    hands,
+    trumpRank,
+    startingPlayerIndex,
+    finishOrder,
+    dealSource,
+    unassignedCards = [],
+  }
+) {
+  room.state.hands =
+    hands.map(
+      (hand) =>
+        sortCards(hand)
+    );
+
+  room.state.trumpRank =
+    trumpRank;
+
+  room.state.currentPlayerIndex =
+    startingPlayerIndex;
+
+  room.state.currentLead =
+    null;
+
+  room.state.lastSuccessfulPlayerIndex =
+    null;
+
+  room.state.consecutivePasses =
+    0;
+
+  room.state.finishOrder =
+    [
+      ...finishOrder,
+    ];
+
+  room.state.hasStarted =
+    true;
+
+  room.state.paused =
+    false;
+
+  room.state.phase =
+    'turn';
+
+  room.state.turnLockedUntil =
+    null;
+
+  room.state.publicReports =
+    createEmptyPublicReports();
+
+  room.state.customUnassignedCards =
+    [
+      ...unassignedCards,
+    ];
+
+  room.players.forEach(
+    (
+      player,
+      seatIndex
+    ) => {
+      player.hasFinished =
+        finishOrder.includes(
+          player.id
+        );
+
+      if (
+        player.hasFinished
+      ) {
+        room.state.publicReports[
+          seatIndex
+        ] =
+          makeReportedCount(
+            0,
+            null
+          );
+      }
+    }
+  );
+
+  createGameLog(
+    room,
+    {
+      dealSource,
+      unassignedCards,
+    }
+  );
+
+  touchRoom(room);
+
+  emitRoomState(
+    room,
+    'gameStateUpdate'
   );
 }
 
@@ -1377,7 +1948,7 @@ function destroyRoom(
 }
 
 /* =========================================================
-   TWO-SECOND PLAY DISPLAY
+   TWO SECOND PLAY DISPLAY
    ========================================================= */
 
 function scheduleAdvanceAfterPlay(
@@ -1428,8 +1999,7 @@ function scheduleAdvanceAfterPlay(
             .hasStarted =
             false;
 
-          currentRoom.state
-            .phase =
+          currentRoom.state.phase =
             'finished';
 
           appendGameEvent(
@@ -1482,8 +2052,7 @@ function scheduleAdvanceAfterPlay(
             .hasStarted =
             false;
 
-          currentRoom.state
-            .phase =
+          currentRoom.state.phase =
             'finished';
 
           finalizeGameLog(
@@ -1508,8 +2077,7 @@ function scheduleAdvanceAfterPlay(
           .currentPlayerIndex =
           nextPlayerIndex;
 
-        currentRoom.state
-          .phase =
+        currentRoom.state.phase =
           'turn';
 
         appendGameEvent(
@@ -1545,7 +2113,7 @@ function scheduleAdvanceAfterPlay(
 }
 
 /* =========================================================
-   SOCKET CONNECTION
+   SOCKETS
    ========================================================= */
 
 io.on(
@@ -1627,7 +2195,7 @@ io.on(
     );
 
     /* =====================================================
-       JOIN ROOM
+       JOIN / REJOIN
        ===================================================== */
 
     socket.on(
@@ -1674,10 +2242,9 @@ io.on(
         }
 
         if (
-          !Number
-            .isInteger(
-              parsedSeatIndex
-            ) ||
+          !Number.isInteger(
+            parsedSeatIndex
+          ) ||
           parsedSeatIndex <
             1 ||
           parsedSeatIndex >
@@ -1770,8 +2337,7 @@ io.on(
             }
           );
         } else if (
-          room.state
-            .gameId
+          room.state.gameId
         ) {
           appendGameEvent(
             room,
@@ -1805,7 +2371,7 @@ io.on(
     );
 
     /* =====================================================
-       DEAL
+       RANDOM DEAL
        ===================================================== */
 
     socket.on(
@@ -1864,99 +2430,35 @@ io.on(
           return;
         }
 
-        if (
-          room.state
-            .gameId &&
-          room.state
-            .hasStarted
-        ) {
-          appendGameEvent(
-            room,
-            'game_aborted',
-            {
-              reason:
-                'host_redeal',
-            }
-          );
-
-          finalizeGameLog(
-            room,
-            'aborted',
-            'host_redeal'
-          );
-        }
-
-        if (
-          room.advanceTimer
-        ) {
-          clearTimeout(
-            room.advanceTimer
-          );
-
-          room.advanceTimer =
-            null;
-        }
+        abortCurrentGameIfNeeded(
+          room,
+          'host_redeal'
+        );
 
         const newDeal =
           createNewDeal();
 
-        room.state.hands =
-          newDeal.hands.map(
-            (hand) =>
-              sortCards(
-                hand
-              )
-          );
+        startGameWithHands(
+          room,
+          {
+            hands:
+              newDeal.hands,
 
-        room.state
-          .currentPlayerIndex =
-          0;
+            trumpRank:
+              '2',
 
-        room.state
-          .currentLead =
-          null;
+            startingPlayerIndex:
+              0,
 
-        room.state
-          .lastSuccessfulPlayerIndex =
-          null;
+            finishOrder:
+              [],
 
-        room.state
-          .consecutivePasses =
-          0;
+            dealSource:
+              'random',
 
-        room.state
-          .finishOrder =
-          [];
-
-        room.state
-          .hasStarted =
-          true;
-
-        room.state
-          .paused =
-          false;
-
-        room.state
-          .phase =
-          'turn';
-
-        room.state
-          .turnLockedUntil =
-          null;
-
-        room.players.forEach(
-          (player) => {
-            player.hasFinished =
-              false;
+            unassignedCards:
+              [],
           }
-        );
-
-        createGameLog(
-          room
-        );
-
-        touchRoom(
-          room
         );
 
         callback({
@@ -1971,16 +2473,479 @@ io.on(
             room.state
               .dealtAt,
         });
+      }
+    );
+
+    /* =====================================================
+       CUSTOM DEAL
+       ===================================================== */
+
+    socket.on(
+      'customDeal',
+
+      (
+        {
+          handTexts,
+          trumpRank,
+          startingPlayerIndex,
+          finishOrderText,
+        } = {},
+
+        callback =
+          () => {}
+      ) => {
+        if (
+          !currentRoomCode ||
+          playerSeatIndex !==
+            0
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Only Player 1 can create a custom deal.',
+          });
+
+          return;
+        }
+
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
+
+        if (!room) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Room not found.',
+          });
+
+          return;
+        }
+
+        if (
+          getConnectedPlayerCount(
+            room
+          ) !== 6
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'All 6 players must be connected before starting a custom game.',
+          });
+
+          return;
+        }
+
+        try {
+          const allowedTrumpRanks =
+            [
+              '2',
+              '3',
+              '4',
+              '5',
+              '6',
+              '7',
+              '8',
+              '9',
+              '10',
+              'J',
+              'Q',
+              'K',
+              'A',
+            ];
+
+          const selectedTrumpRank =
+            String(
+              trumpRank ?? '2'
+            ).toUpperCase();
+
+          if (
+            !allowedTrumpRanks.includes(
+              selectedTrumpRank
+            )
+          ) {
+            throw new Error(
+              'Invalid trump rank.'
+            );
+          }
+
+          const startIndex =
+            Number(
+              startingPlayerIndex
+            );
+
+          if (
+            !Number.isInteger(
+              startIndex
+            ) ||
+            startIndex < 0 ||
+            startIndex > 5
+          ) {
+            throw new Error(
+              'Invalid starting player.'
+            );
+          }
+
+          const finishOrder =
+            parseFinishOrder(
+              finishOrderText
+            );
+
+          const custom =
+            buildCustomHands(
+              handTexts
+            );
+
+          /*
+            Finished players must
+            have no cards.
+          */
+          for (
+            const playerId of
+            finishOrder
+          ) {
+            const index =
+              playerId - 1;
+
+            if (
+              custom.hands[
+                index
+              ].length !== 0
+            ) {
+              throw new Error(
+                `Player ${playerId} is listed as finished but still has cards.`
+              );
+            }
+          }
+
+          /*
+            Active players must
+            actually have cards.
+          */
+          for (
+            let index = 0;
+            index < 6;
+            index += 1
+          ) {
+            const playerId =
+              index + 1;
+
+            const isFinished =
+              finishOrder.includes(
+                playerId
+              );
+
+            if (
+              !isFinished &&
+              custom.hands[
+                index
+              ].length === 0
+            ) {
+              throw new Error(
+                `Player ${playerId} has no cards. ` +
+                `If this player has already finished, add ${playerId} to Finished Order.`
+              );
+            }
+          }
+
+          if (
+            finishOrder.includes(
+              startIndex + 1
+            )
+          ) {
+            throw new Error(
+              'The starting player cannot already be finished.'
+            );
+          }
+
+          const activeCount =
+            6 -
+            finishOrder.length;
+
+          if (
+            activeCount < 2
+          ) {
+            throw new Error(
+              'A custom game must have at least two active players.'
+            );
+          }
+
+          abortCurrentGameIfNeeded(
+            room,
+            'host_custom_redeal'
+          );
+
+          startGameWithHands(
+            room,
+            {
+              hands:
+                custom.hands,
+
+              trumpRank:
+                selectedTrumpRank,
+
+              startingPlayerIndex:
+                startIndex,
+
+              finishOrder,
+
+              dealSource:
+                'custom',
+
+              unassignedCards:
+                custom.unassignedCards,
+            }
+          );
+
+          callback({
+            success:
+              true,
+
+            gameId:
+              room.state
+                .gameId,
+
+            dealtAt:
+              room.state
+                .dealtAt,
+
+            unassignedCardCount:
+              custom
+                .unassignedCards
+                .length,
+          });
+        } catch (error) {
+          callback({
+            success:
+              false,
+
+            message:
+              error.message,
+          });
+        }
+      }
+    );
+
+    /* =====================================================
+       ASK CARD COUNT
+       ===================================================== */
+
+    socket.on(
+      'askCardCount',
+
+      (
+        {
+          targetSeatIndex,
+        } = {},
+
+        callback =
+          () => {}
+      ) => {
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
+
+        if (
+          !room ||
+          !room.state.gameId
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'No game has been dealt yet.',
+          });
+
+          return;
+        }
+
+        const targetIndex =
+          Number(
+            targetSeatIndex
+          );
+
+        if (
+          !Number.isInteger(
+            targetIndex
+          ) ||
+          targetIndex < 0 ||
+          targetIndex > 5
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Invalid player.',
+          });
+
+          return;
+        }
+
+        if (
+          targetIndex ===
+          playerSeatIndex
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'You already know your own card count.',
+          });
+
+          return;
+        }
+
+        const requester =
+          room.players[
+            playerSeatIndex
+          ];
+
+        const target =
+          room.players[
+            targetIndex
+          ];
+
+        const actualCount =
+          room.state.hands[
+            targetIndex
+          ].length;
+
+        const askedAt =
+          nowIso();
+
+        let publicResponse;
+
+        if (
+          actualCount <= 10
+        ) {
+          room.state
+            .publicReports[
+              targetIndex
+            ] = {
+              status:
+                'reported',
+
+              count:
+                actualCount,
+
+              askedAt,
+
+              askedByPlayerId:
+                requester.id,
+            };
+
+          publicResponse =
+            `${actualCount} card${
+              actualCount === 1
+                ? ''
+                : 's'
+            }`;
+        } else {
+          room.state
+            .publicReports[
+              targetIndex
+            ] = {
+              status:
+                'not-reported',
+
+              count:
+                null,
+
+              askedAt,
+
+              askedByPlayerId:
+                requester.id,
+            };
+
+          publicResponse =
+            'Not reported';
+        }
+
+        appendGameEvent(
+          room,
+          'ask_card_count',
+          {
+            requesterPlayerId:
+              requester.id,
+
+            requesterSeatIndex:
+              playerSeatIndex,
+
+            targetPlayerId:
+              target.id,
+
+            targetSeatIndex:
+              targetIndex,
+
+            /*
+              Backend research log
+              keeps the true value.
+            */
+            actualCount,
+
+            publicResponse:
+              actualCount <= 10
+                ? actualCount
+                : 'not-reported',
+          }
+        );
+
+        touchRoom(
+          room
+        );
 
         emitRoomState(
           room,
           'gameStateUpdate'
         );
+
+        io
+          .to(
+            room.code
+          )
+          .emit(
+            'publicMessage',
+
+            `${requester.name} asked ${target.name}: ${publicResponse}`
+          );
+
+        callback({
+          success:
+            true,
+
+          publicResponse:
+            actualCount <= 10
+              ? {
+                  status:
+                    'reported',
+
+                  count:
+                    actualCount,
+                }
+              : {
+                  status:
+                    'not-reported',
+
+                  count:
+                    null,
+                },
+        });
       }
     );
 
     /* =====================================================
-       PLAY CARDS
+       PLAY
        ===================================================== */
 
     socket.on(
@@ -2159,6 +3124,12 @@ io.on(
           room.state.hands[
             playerSeatIndex
           ].length;
+
+        updateKnownPublicCountAfterPlay(
+          room,
+          playerSeatIndex,
+          handCountAfter
+        );
 
         room.state.currentLead =
           {
@@ -2568,8 +3539,8 @@ io.on(
         }
 
         /*
-          HOST LEFT:
-          destroy whole room.
+          Host leaves:
+          destroy room.
         */
         if (
           playerSeatIndex ===
@@ -2654,13 +3625,13 @@ httpServer.listen(
     );
 
     console.log(
-      `Local game history: ${historyFile}`
+      `Game history: ${historyFile}`
     );
 
     console.log(
       githubSyncEnabled
-        ? `GitHub history sync enabled: ${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_HISTORY_PATH}`
-        : 'GitHub history sync is disabled.'
+        ? `GitHub sync enabled: ${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_HISTORY_PATH}`
+        : 'GitHub sync disabled.'
     );
   }
 );

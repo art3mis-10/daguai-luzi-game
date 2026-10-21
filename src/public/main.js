@@ -1,32 +1,40 @@
-import { sortCards } from '/game/deck.js';
+import {
+  sortCards,
+} from '/game/deck.js';
 
-/*
-  Same-origin connection.
+const socket =
+  window.io();
 
-  This works both in development
-  and after deployment to a real
-  internet-accessible Node server.
-*/
-const socket = window.io();
+let localSeatIndex =
+  null;
 
-let localSeatIndex = null;
+let roomState =
+  null;
 
-let roomState = null;
+let selectedCardIds =
+  [];
 
-let selectedCardIds = [];
-
-let lastRevision = -1;
+let lastRevision =
+  -1;
 
 /* =========================================================
    APP HTML
    ========================================================= */
 
-document.querySelector('#app').innerHTML = `
+document.querySelector(
+  '#app'
+).innerHTML = `
+  <!-- ===================================================
+       LOBBY
+       =================================================== -->
+
   <div
     id="room-modal"
     class="modal-backdrop"
   >
-    <div class="modal lobby-modal">
+    <div
+      class="modal lobby-modal"
+    >
       <div class="modal-header">
         <h2>
           Daguai Luzi Online Lobby
@@ -35,8 +43,7 @@ document.querySelector('#app').innerHTML = `
 
       <p>
         Create a room as Player 1,
-        or join an existing room in
-        a specific seat.
+        or join an existing room.
       </p>
 
       <label
@@ -136,6 +143,10 @@ document.querySelector('#app').innerHTML = `
     </div>
   </div>
 
+  <!-- ===================================================
+       GAME
+       =================================================== -->
+
   <div class="game-shell">
     <header class="top-bar">
       <div class="brand">
@@ -191,16 +202,6 @@ document.querySelector('#app').innerHTML = `
             Not dealt
           </strong>
         </div>
-
-        <div class="info-item">
-          <span>
-            Game
-          </span>
-
-          <strong>
-            Game 1
-          </strong>
-        </div>
       </div>
 
       <div class="top-actions">
@@ -209,6 +210,13 @@ document.querySelector('#app').innerHTML = `
           id="deal-button"
         >
           Deal
+        </button>
+
+        <button
+          class="deal-button"
+          id="custom-deal-button"
+        >
+          Custom Deal
         </button>
 
         <button
@@ -315,13 +323,6 @@ document.querySelector('#app').innerHTML = `
             >
               Ask
             </button>
-
-            <button
-              class="secondary-button"
-              id="report-button"
-            >
-              Report
-            </button>
           </div>
         </div>
 
@@ -383,201 +384,599 @@ document.querySelector('#app').innerHTML = `
       id="toast"
     >
     </div>
+  </div>
 
+  <!-- ===================================================
+       ASK MODAL
+       =================================================== -->
+
+  <div
+    class="modal-backdrop hidden"
+    id="ask-modal"
+  >
     <div
-      class="modal-backdrop hidden"
-      id="report-modal"
+      class="modal"
+      style="width: min(480px, 96vw);"
     >
-      <div class="modal">
-        <div class="modal-header">
-          <h2>
-            Report Hand
-          </h2>
+      <div class="modal-header">
+        <h2>
+          Ask Card Count
+        </h2>
 
-          <button
-            class="close-button"
-            id="close-report-modal"
-            aria-label="Close"
+        <button
+          class="close-button"
+          id="close-ask-modal"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <p>
+        You may ask any other player at any time.
+        A player with 10 cards or fewer reports
+        the exact number. Otherwise the public
+        response is "Not reported".
+      </p>
+
+      <div
+        id="ask-player-list"
+      >
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================
+       CUSTOM DEAL MODAL
+       =================================================== -->
+
+  <div
+    class="modal-backdrop hidden"
+    id="custom-deal-modal"
+  >
+    <div
+      class="modal"
+      style="
+        width: min(820px, 96vw);
+        max-height: 92vh;
+        overflow-y: auto;
+      "
+    >
+      <div class="modal-header">
+        <h2>
+          Custom Deal
+        </h2>
+
+        <button
+          class="close-button"
+          id="close-custom-deal-modal"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <p>
+        Enter each player's hand manually.
+        Use card codes such as
+        AS, KH, 10D, QC, BJ and SJ.
+        Repeat a code to use another copy
+        from the three decks.
+      </p>
+
+      <div
+        style="
+          padding: 10px 12px;
+          border: 1px solid rgba(255,255,255,0.09);
+          border-radius: 10px;
+          background: rgba(255,255,255,0.035);
+          color: #a6b2ac;
+          font-size: 11px;
+          line-height: 1.7;
+          margin-bottom: 14px;
+        "
+      >
+        <strong style="color:#f1c86f;">
+          Card notation
+        </strong>
+        <br />
+        S = Spades · H = Hearts ·
+        C = Clubs · D = Diamonds
+        <br />
+        BJ = Big Joker · SJ = Small Joker
+        <br />
+        Example:
+        AS AS 10H 10H QC BJ
+      </div>
+
+      <div
+        id="custom-hand-fields"
+        style="
+          display: grid;
+          grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        "
+      >
+      </div>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 16px;
+        "
+      >
+        <div>
+          <label
+            class="field-label"
+            for="custom-trump-rank"
           >
-            ×
-          </button>
+            Trump rank
+          </label>
+
+          <select
+            class="text-input"
+            id="custom-trump-rank"
+          >
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>J</option>
+            <option>Q</option>
+            <option>K</option>
+            <option>A</option>
+          </select>
         </div>
 
-        <p>
-          The reporting system is not
-          networked yet.
-        </p>
-
-        <div class="modal-actions">
-          <button
-            class="secondary-button"
-            id="report-count-button"
+        <div>
+          <label
+            class="field-label"
+            for="custom-start-player"
           >
-            Report Card Count
-          </button>
+            Starting player
+          </label>
 
-          <button
-            class="primary-button"
-            id="report-route-button"
+          <select
+            class="text-input"
+            id="custom-start-player"
           >
-            Report Luzi
-          </button>
+          </select>
+        </div>
+
+        <div>
+          <label
+            class="field-label"
+            for="custom-finish-order"
+          >
+            Finished order
+          </label>
+
+          <input
+            class="text-input"
+            id="custom-finish-order"
+            placeholder="e.g. 3, 1"
+          />
         </div>
       </div>
+
+      <p
+        style="
+          margin-top: 12px;
+          margin-bottom: 10px;
+        "
+      >
+        If a player has already finished,
+        leave their hand empty and list their
+        player number in Finished order.
+        Example: <strong>3, 1</strong> means
+        Player 3 finished first and Player 1
+        finished second.
+      </p>
+
+      <button
+        class="primary-button full-width"
+        id="start-custom-deal-button"
+      >
+        Start Custom Game
+      </button>
     </div>
   </div>
 `;
 
 /* =========================================================
-   DOM
+   DOM REFERENCES
    ========================================================= */
 
-const roomModal = document.querySelector('#room-modal');
+const roomModal =
+  document.querySelector(
+    '#room-modal'
+  );
 
-const createRoomBtn = document.querySelector('#create-room-btn');
+const createRoomBtn =
+  document.querySelector(
+    '#create-room-btn'
+  );
 
-const joinRoomBtn = document.querySelector('#join-room-btn');
+const joinRoomBtn =
+  document.querySelector(
+    '#join-room-btn'
+  );
 
-const playerNameInput = document.querySelector('#player-name-input');
+const playerNameInput =
+  document.querySelector(
+    '#player-name-input'
+  );
 
-const roomCodeInput = document.querySelector('#room-code-input');
+const roomCodeInput =
+  document.querySelector(
+    '#room-code-input'
+  );
 
-const seatSelect = document.querySelector('#seat-select');
+const seatSelect =
+  document.querySelector(
+    '#seat-select'
+  );
 
-const connectionStatus = document.querySelector('#connection-status');
+const connectionStatus =
+  document.querySelector(
+    '#connection-status'
+  );
 
-const roomCodeDisplay = document.querySelector('#room-code-display');
+const roomCodeDisplay =
+  document.querySelector(
+    '#room-code-display'
+  );
 
-const trumpRankDisplay = document.querySelector('#trump-rank-display');
+const trumpRankDisplay =
+  document.querySelector(
+    '#trump-rank-display'
+  );
 
-const dealTimeDisplay = document.querySelector('#deal-time-display');
+const dealTimeDisplay =
+  document.querySelector(
+    '#deal-time-display'
+  );
 
-const playerSeatsElement = document.querySelector('#player-seats');
+const playerSeatsElement =
+  document.querySelector(
+    '#player-seats'
+  );
 
-const playerHandElement = document.querySelector('#player-hand');
+const playerHandElement =
+  document.querySelector(
+    '#player-hand'
+  );
 
-const selectedCountElement = document.querySelector('#selected-count');
+const selectedCountElement =
+  document.querySelector(
+    '#selected-count'
+  );
 
-const dealButton = document.querySelector('#deal-button');
+const dealButton =
+  document.querySelector(
+    '#deal-button'
+  );
 
-const ownCardCountElement = document.querySelector('#own-card-count');
+const customDealButton =
+  document.querySelector(
+    '#custom-deal-button'
+  );
 
-const playButton = document.querySelector('#play-button');
+const ownCardCountElement =
+  document.querySelector(
+    '#own-card-count'
+  );
 
-const passButton = document.querySelector('#pass-button');
+const playButton =
+  document.querySelector(
+    '#play-button'
+  );
 
-const sortButton = document.querySelector('#sort-button');
+const passButton =
+  document.querySelector(
+    '#pass-button'
+  );
 
-const currentPlayElement = document.querySelector('#current-play');
+const sortButton =
+  document.querySelector(
+    '#sort-button'
+  );
 
-const lastPlayerElement = document.querySelector('#last-player');
+const askButton =
+  document.querySelector(
+    '#ask-button'
+  );
 
-const turnIndicatorElement = document.querySelector('#turn-indicator');
+const currentPlayElement =
+  document.querySelector(
+    '#current-play'
+  );
 
-const toastElement = document.querySelector('#toast');
+const lastPlayerElement =
+  document.querySelector(
+    '#last-player'
+  );
 
-const activePlayerNameElement = document.querySelector('#active-player-name');
+const turnIndicatorElement =
+  document.querySelector(
+    '#turn-indicator'
+  );
 
-const activePlayerTeamElement = document.querySelector('#active-player-team');
+const toastElement =
+  document.querySelector(
+    '#toast'
+  );
 
-const activePlayerAvatarElement = document.querySelector(
-  '#active-player-avatar'
-);
+const activePlayerNameElement =
+  document.querySelector(
+    '#active-player-name'
+  );
 
-const reportButton = document.querySelector('#report-button');
+const activePlayerTeamElement =
+  document.querySelector(
+    '#active-player-team'
+  );
 
-const reportModal = document.querySelector('#report-modal');
+const activePlayerAvatarElement =
+  document.querySelector(
+    '#active-player-avatar'
+  );
 
-const closeReportModalButton = document.querySelector('#close-report-modal');
+/* Ask modal */
+
+const askModal =
+  document.querySelector(
+    '#ask-modal'
+  );
+
+const closeAskModalButton =
+  document.querySelector(
+    '#close-ask-modal'
+  );
+
+const askPlayerList =
+  document.querySelector(
+    '#ask-player-list'
+  );
+
+/* Custom modal */
+
+const customDealModal =
+  document.querySelector(
+    '#custom-deal-modal'
+  );
+
+const closeCustomDealModalButton =
+  document.querySelector(
+    '#close-custom-deal-modal'
+  );
+
+const customHandFields =
+  document.querySelector(
+    '#custom-hand-fields'
+  );
+
+const customTrumpRank =
+  document.querySelector(
+    '#custom-trump-rank'
+  );
+
+const customStartPlayer =
+  document.querySelector(
+    '#custom-start-player'
+  );
+
+const customFinishOrder =
+  document.querySelector(
+    '#custom-finish-order'
+  );
+
+const startCustomDealButton =
+  document.querySelector(
+    '#start-custom-deal-button'
+  );
 
 /* =========================================================
    HELPERS
    ========================================================= */
 
-function escapeHtml(value) {
+function escapeHtml(
+  value
+) {
   return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+    .replaceAll(
+      '&',
+      '&amp;'
+    )
+    .replaceAll(
+      '<',
+      '&lt;'
+    )
+    .replaceAll(
+      '>',
+      '&gt;'
+    )
+    .replaceAll(
+      '"',
+      '&quot;'
+    )
+    .replaceAll(
+      "'",
+      '&#039;'
+    );
 }
 
-function showToast(message) {
-  toastElement.textContent = message;
+function showToast(
+  message
+) {
+  toastElement.textContent =
+    message;
 
-  toastElement.classList.add('visible');
+  toastElement.classList.add(
+    'visible'
+  );
 
-  window.clearTimeout(showToast.timeoutId);
+  window.clearTimeout(
+    showToast.timeoutId
+  );
 
-  showToast.timeoutId = window.setTimeout(() => {
-    toastElement.classList.remove('visible');
-  }, 2400);
+  showToast.timeoutId =
+    window.setTimeout(
+      () => {
+        toastElement
+          .classList
+          .remove(
+            'visible'
+          );
+      },
+      2800
+    );
 }
 
-function formatDealTime(timestamp) {
+function formatDealTime(
+  timestamp
+) {
   if (!timestamp) {
     return 'Not dealt';
   }
 
-  const date = new Date(timestamp);
-
-  return new Intl.DateTimeFormat(undefined, {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  }).format(date);
+  return new Intl.DateTimeFormat(
+    undefined,
+    {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }
+  ).format(
+    new Date(timestamp)
+  );
 }
 
-function getPositionForOffset(offset) {
+function getPositionForOffset(
+  offset
+) {
   const positions = {
-    1: 'bottom-left',
-    2: 'top-left',
-    3: 'top',
-    4: 'top-right',
-    5: 'bottom-right',
+    1:
+      'bottom-left',
+
+    2:
+      'top-left',
+
+    3:
+      'top',
+
+    4:
+      'top-right',
+
+    5:
+      'bottom-right',
   };
 
-  return positions[offset];
+  return positions[
+    offset
+  ];
 }
 
 function getLocalHand() {
-  if (!roomState || localSeatIndex === null) {
+  if (
+    !roomState ||
+    localSeatIndex ===
+      null
+  ) {
     return [];
   }
 
-  return roomState.state.hands[localSeatIndex] || [];
+  return (
+    roomState.state.hands[
+      localSeatIndex
+    ] || []
+  );
+}
+
+function getPublicReportText(
+  seatIndex
+) {
+  const report =
+    roomState?.state
+      ?.publicReports?.[
+        seatIndex
+      ];
+
+  if (!report) {
+    return 'Card count unknown';
+  }
+
+  if (
+    report.status ===
+    'not-reported'
+  ) {
+    return 'Not reported';
+  }
+
+  if (
+    report.status ===
+    'reported'
+  ) {
+    return `${report.count} card${
+      report.count === 1
+        ? ''
+        : 's'
+    }`;
+  }
+
+  return 'Card count unknown';
 }
 
 /* =========================================================
-   REVISION-SAFE STATE UPDATE
+   REVISION SAFE STATE
    ========================================================= */
 
-function applyRoomState(data) {
-  const incomingRevision = data?.state?.revision ?? -1;
+function applyRoomState(
+  data
+) {
+  const incomingRevision =
+    data?.state
+      ?.revision ??
+    -1;
 
-  /*
-    Socket.IO normally preserves
-    ordering, but revision checking
-    protects us from stale state
-    replacing newer state.
-  */
   if (
     roomState &&
-    data.code === roomState.code &&
-    incomingRevision < lastRevision
+    data.code ===
+      roomState.code &&
+    incomingRevision <
+      lastRevision
   ) {
     return;
   }
 
-  lastRevision = incomingRevision;
+  lastRevision =
+    incomingRevision;
 
-  roomState = data;
+  roomState =
+    data;
 
   renderGame();
+
+  if (
+    !askModal.classList
+      .contains(
+        'hidden'
+      )
+  ) {
+    renderAskPlayerList();
+  }
 }
 
 /* =========================================================
@@ -585,30 +984,73 @@ function applyRoomState(data) {
    ========================================================= */
 
 function renderPlayerSeats() {
-  if (!roomState || localSeatIndex === null) {
-    playerSeatsElement.innerHTML = '';
+  if (
+    !roomState ||
+    localSeatIndex ===
+      null
+  ) {
+    playerSeatsElement
+      .innerHTML =
+      '';
 
     return;
   }
 
-  const markup = [];
+  const markup =
+    [];
 
-  for (let offset = 1; offset <= 5; offset += 1) {
-    const playerIndex = (localSeatIndex + offset) % 6;
+  for (
+    let offset = 1;
+    offset <= 5;
+    offset += 1
+  ) {
+    const playerIndex =
+      (
+        localSeatIndex +
+        offset
+      ) % 6;
 
-    const player = roomState.players[playerIndex];
+    const player =
+      roomState.players[
+        playerIndex
+      ];
 
-    let status = 'Ready';
+    const position =
+      getPositionForOffset(
+        offset
+      );
 
-    if (!player.connected) {
-      status = 'Disconnected';
+    let statusText =
+      getPublicReportText(
+        playerIndex
+      );
+
+    if (
+      !roomState.state
+        .gameId
+    ) {
+      statusText =
+        player.connected
+          ? 'Ready'
+          : 'Empty';
     }
 
-    if (player.hasFinished) {
-      status = 'Finished';
+    if (
+      !player.connected
+    ) {
+      statusText =
+        roomState.state
+          .gameId
+          ? `Disconnected · ${statusText}`
+          : 'Empty';
     }
 
-    const position = getPositionForOffset(offset);
+    if (
+      player.hasFinished
+    ) {
+      statusText =
+        'Finished · 0 cards';
+    }
 
     markup.push(`
       <div
@@ -623,18 +1065,21 @@ function renderPlayerSeats() {
 
         <div class="player-details">
           <strong>
-            ${escapeHtml(player.name)}
+            ${escapeHtml(
+              player.name
+            )}
           </strong>
 
           <span
             class="player-status"
           >
-            ${status}
+            ${statusText}
           </span>
         </div>
 
         ${
-          player.connected && !player.hasFinished
+          player.connected &&
+          !player.hasFinished
             ? `
               <div
                 class="hidden-hand"
@@ -651,7 +1096,9 @@ function renderPlayerSeats() {
     `);
   }
 
-  playerSeatsElement.innerHTML = markup.join('');
+  playerSeatsElement
+    .innerHTML =
+    markup.join('');
 }
 
 /* =========================================================
@@ -659,49 +1106,90 @@ function renderPlayerSeats() {
    ========================================================= */
 
 function renderHand() {
-  if (!roomState || localSeatIndex === null) {
+  if (
+    !roomState ||
+    localSeatIndex ===
+      null
+  ) {
     return;
   }
 
-  const player = roomState.players[localSeatIndex];
+  const player =
+    roomState.players[
+      localSeatIndex
+    ];
 
-  const hand = getLocalHand();
+  const hand =
+    getLocalHand();
 
-  activePlayerNameElement.textContent = player.name;
+  activePlayerNameElement
+    .textContent =
+    player.name;
 
-  activePlayerTeamElement.textContent = `Team ${player.team}`;
+  activePlayerTeamElement
+    .textContent =
+    `Team ${player.team}`;
 
-  activePlayerAvatarElement.textContent = player.id;
+  activePlayerAvatarElement
+    .textContent =
+    player.id;
 
-  activePlayerAvatarElement.className = `player-avatar team-${player.team.toLowerCase()} current`;
+  activePlayerAvatarElement
+    .className =
+    `player-avatar team-${player.team.toLowerCase()} current`;
 
-  trumpRankDisplay.textContent = roomState.state.trumpRank;
+  trumpRankDisplay
+    .textContent =
+    roomState.state
+      .trumpRank;
 
-  dealTimeDisplay.textContent = formatDealTime(roomState.state.dealtAt);
+  dealTimeDisplay
+    .textContent =
+    formatDealTime(
+      roomState.state
+        .dealtAt
+    );
 
-  /*
-    Remove selected IDs that
-    disappeared after a play.
-  */
-  const availableIds = new Set(hand.map((card) => card.id));
+  const availableIds =
+    new Set(
+      hand.map(
+        (card) =>
+          card.id
+      )
+    );
 
-  selectedCardIds = selectedCardIds.filter((id) => availableIds.has(id));
+  selectedCardIds =
+    selectedCardIds.filter(
+      (id) =>
+        availableIds.has(
+          id
+        )
+    );
 
-  if (!roomState.state.hasStarted) {
+  if (
+    !roomState.state
+      .gameId
+  ) {
     playerHandElement.innerHTML = `
       <div class="empty-hand">
         Waiting for Player 1 to deal.
       </div>
     `;
 
-    ownCardCountElement.textContent = '0 cards';
+    ownCardCountElement
+      .textContent =
+      '0 cards';
 
     return;
   }
 
-  ownCardCountElement.textContent = `${hand.length} cards`;
+  ownCardCountElement
+    .textContent =
+    `${hand.length} cards`;
 
-  if (hand.length === 0) {
+  if (
+    hand.length === 0
+  ) {
     playerHandElement.innerHTML = `
       <div class="empty-hand">
         You have finished.
@@ -711,19 +1199,35 @@ function renderHand() {
     return;
   }
 
-  playerHandElement.innerHTML = hand
-    .map((card) => {
-      const selected = selectedCardIds.includes(card.id);
+  playerHandElement
+    .innerHTML =
+    hand
+      .map(
+        (card) => {
+          const selected =
+            selectedCardIds.includes(
+              card.id
+            );
 
-      const displayedRank = card.displayRank ?? card.rank;
+          const displayedRank =
+            card.displayRank ??
+            card.rank;
 
-      return `
+          return `
             <button
               class="
                 playing-card
                 ${card.color}
-                ${selected ? 'selected' : ''}
-                ${card.isJoker ? 'joker-card' : ''}
+                ${
+                  selected
+                    ? 'selected'
+                    : ''
+                }
+                ${
+                  card.isJoker
+                    ? 'joker-card'
+                    : ''
+                }
               "
               data-card-id="${card.id}"
               aria-pressed="${selected}"
@@ -747,28 +1251,55 @@ function renderHand() {
               </span>
             </button>
           `;
-    })
-    .join('');
+        }
+      )
+      .join('');
 
-  playerHandElement.querySelectorAll('.playing-card').forEach((cardElement) => {
-    cardElement.addEventListener('click', () => {
-      const cardId = cardElement.dataset.cardId;
+  playerHandElement
+    .querySelectorAll(
+      '.playing-card'
+    )
+    .forEach(
+      (
+        cardElement
+      ) => {
+        cardElement
+          .addEventListener(
+            'click',
+            () => {
+              const cardId =
+                cardElement
+                  .dataset
+                  .cardId;
 
-      if (selectedCardIds.includes(cardId)) {
-        selectedCardIds = selectedCardIds.filter((id) => id !== cardId);
-      } else {
-        selectedCardIds.push(cardId);
+              if (
+                selectedCardIds.includes(
+                  cardId
+                )
+              ) {
+                selectedCardIds =
+                  selectedCardIds.filter(
+                    (id) =>
+                      id !==
+                      cardId
+                  );
+              } else {
+                selectedCardIds.push(
+                  cardId
+                );
+              }
+
+              renderHand();
+
+              updateActionUI();
+            }
+          );
       }
-
-      renderHand();
-
-      updateActionUI();
-    });
-  });
+    );
 }
 
 /* =========================================================
-   CENTER TABLE
+   CENTER
    ========================================================= */
 
 function renderCenter() {
@@ -776,103 +1307,167 @@ function renderCenter() {
     return;
   }
 
-  const state = roomState.state;
+  const state =
+    roomState.state;
 
-  if (!state.hasStarted) {
-    turnIndicatorElement.textContent = state.dealtAt
-      ? 'Game finished'
-      : 'Waiting to deal';
-  } else if (state.paused) {
-    turnIndicatorElement.textContent = 'Game paused — waiting for all players';
-  } else if (state.phase === 'showing-play') {
-    const lead = state.currentLead;
+  if (
+    !state.gameId
+  ) {
+    turnIndicatorElement
+      .textContent =
+      'Waiting to deal';
+  } else if (
+    !state.hasStarted
+  ) {
+    turnIndicatorElement
+      .textContent =
+      'Game finished';
+  } else if (
+    state.paused
+  ) {
+    turnIndicatorElement
+      .textContent =
+      'Game paused — waiting for players';
+  } else if (
+    state.phase ===
+    'showing-play'
+  ) {
+    const lead =
+      state.currentLead;
 
     if (lead) {
-      const player = roomState.players[lead.playerIndex];
+      const player =
+        roomState.players[
+          lead.playerIndex
+        ];
 
-      turnIndicatorElement.textContent = `${player.name} played`;
-    } else {
-      turnIndicatorElement.textContent = 'Play resolving…';
+      turnIndicatorElement
+        .textContent =
+        `${player.name} played`;
     }
   } else {
-    const turnPlayer = roomState.players[state.currentPlayerIndex];
+    const turnPlayer =
+      roomState.players[
+        state.currentPlayerIndex
+      ];
 
-    turnIndicatorElement.textContent = `${turnPlayer.name}'s Turn`;
+    turnIndicatorElement
+      .textContent =
+      `${turnPlayer.name}'s Turn`;
   }
 
-  /*
-    The current lead stays visible
-    after the 2-second delay because
-    the next player must respond to it.
-  */
-  if (state.currentLead) {
-    const lead = state.currentLead;
+  if (
+    state.currentLead
+  ) {
+    const lead =
+      state.currentLead;
 
-    const leader = roomState.players[lead.playerIndex];
+    const leader =
+      roomState.players[
+        lead.playerIndex
+      ];
 
-    currentPlayElement.innerHTML = `
-      <div class="played-cards">
-        ${lead.cards
-          .map((card) => {
-            const displayedRank = card.displayRank ?? card.rank;
+    currentPlayElement
+      .innerHTML = `
+        <div class="played-cards">
+          ${lead.cards
+            .map(
+              (card) => {
+                const displayedRank =
+                  card.displayRank ??
+                  card.rank;
 
-            return `
-                <div
-                  class="mini-card ${card.color}"
-                >
-                  <strong>
-                    ${displayedRank}
-                  </strong>
+                return `
+                  <div
+                    class="mini-card ${card.color}"
+                  >
+                    <strong>
+                      ${displayedRank}
+                    </strong>
 
-                  <span>
-                    ${card.symbol}
-                  </span>
-                </div>
-              `;
-          })
-          .join('')}
-      </div>
-    `;
+                    <span>
+                      ${card.symbol}
+                    </span>
+                  </div>
+                `;
+              }
+            )
+            .join('')}
+        </div>
+      `;
 
-    lastPlayerElement.textContent = `${leader.name}: ${lead.combination.label}`;
+    lastPlayerElement
+      .textContent =
+      `${leader.name}: ${lead.combination.label}`;
   } else {
-    currentPlayElement.innerHTML = `
-      <div class="empty-play">
-        <span>
-          ${state.hasStarted ? 'New Lead' : 'No active play'}
-        </span>
-      </div>
-    `;
+    currentPlayElement
+      .innerHTML = `
+        <div class="empty-play">
+          <span>
+            ${
+              state.hasStarted
+                ? 'New Lead'
+                : 'No active play'
+            }
+          </span>
+        </div>
+      `;
 
-    lastPlayerElement.textContent = state.hasStarted
-      ? 'Awaiting lead...'
-      : 'No previous play';
+    lastPlayerElement
+      .textContent =
+      state.hasStarted
+        ? 'Awaiting lead...'
+        : 'No previous play';
   }
 }
 
 /* =========================================================
-   BUTTON STATE
+   ACTION UI
    ========================================================= */
 
 function updateActionUI() {
-  selectedCountElement.textContent = selectedCardIds.length;
+  selectedCountElement
+    .textContent =
+    selectedCardIds.length;
 
-  const state = roomState?.state;
+  const state =
+    roomState?.state;
 
-  const activeGame = Boolean(state?.hasStarted);
+  const activeGame =
+    Boolean(
+      state?.hasStarted
+    );
 
-  const normalTurn = activeGame && !state.paused && state.phase === 'turn';
+  const normalTurn =
+    activeGame &&
+    !state.paused &&
+    state.phase ===
+      'turn';
 
   const myTurn =
     normalTurn &&
-    localSeatIndex !== null &&
-    state.currentPlayerIndex === localSeatIndex;
+    localSeatIndex !==
+      null &&
+    state.currentPlayerIndex ===
+      localSeatIndex;
 
-  playButton.disabled = !myTurn || selectedCardIds.length === 0;
+  playButton.disabled =
+    !myTurn ||
+    selectedCardIds.length ===
+      0;
 
-  passButton.disabled = !myTurn || !state?.currentLead;
+  passButton.disabled =
+    !myTurn ||
+    !state?.currentLead;
 
-  sortButton.disabled = !activeGame;
+  sortButton.disabled =
+    !state?.gameId;
+
+  /*
+    Ask is independent of turn.
+  */
+  askButton.disabled =
+    !state?.gameId;
 }
 
 /* =========================================================
@@ -880,13 +1475,31 @@ function updateActionUI() {
    ========================================================= */
 
 function renderGame() {
-  if (!roomState || localSeatIndex === null) {
+  if (
+    !roomState ||
+    localSeatIndex ===
+      null
+  ) {
     return;
   }
 
-  roomCodeDisplay.textContent = roomState.code;
+  roomCodeDisplay
+    .textContent =
+    roomState.code;
 
-  dealButton.style.display = localSeatIndex === 0 ? '' : 'none';
+  const isHost =
+    localSeatIndex ===
+    0;
+
+  dealButton.style.display =
+    isHost
+      ? ''
+      : 'none';
+
+  customDealButton.style.display =
+    isHost
+      ? ''
+      : 'none';
 
   renderPlayerSeats();
 
@@ -898,69 +1511,542 @@ function renderGame() {
 }
 
 /* =========================================================
+   ASK MODAL
+   ========================================================= */
+
+function renderAskPlayerList() {
+  if (
+    !roomState ||
+    localSeatIndex ===
+      null
+  ) {
+    return;
+  }
+
+  const rows =
+    [];
+
+  roomState.players.forEach(
+    (
+      player,
+      seatIndex
+    ) => {
+      if (
+        seatIndex ===
+        localSeatIndex
+      ) {
+        return;
+      }
+
+      const reportText =
+        getPublicReportText(
+          seatIndex
+        );
+
+      rows.push(`
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom:
+              1px solid
+              rgba(255,255,255,0.07);
+          "
+        >
+          <div>
+            <strong
+              style="
+                display:block;
+                font-size:13px;
+              "
+            >
+              Player ${player.id} ·
+              ${escapeHtml(player.name)}
+            </strong>
+
+            <span
+              style="
+                display:block;
+                color:#8ea197;
+                font-size:11px;
+                margin-top:3px;
+              "
+            >
+              Team ${player.team} ·
+              ${reportText}
+            </span>
+          </div>
+
+          <button
+            class="secondary-button ask-target-button"
+            data-target-seat="${seatIndex}"
+          >
+            Ask
+          </button>
+        </div>
+      `);
+    }
+  );
+
+  askPlayerList.innerHTML =
+    rows.join('');
+
+  askPlayerList
+    .querySelectorAll(
+      '.ask-target-button'
+    )
+    .forEach(
+      (button) => {
+        button
+          .addEventListener(
+            'click',
+            () => {
+              const targetSeatIndex =
+                Number(
+                  button
+                    .dataset
+                    .targetSeat
+                );
+
+              socket.emit(
+                'askCardCount',
+
+                {
+                  targetSeatIndex,
+                },
+
+                (response) => {
+                  if (
+                    !response
+                      ?.success
+                  ) {
+                    showToast(
+                      response
+                        ?.message ||
+                      'Could not ask player.'
+                    );
+                  }
+                }
+              );
+            }
+          );
+      }
+    );
+}
+
+askButton
+  .addEventListener(
+    'click',
+    () => {
+      if (
+        !roomState?.state
+          ?.gameId
+      ) {
+        showToast(
+          'Deal the cards first.'
+        );
+
+        return;
+      }
+
+      renderAskPlayerList();
+
+      askModal
+        .classList
+        .remove(
+          'hidden'
+        );
+    }
+  );
+
+closeAskModalButton
+  .addEventListener(
+    'click',
+    () => {
+      askModal
+        .classList
+        .add(
+          'hidden'
+        );
+    }
+  );
+
+askModal
+  .addEventListener(
+    'click',
+    (event) => {
+      if (
+        event.target ===
+        askModal
+      ) {
+        askModal
+          .classList
+          .add(
+            'hidden'
+          );
+      }
+    }
+  );
+
+/* =========================================================
+   CUSTOM DEAL MODAL
+   ========================================================= */
+
+function populateCustomDealModal() {
+  if (!roomState) {
+    return;
+  }
+
+  customHandFields
+    .innerHTML =
+    roomState.players
+      .map(
+        (
+          player,
+          seatIndex
+        ) => `
+          <div>
+            <label
+              class="field-label"
+              for="custom-hand-${seatIndex}"
+            >
+              Player ${player.id} ·
+              ${escapeHtml(player.name)} ·
+              Team ${player.team}
+            </label>
+
+            <textarea
+              class="text-input"
+              id="custom-hand-${seatIndex}"
+              rows="4"
+              placeholder="AS KH 10D 10D BJ"
+              style="
+                resize: vertical;
+                min-height: 92px;
+                line-height: 1.5;
+              "
+            ></textarea>
+          </div>
+        `
+      )
+      .join('');
+
+  customStartPlayer
+    .innerHTML =
+    roomState.players
+      .map(
+        (
+          player,
+          seatIndex
+        ) => `
+          <option
+            value="${seatIndex}"
+          >
+            Player ${player.id} ·
+            ${escapeHtml(player.name)}
+          </option>
+        `
+      )
+      .join('');
+
+  customTrumpRank.value =
+    roomState.state
+      .trumpRank ||
+    '2';
+
+  customStartPlayer.value =
+    '0';
+
+  customFinishOrder.value =
+    '';
+}
+
+customDealButton
+  .addEventListener(
+    'click',
+    () => {
+      if (
+        localSeatIndex !==
+        0
+      ) {
+        return;
+      }
+
+      populateCustomDealModal();
+
+      customDealModal
+        .classList
+        .remove(
+          'hidden'
+        );
+    }
+  );
+
+closeCustomDealModalButton
+  .addEventListener(
+    'click',
+    () => {
+      customDealModal
+        .classList
+        .add(
+          'hidden'
+        );
+    }
+  );
+
+customDealModal
+  .addEventListener(
+    'click',
+    (event) => {
+      if (
+        event.target ===
+        customDealModal
+      ) {
+        customDealModal
+          .classList
+          .add(
+            'hidden'
+          );
+      }
+    }
+  );
+
+startCustomDealButton
+  .addEventListener(
+    'click',
+    () => {
+      if (
+        localSeatIndex !==
+        0
+      ) {
+        return;
+      }
+
+      const handTexts =
+        Array.from(
+          {
+            length: 6,
+          },
+
+          (
+            _value,
+            seatIndex
+          ) =>
+            document
+              .querySelector(
+                `#custom-hand-${seatIndex}`
+              )
+              ?.value ??
+            ''
+        );
+
+      const confirmed =
+        !roomState?.state
+          ?.hasStarted ||
+        window.confirm(
+          'Replace the current game with this custom deal?'
+        );
+
+      if (!confirmed) {
+        return;
+      }
+
+      startCustomDealButton
+        .disabled =
+        true;
+
+      socket.emit(
+        'customDeal',
+
+        {
+          handTexts,
+
+          trumpRank:
+            customTrumpRank
+              .value,
+
+          startingPlayerIndex:
+            Number(
+              customStartPlayer
+                .value
+            ),
+
+          finishOrderText:
+            customFinishOrder
+              .value,
+        },
+
+        (response) => {
+          startCustomDealButton
+            .disabled =
+            false;
+
+          if (
+            !response
+              ?.success
+          ) {
+            showToast(
+              response
+                ?.message ||
+              'Could not start custom game.'
+            );
+
+            return;
+          }
+
+          selectedCardIds =
+            [];
+
+          customDealModal
+            .classList
+            .add(
+              'hidden'
+            );
+
+          showToast(
+            `Custom game started. ${response.unassignedCardCount} cards unassigned.`
+          );
+        }
+      );
+    }
+  );
+
+/* =========================================================
    SOCKET CONNECTION STATUS
    ========================================================= */
 
-socket.on('connect', () => {
-  connectionStatus.textContent = 'Connected';
+socket.on(
+  'connect',
+  () => {
+    connectionStatus
+      .textContent =
+      'Connected';
 
-  connectionStatus.classList.add('connected');
-});
+    connectionStatus
+      .classList
+      .add(
+        'connected'
+      );
+  }
+);
 
-socket.on('disconnect', () => {
-  connectionStatus.textContent = 'Disconnected from server';
+socket.on(
+  'disconnect',
+  () => {
+    connectionStatus
+      .textContent =
+      'Disconnected from server';
 
-  connectionStatus.classList.remove('connected');
-});
+    connectionStatus
+      .classList
+      .remove(
+        'connected'
+      );
+  }
+);
 
-socket.on('connect_error', (error) => {
-  connectionStatus.textContent = `Connection error: ${error.message}`;
+socket.on(
+  'connect_error',
+  (error) => {
+    connectionStatus
+      .textContent =
+      `Connection error: ${error.message}`;
 
-  connectionStatus.classList.remove('connected');
-});
+    connectionStatus
+      .classList
+      .remove(
+        'connected'
+      );
+  }
+);
 
 /* =========================================================
-   SERVER STATE
+   SERVER STATE EVENTS
    ========================================================= */
 
-socket.on('roomStateUpdate', (data) => {
-  applyRoomState(data);
-});
+socket.on(
+  'roomStateUpdate',
+  (data) => {
+    applyRoomState(
+      data
+    );
+  }
+);
 
-socket.on('gameStateUpdate', (data) => {
-  applyRoomState(data);
-});
+socket.on(
+  'gameStateUpdate',
+  (data) => {
+    applyRoomState(
+      data
+    );
+  }
+);
 
-socket.on('toast', (message) => {
-  showToast(message);
-});
+socket.on(
+  'toast',
+  (message) => {
+    showToast(
+      message
+    );
+  }
+);
+
+socket.on(
+  'publicMessage',
+  (message) => {
+    showToast(
+      message
+    );
+  }
+);
 
 /* =========================================================
-   ROOM CLOSED BY HOST EXIT
+   ROOM CLOSED
    ========================================================= */
 
-socket.on('roomClosed', ({ reason } = {}) => {
-  roomState = null;
+socket.on(
+  'roomClosed',
+  (
+    {
+      reason,
+    } = {}
+  ) => {
+    roomState =
+      null;
 
-  localSeatIndex = null;
+    localSeatIndex =
+      null;
 
-  selectedCardIds = [];
+    selectedCardIds =
+      [];
 
-  lastRevision = -1;
+    lastRevision =
+      -1;
 
-  roomCodeDisplay.textContent = '------';
+    roomCodeDisplay
+      .textContent =
+      '------';
 
-  dealTimeDisplay.textContent = 'Not dealt';
+    dealTimeDisplay
+      .textContent =
+      'Not dealt';
 
-  playerSeatsElement.innerHTML = '';
+    playerSeatsElement
+      .innerHTML =
+      '';
 
-  playerHandElement.innerHTML = `
+    playerHandElement
+      .innerHTML = `
         <div class="empty-hand">
           Room closed.
         </div>
       `;
 
-  currentPlayElement.innerHTML = `
+    currentPlayElement
+      .innerHTML = `
         <div class="empty-play">
           <span>
             No active play
@@ -968,215 +2054,346 @@ socket.on('roomClosed', ({ reason } = {}) => {
         </div>
       `;
 
-  turnIndicatorElement.textContent = 'Room closed';
+    turnIndicatorElement
+      .textContent =
+      'Room closed';
 
-  lastPlayerElement.textContent = 'No previous play';
+    lastPlayerElement
+      .textContent =
+      'No previous play';
 
-  roomModal.classList.remove('hidden');
+    askModal
+      .classList
+      .add(
+        'hidden'
+      );
 
-  showToast(
-    reason === 'host_disconnected'
-      ? 'Room closed because the host left.'
-      : 'Room closed.'
-  );
-});
+    customDealModal
+      .classList
+      .add(
+        'hidden'
+      );
+
+    roomModal
+      .classList
+      .remove(
+        'hidden'
+      );
+
+    showToast(
+      reason ===
+        'host_disconnected'
+        ? 'Room closed because the host left.'
+        : 'Room closed.'
+    );
+  }
+);
 
 /* =========================================================
    CREATE ROOM
    ========================================================= */
 
-createRoomBtn.addEventListener('click', () => {
-  const name = playerNameInput.value.trim() || 'Player 1';
+createRoomBtn
+  .addEventListener(
+    'click',
+    () => {
+      const name =
+        playerNameInput
+          .value
+          .trim() ||
+        'Player 1';
 
-  socket.emit(
-    'createRoom',
-    {
-      name,
-    },
-    (response) => {
-      if (!response?.success) {
-        showToast(response?.message || 'Could not create room.');
+      socket.emit(
+        'createRoom',
+
+        {
+          name,
+        },
+
+        (response) => {
+          if (
+            !response
+              ?.success
+          ) {
+            showToast(
+              response
+                ?.message ||
+              'Could not create room.'
+            );
+
+            return;
+          }
+
+          localSeatIndex =
+            response
+              .seatIndex;
+
+          lastRevision =
+            -1;
+
+          roomCodeDisplay
+            .textContent =
+            response
+              .roomCode;
+
+          roomModal
+            .classList
+            .add(
+              'hidden'
+            );
+        }
+      );
+    }
+  );
+
+/* =========================================================
+   JOIN ROOM
+   ========================================================= */
+
+joinRoomBtn
+  .addEventListener(
+    'click',
+    () => {
+      const name =
+        playerNameInput
+          .value
+          .trim();
+
+      const roomCode =
+        roomCodeInput
+          .value
+          .trim()
+          .toUpperCase();
+
+      const seatIndex =
+        Number.parseInt(
+          seatSelect.value,
+          10
+        );
+
+      if (!roomCode) {
+        showToast(
+          'Enter a room code.'
+        );
 
         return;
       }
 
-      localSeatIndex = response.seatIndex;
+      socket.emit(
+        'joinRoom',
 
-      lastRevision = -1;
+        {
+          roomCode,
+          seatIndex,
+          name,
+        },
 
-      roomCodeDisplay.textContent = response.roomCode;
+        (response) => {
+          if (
+            !response
+              ?.success
+          ) {
+            showToast(
+              response
+                ?.message ||
+              'Could not join room.'
+            );
 
-      roomModal.classList.add('hidden');
+            return;
+          }
+
+          localSeatIndex =
+            response
+              .seatIndex;
+
+          lastRevision =
+            -1;
+
+          roomCodeDisplay
+            .textContent =
+            response
+              .roomCode;
+
+          roomModal
+            .classList
+            .add(
+              'hidden'
+            );
+        }
+      );
     }
   );
-});
 
 /* =========================================================
-   JOIN / REJOIN ROOM
+   RANDOM DEAL
    ========================================================= */
 
-joinRoomBtn.addEventListener('click', () => {
-  const name = playerNameInput.value.trim();
+dealButton
+  .addEventListener(
+    'click',
+    () => {
+      const confirmed =
+        !roomState?.state
+          ?.hasStarted ||
+        window.confirm(
+          'Start a new random game and reshuffle all cards?'
+        );
 
-  const roomCode = roomCodeInput.value.trim().toUpperCase();
-
-  const seatIndex = Number.parseInt(seatSelect.value, 10);
-
-  if (!roomCode) {
-    showToast('Enter a room code.');
-
-    return;
-  }
-
-  socket.emit(
-    'joinRoom',
-    {
-      roomCode,
-      seatIndex,
-      name,
-    },
-    (response) => {
-      if (!response?.success) {
-        showToast(response?.message || 'Could not join room.');
-
+      if (!confirmed) {
         return;
       }
 
-      localSeatIndex = response.seatIndex;
+      socket.emit(
+        'dealCards',
 
-      lastRevision = -1;
+        (response) => {
+          if (
+            !response
+              ?.success
+          ) {
+            showToast(
+              response
+                ?.message ||
+              'Could not deal cards.'
+            );
 
-      roomCodeDisplay.textContent = response.roomCode;
+            return;
+          }
 
-      roomModal.classList.add('hidden');
+          selectedCardIds =
+            [];
+        }
+      );
     }
   );
-});
-
-/* =========================================================
-   DEAL
-   ========================================================= */
-
-dealButton.addEventListener('click', () => {
-  const confirmed =
-    !roomState?.state?.hasStarted ||
-    window.confirm('Start a new game and reshuffle all cards?');
-
-  if (!confirmed) {
-    return;
-  }
-
-  socket.emit('dealCards', (response) => {
-    if (!response?.success) {
-      showToast(response?.message || 'Could not deal cards.');
-
-      return;
-    }
-
-    selectedCardIds = [];
-  });
-});
 
 /* =========================================================
    PLAY
    ========================================================= */
 
-playButton.addEventListener('click', () => {
-  socket.emit(
-    'playCards',
-    {
-      cardIds: selectedCardIds,
-    },
-    (response) => {
-      if (!response?.success) {
-        showToast(response?.message || 'Invalid play.');
+playButton
+  .addEventListener(
+    'click',
+    () => {
+      socket.emit(
+        'playCards',
 
-        return;
-      }
+        {
+          cardIds:
+            selectedCardIds,
+        },
 
-      selectedCardIds = [];
+        (response) => {
+          if (
+            !response
+              ?.success
+          ) {
+            showToast(
+              response
+                ?.message ||
+              'Invalid play.'
+            );
+
+            return;
+          }
+
+          selectedCardIds =
+            [];
+        }
+      );
     }
   );
-});
 
 /* =========================================================
    PASS
    ========================================================= */
 
-passButton.addEventListener('click', () => {
-  socket.emit('passTurn', (response) => {
-    if (!response?.success) {
-      showToast(response?.message || 'Could not pass.');
+passButton
+  .addEventListener(
+    'click',
+    () => {
+      socket.emit(
+        'passTurn',
 
-      return;
+        (response) => {
+          if (
+            !response
+              ?.success
+          ) {
+            showToast(
+              response
+                ?.message ||
+              'Could not pass.'
+            );
+
+            return;
+          }
+
+          selectedCardIds =
+            [];
+        }
+      );
     }
-
-    selectedCardIds = [];
-  });
-});
+  );
 
 /* =========================================================
    SORT
    ========================================================= */
 
-sortButton.addEventListener('click', () => {
-  if (!roomState?.state?.hasStarted || localSeatIndex === null) {
-    return;
-  }
+sortButton
+  .addEventListener(
+    'click',
+    () => {
+      if (
+        !roomState?.state
+          ?.gameId ||
+        localSeatIndex ===
+          null
+      ) {
+        return;
+      }
 
-  roomState.state.hands[localSeatIndex] = sortCards(getLocalHand());
+      roomState.state.hands[
+        localSeatIndex
+      ] =
+        sortCards(
+          getLocalHand()
+        );
 
-  renderHand();
+      renderHand();
 
-  updateActionUI();
-});
+      updateActionUI();
+    }
+  );
 
 /* =========================================================
-   ROOM CODE INPUT
+   ROOM CODE
    ========================================================= */
 
-roomCodeInput.addEventListener('input', () => {
-  roomCodeInput.value = roomCodeInput.value.toUpperCase();
-});
-
-/* =========================================================
-   ASK / REPORT
-   ========================================================= */
-
-document.querySelector('#ask-button').addEventListener('click', () => {
-  showToast('Ask/report networking is not implemented yet.');
-});
-
-reportButton.addEventListener('click', () => {
-  reportModal.classList.remove('hidden');
-});
-
-closeReportModalButton.addEventListener('click', () => {
-  reportModal.classList.add('hidden');
-});
-
-reportModal.addEventListener('click', (event) => {
-  if (event.target === reportModal) {
-    reportModal.classList.add('hidden');
-  }
-});
-
-document.querySelector('#report-count-button').addEventListener('click', () => {
-  reportModal.classList.add('hidden');
-
-  showToast('Reporting is not synchronized yet.');
-});
-
-document.querySelector('#report-route-button').addEventListener('click', () => {
-  reportModal.classList.add('hidden');
-
-  showToast('Route reporting is not implemented yet.');
-});
+roomCodeInput
+  .addEventListener(
+    'input',
+    () => {
+      roomCodeInput.value =
+        roomCodeInput
+          .value
+          .toUpperCase();
+    }
+  );
 
 /* =========================================================
    MENU
    ========================================================= */
 
-document.querySelector('#menu-button').addEventListener('click', () => {
-  showToast('Settings will be added later.');
-});
+document
+  .querySelector(
+    '#menu-button'
+  )
+  .addEventListener(
+    'click',
+    () => {
+      showToast(
+        'Settings will be added later.'
+      );
+    }
+  );
