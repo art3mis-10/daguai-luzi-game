@@ -3127,6 +3127,87 @@
           },
           "trickEnded": false,
           "nextPlayerId": 3
+        },
+        {
+          "sequence": 38,
+          "timestamp": "2026-10-22T14:09:18.064Z",
+          "timestampMinute": "2026-10-22T14:09Z",
+          "type": "play",
+          "playerId": 3,
+          "seatIndex": 2,
+          "team": "A",
+          "cards": [
+            {
+              "id": "deck-3-spades-5",
+              "deckNumber": 3,
+              "rank": "5",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-1-diamonds-5",
+              "deckNumber": 1,
+              "rank": "5",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-3-diamonds-5",
+              "deckNumber": 3,
+              "rank": "5",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-hearts-8",
+              "deckNumber": 2,
+              "rank": "8",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-3-hearts-8",
+              "deckNumber": 3,
+              "rank": "8",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "full-house",
+            "subtype": null,
+            "cardCount": 5,
+            "primaryRank": "5",
+            "strength": 61,
+            "categoryStrength": 3,
+            "label": "Full House, 5s over 8s",
+            "wildAssignments": []
+          },
+          "handCountBefore": 26,
+          "handCountAfter": 21,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -3136,5 +3217,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:09:03.932Z"
+  "lastUpdatedAt": "2026-10-22T14:09:18.064Z"
 }
