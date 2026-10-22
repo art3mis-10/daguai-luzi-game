@@ -3216,6 +3216,87 @@
           "type": "turn_advance",
           "fromPlayerId": 3,
           "toPlayerId": 4
+        },
+        {
+          "sequence": 40,
+          "timestamp": "2026-10-22T14:09:49.604Z",
+          "timestampMinute": "2026-10-22T14:09Z",
+          "type": "play",
+          "playerId": 4,
+          "seatIndex": 3,
+          "team": "B",
+          "cards": [
+            {
+              "id": "deck-2-spades-4",
+              "deckNumber": 2,
+              "rank": "4",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-3-hearts-4",
+              "deckNumber": 3,
+              "rank": "4",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-1-spades-7",
+              "deckNumber": 1,
+              "rank": "7",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-diamonds-7",
+              "deckNumber": 2,
+              "rank": "7",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-1-diamonds-7",
+              "deckNumber": 1,
+              "rank": "7",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "full-house",
+            "subtype": null,
+            "cardCount": 5,
+            "primaryRank": "7",
+            "strength": 63,
+            "categoryStrength": 3,
+            "label": "Full House, 7s over 4s",
+            "wildAssignments": []
+          },
+          "handCountBefore": 25,
+          "handCountAfter": 20,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -3225,5 +3306,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:09:20.067Z"
+  "lastUpdatedAt": "2026-10-22T14:09:49.604Z"
 }
