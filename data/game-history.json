@@ -3904,6 +3904,87 @@
           },
           "trickEnded": false,
           "nextPlayerId": 6
+        },
+        {
+          "sequence": 53,
+          "timestamp": "2026-10-22T14:12:24.745Z",
+          "timestampMinute": "2026-10-22T14:12Z",
+          "type": "pass",
+          "playerId": 6,
+          "seatIndex": 5,
+          "passSource": "manual",
+          "leadAtPass": {
+            "playerIndex": 1,
+            "combination": {
+              "type": "four-plus-one",
+              "subtype": null,
+              "cardCount": 5,
+              "primaryRank": "9",
+              "strength": 65,
+              "categoryStrength": 4,
+              "label": "Four 9s + 1",
+              "wildAssignments": []
+            },
+            "cards": [
+              {
+                "id": "deck-2-spades-9",
+                "deckNumber": 2,
+                "rank": "9",
+                "displayRank": null,
+                "suit": "spades",
+                "symbol": "♠",
+                "color": "black",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-3-hearts-9",
+                "deckNumber": 3,
+                "rank": "9",
+                "displayRank": null,
+                "suit": "hearts",
+                "symbol": "♥",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-3-diamonds-9",
+                "deckNumber": 3,
+                "rank": "9",
+                "displayRank": null,
+                "suit": "diamonds",
+                "symbol": "♦",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-2-diamonds-9",
+                "deckNumber": 2,
+                "rank": "9",
+                "displayRank": null,
+                "suit": "diamonds",
+                "symbol": "♦",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-2-hearts-Q",
+                "deckNumber": 2,
+                "rank": "Q",
+                "displayRank": null,
+                "suit": "hearts",
+                "symbol": "♥",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              }
+            ]
+          },
+          "trickEnded": false,
+          "nextPlayerId": 1
         }
       ],
       "headPlayerId": null,
@@ -3913,5 +3994,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:12:18.681Z"
+  "lastUpdatedAt": "2026-10-22T14:12:24.745Z"
 }
