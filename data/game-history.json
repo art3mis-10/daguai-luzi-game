@@ -2310,6 +2310,43 @@
           },
           "trickEnded": false,
           "nextPlayerId": 4
+        },
+        {
+          "sequence": 14,
+          "timestamp": "2026-10-22T14:05:53.458Z",
+          "timestampMinute": "2026-10-22T14:05Z",
+          "type": "pass",
+          "playerId": 4,
+          "seatIndex": 3,
+          "passSource": "manual",
+          "leadAtPass": {
+            "playerIndex": 4,
+            "combination": {
+              "type": "single",
+              "subtype": null,
+              "cardCount": 1,
+              "primaryRank": "2",
+              "strength": 80,
+              "categoryStrength": null,
+              "label": "2",
+              "wildAssignments": []
+            },
+            "cards": [
+              {
+                "id": "deck-1-spades-2",
+                "deckNumber": 1,
+                "rank": "2",
+                "displayRank": null,
+                "suit": "spades",
+                "symbol": "♠",
+                "color": "black",
+                "isJoker": false,
+                "jokerType": null
+              }
+            ]
+          },
+          "trickEnded": true,
+          "nextPlayerId": 5
         }
       ],
       "headPlayerId": null,
@@ -2319,5 +2356,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:05:37.300Z"
+  "lastUpdatedAt": "2026-10-22T14:05:53.458Z"
 }
