@@ -2392,6 +2392,43 @@
           "type": "turn_advance",
           "fromPlayerId": 5,
           "toPlayerId": 6
+        },
+        {
+          "sequence": 17,
+          "timestamp": "2026-10-22T14:06:47.471Z",
+          "timestampMinute": "2026-10-22T14:06Z",
+          "type": "pass",
+          "playerId": 6,
+          "seatIndex": 5,
+          "passSource": "manual",
+          "leadAtPass": {
+            "playerIndex": 4,
+            "combination": {
+              "type": "single",
+              "subtype": null,
+              "cardCount": 1,
+              "primaryRank": "3",
+              "strength": 59,
+              "categoryStrength": null,
+              "label": "3",
+              "wildAssignments": []
+            },
+            "cards": [
+              {
+                "id": "deck-3-clubs-3",
+                "deckNumber": 3,
+                "rank": "3",
+                "displayRank": null,
+                "suit": "clubs",
+                "symbol": "♣",
+                "color": "black",
+                "isJoker": false,
+                "jokerType": null
+              }
+            ]
+          },
+          "trickEnded": false,
+          "nextPlayerId": 1
         }
       ],
       "headPlayerId": null,
@@ -2401,5 +2438,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:06:22.250Z"
+  "lastUpdatedAt": "2026-10-22T14:06:47.471Z"
 }
