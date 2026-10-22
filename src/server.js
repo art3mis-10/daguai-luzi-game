@@ -13,7 +13,6 @@ import { Server } from 'socket.io';
 
 import {
   createNewDeal,
-  createThreeDecks,
   sortCards,
 } from './game/deck.js';
 
@@ -25,36 +24,16 @@ import {
    PATHS
    ========================================================= */
 
-const __filename =
-  fileURLToPath(import.meta.url);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const __dirname =
-  path.dirname(__filename);
-
-const publicDir =
-  path.join(
-    __dirname,
-    'public'
-  );
-
-const gameDir =
-  path.join(
-    __dirname,
-    'game'
-  );
-
-const dataDir =
-  path.join(
-    __dirname,
-    '..',
-    'data'
-  );
-
-const historyFile =
-  path.join(
-    dataDir,
-    'game-history.json'
-  );
+const publicDir = path.join(__dirname, 'public');
+const gameDir = path.join(__dirname, 'game');
+const dataDir = path.join(__dirname, '..', 'data');
+const historyFile = path.join(
+  dataDir,
+  'game-history.json'
+);
 
 /* =========================================================
    GITHUB CONFIG
@@ -69,7 +48,7 @@ const GITHUB_OWNER =
 
 const GITHUB_REPO =
   process.env.GITHUB_REPO ||
-  'Daguai_Luzi';
+  'daguai-luzi-game';
 
 const GITHUB_BRANCH =
   process.env.GITHUB_BRANCH ||
@@ -87,6 +66,18 @@ const githubSyncEnabled =
   );
 
 /* =========================================================
+   HISTORY DIAGNOSTICS
+   ========================================================= */
+
+const historyDiagnostics = {
+  lastLocalSave: null,
+  lastGitHubSyncAttempt: null,
+  lastGitHubSync: null,
+  lastGitHubSyncSuccess: null,
+  lastGitHubError: null,
+};
+
+/* =========================================================
    LOCAL HISTORY
    ========================================================= */
 
@@ -101,7 +92,7 @@ if (!existsSync(dataDir)) {
 
 function createEmptyHistory() {
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     lastUpdatedAt: null,
     games: [],
   };
@@ -113,20 +104,33 @@ function loadLocalHistory() {
   }
 
   try {
-    const raw =
-      readFileSync(
-        historyFile,
-        'utf8'
-      );
+    const raw = readFileSync(
+      historyFile,
+      'utf8'
+    );
 
-    const parsed =
-      JSON.parse(raw);
+    const parsed = JSON.parse(raw);
 
     if (
       !parsed ||
       !Array.isArray(parsed.games)
     ) {
       return createEmptyHistory();
+    }
+
+    parsed.schemaVersion =
+      Math.max(
+        Number(parsed.schemaVersion) || 1,
+        3
+      );
+
+    if (
+      !Object.prototype.hasOwnProperty.call(
+        parsed,
+        'lastUpdatedAt'
+      )
+    ) {
+      parsed.lastUpdatedAt = null;
     }
 
     return parsed;
@@ -140,24 +144,23 @@ function loadLocalHistory() {
   }
 }
 
-function writeLocalHistory(
-  history
-) {
+function writeLocalHistory(history) {
   writeFileSync(
     historyFile,
-
     JSON.stringify(
       history,
       null,
       2
     ),
-
     'utf8'
   );
+
+  historyDiagnostics.lastLocalSave =
+    new Date().toISOString();
 }
 
 /* =========================================================
-   GITHUB API
+   GITHUB HISTORY API
    ========================================================= */
 
 function getGitHubReadUrl() {
@@ -191,7 +194,7 @@ function getGitHubHeaders() {
       '2022-11-28',
 
     'User-Agent':
-      'daguai-luzi-server',
+      'daguai-luzi-game-server',
   };
 }
 
@@ -200,165 +203,308 @@ async function readHistoryFromGitHub() {
     return null;
   }
 
-  try {
-    const response =
-      await fetch(
-        getGitHubReadUrl(),
-        {
-          headers:
-            getGitHubHeaders(),
-        }
-      );
-
-    if (response.status === 404) {
-      return null;
-    }
-
-    if (!response.ok) {
-      const text =
-        await response.text();
-
-      throw new Error(
-        `GitHub GET failed: ` +
-        `${response.status} ${text}`
-      );
-    }
-
-    const data =
-      await response.json();
-
-    const decoded =
-      Buffer
-        .from(
-          data.content,
-          'base64'
-        )
-        .toString('utf8');
-
-    const parsed =
-      JSON.parse(decoded);
-
-    if (
-      !parsed ||
-      !Array.isArray(parsed.games)
-    ) {
-      return null;
-    }
-
-    return parsed;
-  } catch (error) {
-    console.error(
-      'Could not read history from GitHub:',
-      error
+  const response =
+    await fetch(
+      getGitHubReadUrl(),
+      {
+        headers:
+          getGitHubHeaders(),
+      }
     );
 
+  if (response.status === 404) {
     return null;
   }
+
+  if (!response.ok) {
+    const text =
+      await response.text();
+
+    throw new Error(
+      `GitHub GET failed: ` +
+      `${response.status} ${text}`
+    );
+  }
+
+  const data =
+    await response.json();
+
+  if (!data.content) {
+    return null;
+  }
+
+  const decoded =
+    Buffer
+      .from(
+        data.content,
+        'base64'
+      )
+      .toString('utf8');
+
+  const parsed =
+    JSON.parse(decoded);
+
+  if (
+    !parsed ||
+    !Array.isArray(parsed.games)
+  ) {
+    return null;
+  }
+
+  parsed.schemaVersion =
+    Math.max(
+      Number(parsed.schemaVersion) || 1,
+      3
+    );
+
+  return parsed;
 }
 
 async function pushHistoryToGitHub(
-  history
+  historySnapshot
 ) {
-  if (!githubSyncEnabled) {
-    return;
+  let sha = null;
+
+  const existingResponse =
+    await fetch(
+      getGitHubReadUrl(),
+      {
+        headers:
+          getGitHubHeaders(),
+      }
+    );
+
+  if (existingResponse.ok) {
+    const existing =
+      await existingResponse.json();
+
+    sha = existing.sha;
+  } else if (
+    existingResponse.status !== 404
+  ) {
+    const text =
+      await existingResponse.text();
+
+    throw new Error(
+      `GitHub read-before-write failed: ` +
+      `${existingResponse.status} ${text}`
+    );
   }
 
+  const jsonText =
+    JSON.stringify(
+      historySnapshot,
+      null,
+      2
+    );
+
+  const content =
+    Buffer
+      .from(
+        jsonText,
+        'utf8'
+      )
+      .toString('base64');
+
+  const body = {
+    message:
+      `Update Daguai game history ` +
+      new Date().toISOString(),
+
+    content,
+
+    branch:
+      GITHUB_BRANCH,
+  };
+
+  if (sha) {
+    body.sha = sha;
+  }
+
+  const response =
+    await fetch(
+      getGitHubWriteUrl(),
+      {
+        method: 'PUT',
+
+        headers: {
+          ...getGitHubHeaders(),
+
+          'Content-Type':
+            'application/json',
+        },
+
+        body:
+          JSON.stringify(body),
+      }
+    );
+
+  if (!response.ok) {
+    const text =
+      await response.text();
+
+    throw new Error(
+      `GitHub PUT failed: ` +
+      `${response.status} ${text}`
+    );
+  }
+}
+
+let githubSyncChain =
+  Promise.resolve();
+
+let syncTimer = null;
+
+async function performGitHubSync(
+  historySnapshot
+) {
+  if (!githubSyncEnabled) {
+    return true;
+  }
+
+  historyDiagnostics
+    .lastGitHubSyncAttempt =
+    new Date().toISOString();
+
   try {
-    let sha = null;
+    await pushHistoryToGitHub(
+      historySnapshot
+    );
 
-    const existingResponse =
-      await fetch(
-        getGitHubReadUrl(),
-        {
-          headers:
-            getGitHubHeaders(),
-        }
-      );
+    historyDiagnostics
+      .lastGitHubSync =
+      new Date().toISOString();
 
-    if (existingResponse.ok) {
-      const existing =
-        await existingResponse.json();
+    historyDiagnostics
+      .lastGitHubSyncSuccess =
+      true;
 
-      sha =
-        existing.sha;
-    } else if (
-      existingResponse.status !== 404
-    ) {
-      const text =
-        await existingResponse.text();
-
-      throw new Error(
-        `GitHub read-before-write failed: ` +
-        `${existingResponse.status} ${text}`
-      );
-    }
-
-    const jsonText =
-      JSON.stringify(
-        history,
-        null,
-        2
-      );
-
-    const content =
-      Buffer
-        .from(
-          jsonText,
-          'utf8'
-        )
-        .toString('base64');
-
-    const body = {
-      message:
-        `Update Daguai game history ${new Date().toISOString()}`,
-
-      content,
-
-      branch:
-        GITHUB_BRANCH,
-    };
-
-    if (sha) {
-      body.sha = sha;
-    }
-
-    const response =
-      await fetch(
-        getGitHubWriteUrl(),
-        {
-          method: 'PUT',
-
-          headers: {
-            ...getGitHubHeaders(),
-
-            'Content-Type':
-              'application/json',
-          },
-
-          body:
-            JSON.stringify(body),
-        }
-      );
-
-    if (!response.ok) {
-      const text =
-        await response.text();
-
-      throw new Error(
-        `GitHub PUT failed: ` +
-        `${response.status} ${text}`
-      );
-    }
+    historyDiagnostics
+      .lastGitHubError =
+      null;
 
     console.log(
       'Game history synced to GitHub.'
     );
+
+    return true;
   } catch (error) {
+    historyDiagnostics
+      .lastGitHubSyncSuccess =
+      false;
+
+    historyDiagnostics
+      .lastGitHubError =
+      error.message;
+
     console.error(
       'Could not sync history to GitHub:',
       error
     );
+
+    return false;
   }
+}
+
+function enqueueGitHubSync(
+  historySnapshot
+) {
+  githubSyncChain =
+    githubSyncChain
+      .then(
+        () =>
+          performGitHubSync(
+            historySnapshot
+          )
+      )
+      .catch(
+        (error) => {
+          historyDiagnostics
+            .lastGitHubSyncSuccess =
+            false;
+
+          historyDiagnostics
+            .lastGitHubError =
+            error.message;
+
+          console.error(
+            'GitHub sync queue error:',
+            error
+          );
+
+          return false;
+        }
+      );
+
+  return githubSyncChain;
+}
+
+function queueGitHubSync() {
+  if (!githubSyncEnabled) {
+    return;
+  }
+
+  clearTimeout(syncTimer);
+
+  syncTimer =
+    setTimeout(
+      () => {
+        syncTimer = null;
+
+        const snapshot =
+          JSON.parse(
+            JSON.stringify(
+              gameHistory
+            )
+          );
+
+        enqueueGitHubSync(
+          snapshot
+        );
+      },
+      700
+    );
+}
+
+async function saveHistory(
+  {
+    immediateGitHub = false,
+  } = {}
+) {
+  gameHistory.schemaVersion = 3;
+
+  gameHistory.lastUpdatedAt =
+    new Date().toISOString();
+
+  writeLocalHistory(
+    gameHistory
+  );
+
+  if (!githubSyncEnabled) {
+    return true;
+  }
+
+  if (!immediateGitHub) {
+    queueGitHubSync();
+
+    return true;
+  }
+
+  if (syncTimer) {
+    clearTimeout(syncTimer);
+    syncTimer = null;
+  }
+
+  const snapshot =
+    JSON.parse(
+      JSON.stringify(
+        gameHistory
+      )
+    );
+
+  return enqueueGitHubSync(
+    snapshot
+  );
 }
 
 /* =========================================================
@@ -381,86 +527,47 @@ async function initializeHistory() {
     return;
   }
 
-  const remote =
-    await readHistoryFromGitHub();
+  try {
+    const remote =
+      await readHistoryFromGitHub();
 
-  if (remote) {
-    gameHistory = remote;
+    if (remote) {
+      gameHistory = remote;
+
+      writeLocalHistory(
+        gameHistory
+      );
+
+      console.log(
+        `Loaded ${gameHistory.games.length} game(s) from GitHub.`
+      );
+    } else {
+      writeLocalHistory(
+        gameHistory
+      );
+
+      await saveHistory({
+        immediateGitHub: true,
+      });
+    }
+  } catch (error) {
+    historyDiagnostics
+      .lastGitHubSyncSuccess =
+      false;
+
+    historyDiagnostics
+      .lastGitHubError =
+      error.message;
+
+    console.error(
+      'Could not initialize history from GitHub:',
+      error
+    );
 
     writeLocalHistory(
       gameHistory
     );
-
-    console.log(
-      `Loaded ${gameHistory.games.length} game(s) from GitHub.`
-    );
-  } else {
-    writeLocalHistory(
-      gameHistory
-    );
-
-    await pushHistoryToGitHub(
-      gameHistory
-    );
   }
-}
-
-/* =========================================================
-   GITHUB SYNC QUEUE
-   ========================================================= */
-
-let githubSyncChain =
-  Promise.resolve();
-
-let syncTimer = null;
-
-function queueGitHubSync() {
-  if (!githubSyncEnabled) {
-    return;
-  }
-
-  clearTimeout(syncTimer);
-
-  syncTimer =
-    setTimeout(
-      () => {
-        const snapshot =
-          JSON.parse(
-            JSON.stringify(
-              gameHistory
-            )
-          );
-
-        githubSyncChain =
-          githubSyncChain
-            .then(
-              () =>
-                pushHistoryToGitHub(
-                  snapshot
-                )
-            )
-            .catch(
-              (error) => {
-                console.error(
-                  'GitHub sync queue error:',
-                  error
-                );
-              }
-            );
-      },
-      700
-    );
-}
-
-function saveHistory() {
-  gameHistory.lastUpdatedAt =
-    new Date().toISOString();
-
-  writeLocalHistory(
-    gameHistory
-  );
-
-  queueGitHubSync();
 }
 
 /* =========================================================
@@ -508,6 +615,10 @@ app.get(
   }
 );
 
+/* =========================================================
+   HISTORY STATUS DEBUG ENDPOINT
+   ========================================================= */
+
 app.get(
   '/api/history-status',
   (_req, res) => {
@@ -523,8 +634,31 @@ app.get(
       lastUpdatedAt:
         gameHistory.lastUpdatedAt,
 
+      lastLocalSave:
+        historyDiagnostics
+          .lastLocalSave,
+
+      lastGitHubSyncAttempt:
+        historyDiagnostics
+          .lastGitHubSyncAttempt,
+
+      lastGitHubSync:
+        historyDiagnostics
+          .lastGitHubSync,
+
+      lastGitHubSyncSuccess:
+        historyDiagnostics
+          .lastGitHubSyncSuccess,
+
+      lastGitHubError:
+        historyDiagnostics
+          .lastGitHubError,
+
       githubRepository:
         `${GITHUB_OWNER}/${GITHUB_REPO}`,
+
+      githubBranch:
+        GITHUB_BRANCH,
 
       githubPath:
         GITHUB_HISTORY_PATH,
@@ -647,7 +781,8 @@ function serializeCombination(
       null,
 
     wildAssignments:
-      combination.wildAssignments ??
+      combination
+        .wildAssignments ??
       [],
   };
 }
@@ -720,7 +855,8 @@ function getPassesNeeded(
   }
 
   const leaderIndex =
-    room.state.currentLead
+    room.state
+      .currentLead
       .playerIndex;
 
   const leader =
@@ -758,26 +894,249 @@ function touchRoom(
 }
 
 /* =========================================================
+   STARTING PLAYER RULE
+
+   FIRST GAME:
+   Compare number of:
+   ♠3 -> ♠4 -> ♠5 -> ... -> ♠A -> ♠2
+
+   Only players tied at the previous step
+   continue to the next comparison.
+
+   LATER GAMES:
+   Previous first-out player (头家) starts.
+   ========================================================= */
+
+const FIRST_GAME_SPADE_RANK_ORDER =
+  [
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    'J',
+    'Q',
+    'K',
+    'A',
+    '2',
+  ];
+
+function normalizeRank(
+  rank
+) {
+  return String(
+    rank ?? ''
+  )
+    .trim()
+    .toUpperCase();
+}
+
+function isSpade(
+  card
+) {
+  const suit =
+    String(
+      card?.suit ?? ''
+    )
+      .trim()
+      .toLowerCase();
+
+  const symbol =
+    String(
+      card?.symbol ?? ''
+    ).trim();
+
+  return (
+    suit === 'spades' ||
+    suit === 'spade' ||
+    suit === 's' ||
+    symbol === '♠'
+  );
+}
+
+function countSpadeRank(
+  hand,
+  rank
+) {
+  const normalizedTarget =
+    normalizeRank(rank);
+
+  return (
+    hand.filter(
+      (card) =>
+        isSpade(card) &&
+        normalizeRank(
+          card.rank
+        ) ===
+          normalizedTarget
+    ).length
+  );
+}
+
+function determineFirstGameStarter(
+  hands
+) {
+  let candidates =
+    [0, 1, 2, 3, 4, 5];
+
+  const comparison = [];
+
+  for (
+    const rank of
+    FIRST_GAME_SPADE_RANK_ORDER
+  ) {
+    const counts =
+      hands.map(
+        (hand) =>
+          countSpadeRank(
+            hand,
+            rank
+          )
+      );
+
+    const candidateCounts =
+      candidates.map(
+        (seatIndex) =>
+          counts[
+            seatIndex
+          ]
+      );
+
+    const maxCount =
+      Math.max(
+        ...candidateCounts
+      );
+
+    const beforeCandidates =
+      [
+        ...candidates,
+      ];
+
+    candidates =
+      candidates.filter(
+        (seatIndex) =>
+          counts[
+            seatIndex
+          ] ===
+          maxCount
+      );
+
+    comparison.push({
+      rank,
+
+      countsBySeat:
+        counts,
+
+      candidateSeatsBefore:
+        beforeCandidates,
+
+      maxCount,
+
+      candidateSeatsAfter:
+        [
+          ...candidates,
+        ],
+    });
+
+    if (
+      candidates.length === 1
+    ) {
+      break;
+    }
+  }
+
+  /*
+    The real card comparison
+    should almost always resolve it.
+
+    If every compared spade count
+    is still identical, use the
+    lower seat number so the server
+    always has a deterministic result.
+  */
+  const startingPlayerIndex =
+    candidates[0];
+
+  return {
+    startingPlayerIndex,
+
+    method:
+      'first_game_spade_tiebreak',
+
+    comparison,
+
+    fallbackUsed:
+      candidates.length > 1,
+  };
+}
+
+function determineRandomDealStarter(
+  room,
+  hands
+) {
+  /*
+    Once a head player has been
+    determined, they start every
+    following game.
+  */
+  if (
+    Number.isInteger(
+      room.previousHeadPlayerIndex
+    )
+  ) {
+    return {
+      startingPlayerIndex:
+        room.previousHeadPlayerIndex,
+
+      method:
+        'previous_head_player',
+
+      previousHeadPlayerId:
+        room.players[
+          room.previousHeadPlayerIndex
+        ].id,
+
+      comparison: [],
+
+      fallbackUsed:
+        false,
+    };
+  }
+
+  return determineFirstGameStarter(
+    hands
+  );
+}
+
+/* =========================================================
    CUSTOM DEAL PARSING
    ========================================================= */
 
-/*
-  Supported examples:
+function createFullPhysicalCardPool() {
+  const freshDeal =
+    createNewDeal();
 
-  AS
-  AH
-  AC
-  AD
+  if (
+    !freshDeal ||
+    !Array.isArray(
+      freshDeal.hands
+    )
+  ) {
+    throw new Error(
+      'createNewDeal() did not return a valid hands array.'
+    );
+  }
 
-  10S
-  10H
-
-  SJ = Small Joker
-  BJ = Big Joker
-
-  Duplicate tokens use duplicate
-  physical copies from the 3 decks.
-*/
+  /*
+    A normal deal contains all 162
+    physical cards, so flattening it
+    gives us a complete physical pool.
+  */
+  return freshDeal.hands.flat();
+}
 
 function normalizeCardToken(
   rawToken
@@ -789,12 +1148,30 @@ function normalizeCardToken(
 
   token =
     token
-      .replaceAll('♠', 'S')
-      .replaceAll('♥', 'H')
-      .replaceAll('♣', 'C')
-      .replaceAll('♦', 'D')
-      .replaceAll('-', '')
-      .replaceAll('_', '');
+      .replaceAll(
+        '♠',
+        'S'
+      )
+      .replaceAll(
+        '♥',
+        'H'
+      )
+      .replaceAll(
+        '♣',
+        'C'
+      )
+      .replaceAll(
+        '♦',
+        'D'
+      )
+      .replaceAll(
+        '-',
+        ''
+      )
+      .replaceAll(
+        '_',
+        ''
+      );
 
   if (
     token === 'BIGJOKER' ||
@@ -805,7 +1182,8 @@ function normalizeCardToken(
   }
 
   if (
-    token === 'SMALLJOKER' ||
+    token ===
+      'SMALLJOKER' ||
     token === 'SMALL' ||
     token === '小怪'
   ) {
@@ -819,7 +1197,9 @@ function tokenizeHandText(
   text
 ) {
   const normalized =
-    String(text ?? '')
+    String(
+      text ?? ''
+    )
       .replace(
         /BIG\s+JOKER/gi,
         'BJ'
@@ -833,12 +1213,14 @@ function tokenizeHandText(
         ' '
       );
 
-  return normalized
-    .split(/\s+/)
-    .map(
-      normalizeCardToken
-    )
-    .filter(Boolean);
+  return (
+    normalized
+      .split(/\s+/)
+      .map(
+        normalizeCardToken
+      )
+      .filter(Boolean)
+  );
 }
 
 function parseCardToken(
@@ -846,13 +1228,15 @@ function parseCardToken(
 ) {
   if (token === 'BJ') {
     return {
-      kind: 'big-joker',
+      kind:
+        'big-joker',
     };
   }
 
   if (token === 'SJ') {
     return {
-      kind: 'small-joker',
+      kind:
+        'small-joker',
     };
   }
 
@@ -863,7 +1247,8 @@ function parseCardToken(
 
   if (match) {
     return {
-      kind: 'ordinary',
+      kind:
+        'ordinary',
 
       rank:
         match[1],
@@ -873,9 +1258,6 @@ function parseCardToken(
     };
   }
 
-  /*
-    Also accept SA instead of AS.
-  */
   match =
     token.match(
       /^([SHCD])(10|[2-9JQKA])$/
@@ -883,7 +1265,8 @@ function parseCardToken(
 
   if (match) {
     return {
-      kind: 'ordinary',
+      kind:
+        'ordinary',
 
       rank:
         match[2],
@@ -895,7 +1278,7 @@ function parseCardToken(
 
   throw new Error(
     `Invalid card token "${token}". ` +
-    `Use examples such as AS, 10H, QC, BJ, or SJ.`
+    `Use AS, 10H, QC, BJ, or SJ.`
   );
 }
 
@@ -909,7 +1292,63 @@ function suitCodeToName(
     D: 'diamonds',
   };
 
-  return suits[suitCode];
+  return suits[
+    suitCode
+  ];
+}
+
+function jokerText(
+  card
+) {
+  return [
+    card?.rank,
+    card?.displayRank,
+    card?.jokerType,
+    card?.id,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function isBigJokerCard(
+  card
+) {
+  if (
+    !card?.isJoker
+  ) {
+    return false;
+  }
+
+  const text =
+    jokerText(card);
+
+  return (
+    text.includes('big') ||
+    text.includes('大怪') ||
+    text.includes('bj')
+  );
+}
+
+function isSmallJokerCard(
+  card
+) {
+  if (
+    !card?.isJoker
+  ) {
+    return false;
+  }
+
+  const text =
+    jokerText(card);
+
+  return (
+    text.includes(
+      'small'
+    ) ||
+    text.includes('小怪') ||
+    text.includes('sj')
+  );
 }
 
 function cardMatchesRequest(
@@ -920,9 +1359,8 @@ function cardMatchesRequest(
     request.kind ===
     'big-joker'
   ) {
-    return (
-      card.rank ===
-      'big-joker'
+    return isBigJokerCard(
+      card
     );
   }
 
@@ -930,16 +1368,21 @@ function cardMatchesRequest(
     request.kind ===
     'small-joker'
   ) {
-    return (
-      card.rank ===
-      'small-joker'
+    return isSmallJokerCard(
+      card
     );
   }
 
   return (
-    card.rank ===
-      request.rank &&
-    card.suit ===
+    normalizeRank(
+      card.rank
+    ) ===
+      normalizeRank(
+        request.rank
+      ) &&
+    String(
+      card.suit ?? ''
+    ).toLowerCase() ===
       suitCodeToName(
         request.suitCode
       )
@@ -961,7 +1404,7 @@ function buildCustomHands(
   }
 
   const fullDeck =
-    createThreeDecks();
+    createFullPhysicalCardPool();
 
   const usedCardIds =
     new Set();
@@ -1010,7 +1453,7 @@ function buildCustomHands(
         throw new Error(
           `Player ${seatIndex + 1}: ` +
           `"${token}" is unavailable. ` +
-          `You may have used more physical copies than exist in the 3 decks.`
+          `You may have used more copies than exist in the three decks.`
         );
       }
 
@@ -1020,14 +1463,18 @@ function buildCustomHands(
 
       hands[
         seatIndex
-      ].push(card);
+      ].push(
+        card
+      );
     }
   }
 
   const sortedHands =
     hands.map(
       (hand) =>
-        sortCards(hand)
+        sortCards(
+          hand
+        )
     );
 
   const unassignedCards =
@@ -1070,7 +1517,8 @@ function parseFinishOrder(
       );
 
   for (
-    const playerId of values
+    const playerId of
+    values
   ) {
     if (
       !Number.isInteger(
@@ -1086,7 +1534,8 @@ function parseFinishOrder(
   }
 
   if (
-    new Set(values).size !==
+    new Set(values)
+      .size !==
     values.length
   ) {
     throw new Error(
@@ -1098,7 +1547,7 @@ function parseFinishOrder(
 }
 
 /* =========================================================
-   PUBLIC CARD-COUNT REPORTS
+   PUBLIC CARD COUNT REPORTS
    ========================================================= */
 
 function createEmptyPublicReports() {
@@ -1135,42 +1584,45 @@ function updateKnownPublicCountAfterPlay(
   newCount
 ) {
   const existing =
-    room.state.publicReports[
-      seatIndex
-    ];
+    room.state
+      .publicReports[
+        seatIndex
+      ];
 
   /*
-    If a concrete number was
-    already public, everybody can
-    count cards played afterwards.
+    If the number was already
+    public, everybody can subtract
+    subsequently played cards.
   */
   if (
     existing?.status ===
     'reported'
   ) {
-    room.state.publicReports[
-      seatIndex
-    ] = {
-      ...existing,
+    room.state
+      .publicReports[
+        seatIndex
+      ] = {
+        ...existing,
 
-      count:
-        newCount,
+        count:
+          newCount,
 
-      updatedAt:
-        nowIso(),
-    };
+        updatedAt:
+          nowIso(),
+      };
   }
 
   /*
-    A finished player obviously
-    has zero cards.
+    Finished = publicly 0 cards.
   */
   if (newCount === 0) {
-    room.state.publicReports[
-      seatIndex
-    ] =
+    room.state
+      .publicReports[
+        seatIndex
+      ] =
       makeReportedCount(
         0,
+
         existing
           ?.askedByPlayerId ??
           null
@@ -1179,7 +1631,7 @@ function updateKnownPublicCountAfterPlay(
 }
 
 /* =========================================================
-   GAME HISTORY
+   GAME HISTORY HELPERS
    ========================================================= */
 
 function getGameLog(
@@ -1199,6 +1651,7 @@ function createGameLog(
   {
     dealSource,
     unassignedCards = [],
+    startingPlayerInfo = null,
   }
 ) {
   const dealtAt =
@@ -1223,6 +1676,9 @@ function createGameLog(
     roomCode:
       room.code,
 
+    gameNumber:
+      room.gameSequence,
+
     status:
       'ongoing',
 
@@ -1236,13 +1692,38 @@ function createGameLog(
       ),
 
     trumpRank:
-      room.state.trumpRank,
+      room.state
+        .trumpRank,
 
     startingPlayerId:
       room.players[
         room.state
           .currentPlayerIndex
       ].id,
+
+    startingPlayerSeatIndex:
+      room.state
+        .currentPlayerIndex,
+
+    startingPlayerMethod:
+      startingPlayerInfo
+        ?.method ??
+      'unknown',
+
+    startingPlayerComparison:
+      startingPlayerInfo
+        ?.comparison ??
+      [],
+
+    startingPlayerFallbackUsed:
+      startingPlayerInfo
+        ?.fallbackUsed ??
+      false,
+
+    previousHeadPlayerId:
+      startingPlayerInfo
+        ?.previousHeadPlayerId ??
+      null,
 
     players:
       room.players.map(
@@ -1296,6 +1777,11 @@ function createGameLog(
 
     events: [],
 
+    headPlayerId:
+      room.state
+        .finishOrder[0] ??
+      null,
+
     finishOrder:
       [
         ...room.state
@@ -1315,43 +1801,15 @@ function createGameLog(
   gameHistory.games.push(
     gameLog
   );
-
-  saveHistory();
-
-  appendGameEvent(
-    room,
-    'deal',
-    {
-      dealSource,
-
-      dealtAt,
-
-      trumpRank:
-        room.state
-          .trumpRank,
-
-      startingPlayerId:
-        room.players[
-          room.state
-            .currentPlayerIndex
-        ].id,
-
-      initialFinishOrder:
-        [
-          ...room.state
-            .finishOrder,
-        ],
-
-      unassignedCardCount:
-        unassignedCards.length,
-    }
-  );
 }
 
 function appendGameEvent(
   room,
   type,
-  details = {}
+  details = {},
+  {
+    persist = true,
+  } = {}
 ) {
   if (
     !room.state.gameId
@@ -1394,7 +1852,19 @@ function appendGameEvent(
         .finishOrder,
     ];
 
-  saveHistory();
+  if (
+    room.state
+      .finishOrder
+      .length > 0
+  ) {
+    gameLog.headPlayerId =
+      room.state
+        .finishOrder[0];
+  }
+
+  if (persist) {
+    void saveHistory();
+  }
 }
 
 function finalizeGameLog(
@@ -1436,6 +1906,11 @@ function finalizeGameLog(
         .finishOrder,
     ];
 
+  gameLog.headPlayerId =
+    room.state
+      .finishOrder[0] ??
+    null;
+
   gameLog.finalHands =
     room.state.hands.map(
       (
@@ -1456,7 +1931,7 @@ function finalizeGameLog(
       })
     );
 
-  saveHistory();
+  void saveHistory();
 }
 
 /* =========================================================
@@ -1475,15 +1950,34 @@ function createEmptyRoom(
     advanceTimer:
       null,
 
+    /*
+      null = this room has not
+      established a 头家 yet.
+
+      Once somebody becomes the
+      first player out, their
+      seat is stored here and they
+      start the next game.
+    */
+    previousHeadPlayerIndex:
+      null,
+
+    gameSequence:
+      0,
+
     players: [
       {
         id: 1,
+
         name:
           hostName ||
           'Player 1',
+
         team: 'A',
+
         socketId:
           hostSocketId,
+
         hasFinished:
           false,
       },
@@ -1626,8 +2120,8 @@ function buildClientRoomState(
 
     state: {
       /*
-        A client receives only
-        its own private hand.
+        Only own private hand is
+        sent to each browser.
       */
       hands:
         room.state.hands.map(
@@ -1699,10 +2193,6 @@ function buildClientRoomState(
         room.state
           .dealSource,
 
-      /*
-        Public information.
-        Safe to send to everyone.
-      */
       publicReports:
         room.state
           .publicReports
@@ -1789,7 +2279,7 @@ function abortCurrentGameIfNeeded(
   }
 }
 
-function startGameWithHands(
+async function startGameWithHands(
   room,
   {
     hands,
@@ -1798,12 +2288,17 @@ function startGameWithHands(
     finishOrder,
     dealSource,
     unassignedCards = [],
+    startingPlayerInfo = null,
   }
 ) {
+  room.gameSequence += 1;
+
   room.state.hands =
     hands.map(
       (hand) =>
-        sortCards(hand)
+        sortCards(
+          hand
+        )
     );
 
   room.state.trumpRank =
@@ -1859,9 +2354,10 @@ function startGameWithHands(
       if (
         player.hasFinished
       ) {
-        room.state.publicReports[
-          seatIndex
-        ] =
+        room.state
+          .publicReports[
+            seatIndex
+          ] =
           makeReportedCount(
             0,
             null
@@ -1870,20 +2366,140 @@ function startGameWithHands(
     }
   );
 
+  /*
+    If a custom checkpoint already
+    contains a head player, that
+    player becomes the next game's
+    starting player.
+  */
+  if (
+    finishOrder.length > 0
+  ) {
+    room.previousHeadPlayerIndex =
+      finishOrder[0] - 1;
+  }
+
   createGameLog(
     room,
     {
       dealSource,
+
       unassignedCards,
+
+      startingPlayerInfo,
     }
   );
 
-  touchRoom(room);
+  appendGameEvent(
+    room,
+    'deal',
+    {
+      dealSource,
+
+      dealtAt:
+        room.state
+          .dealtAt,
+
+      trumpRank:
+        room.state
+          .trumpRank,
+
+      startingPlayerId:
+        room.players[
+          room.state
+            .currentPlayerIndex
+        ].id,
+
+      startingPlayerMethod:
+        startingPlayerInfo
+          ?.method ??
+        'unknown',
+
+      startingPlayerComparison:
+        startingPlayerInfo
+          ?.comparison ??
+        [],
+
+      initialFinishOrder:
+        [
+          ...room.state
+            .finishOrder,
+        ],
+
+      unassignedCardCount:
+        unassignedCards.length,
+    },
+
+    {
+      persist:
+        false,
+    }
+  );
+
+  /*
+    IMPORTANT:
+    The initial game record is
+    immediately written to GitHub.
+
+    If GitHub sync fails, the game
+    pauses rather than silently
+    continuing without research data.
+  */
+  const persistenceOk =
+    await saveHistory({
+      immediateGitHub:
+        true,
+    });
+
+  if (
+    githubSyncEnabled &&
+    !persistenceOk
+  ) {
+    room.state.paused =
+      true;
+
+    room.state.phase =
+      'history-error';
+
+    touchRoom(
+      room
+    );
+
+    emitRoomState(
+      room,
+      'gameStateUpdate'
+    );
+
+    return {
+      success:
+        false,
+
+      message:
+        'The cards were created, but the game history could not be written to GitHub. The game has been paused to protect the research record. Check /api/history-status and Render logs.',
+    };
+  }
+
+  touchRoom(
+    room
+  );
 
   emitRoomState(
     room,
     'gameStateUpdate'
   );
+
+  return {
+    success:
+      true,
+
+    gameId:
+      room.state
+        .gameId,
+
+    dealtAt:
+      room.state
+        .dealtAt,
+  };
 }
 
 /* =========================================================
@@ -1999,7 +2615,8 @@ function scheduleAdvanceAfterPlay(
             .hasStarted =
             false;
 
-          currentRoom.state.phase =
+          currentRoom.state
+            .phase =
             'finished';
 
           appendGameEvent(
@@ -2052,7 +2669,8 @@ function scheduleAdvanceAfterPlay(
             .hasStarted =
             false;
 
-          currentRoom.state.phase =
+          currentRoom.state
+            .phase =
             'finished';
 
           finalizeGameLog(
@@ -2077,7 +2695,8 @@ function scheduleAdvanceAfterPlay(
           .currentPlayerIndex =
           nextPlayerIndex;
 
-        currentRoom.state.phase =
+        currentRoom.state
+          .phase =
           'turn';
 
         appendGameEvent(
@@ -2133,7 +2752,9 @@ io.on(
       'createRoom',
 
       (
-        { name } = {},
+        {
+          name,
+        } = {},
 
         callback =
           () => {}
@@ -2245,10 +2866,8 @@ io.on(
           !Number.isInteger(
             parsedSeatIndex
           ) ||
-          parsedSeatIndex <
-            1 ||
-          parsedSeatIndex >
-            5
+          parsedSeatIndex < 1 ||
+          parsedSeatIndex > 5
         ) {
           callback({
             success:
@@ -2321,6 +2940,9 @@ io.on(
         if (
           room.state
             .hasStarted &&
+          room.state
+            .phase !==
+            'history-error' &&
           getConnectedPlayerCount(
             room
           ) === 6
@@ -2377,7 +2999,7 @@ io.on(
     socket.on(
       'dealCards',
 
-      (
+      async (
         callback =
           () => {}
       ) => {
@@ -2438,41 +3060,73 @@ io.on(
         const newDeal =
           createNewDeal();
 
-        startGameWithHands(
-          room,
-          {
-            hands:
-              newDeal.hands,
+        /*
+          FIRST GAME:
+          ♠3 -> ♠4 -> ♠5 ...
 
-            trumpRank:
-              '2',
+          FOLLOWING GAMES:
+          previous 头家.
+        */
+        const startingPlayerInfo =
+          determineRandomDealStarter(
+            room,
+            newDeal.hands
+          );
 
-            startingPlayerIndex:
-              0,
+        const result =
+          await startGameWithHands(
+            room,
+            {
+              hands:
+                newDeal.hands,
 
-            finishOrder:
-              [],
+              trumpRank:
+                '2',
 
-            dealSource:
-              'random',
+              startingPlayerIndex:
+                startingPlayerInfo
+                  .startingPlayerIndex,
 
-            unassignedCards:
-              [],
-          }
+              finishOrder:
+                [],
+
+              dealSource:
+                'random',
+
+              unassignedCards:
+                [],
+
+              startingPlayerInfo,
+            }
+          );
+
+        callback(
+          result
         );
 
-        callback({
-          success:
-            true,
+        if (
+          result.success
+        ) {
+          const starter =
+            room.players[
+              room.state
+                .currentPlayerIndex
+            ];
 
-          gameId:
-            room.state
-              .gameId,
+          io
+            .to(
+              room.code
+            )
+            .emit(
+              'toast',
 
-          dealtAt:
-            room.state
-              .dealtAt,
-        });
+              startingPlayerInfo
+                .method ===
+              'previous_head_player'
+                ? `${starter.name} starts because they were the previous head player.`
+                : `${starter.name} starts based on the Spade 3, 4, 5... tie-break rule.`
+            );
+        }
       }
     );
 
@@ -2483,7 +3137,7 @@ io.on(
     socket.on(
       'customDeal',
 
-      (
+      async (
         {
           handTexts,
           trumpRank,
@@ -2563,13 +3217,15 @@ io.on(
 
           const selectedTrumpRank =
             String(
-              trumpRank ?? '2'
+              trumpRank ??
+              '2'
             ).toUpperCase();
 
           if (
-            !allowedTrumpRanks.includes(
-              selectedTrumpRank
-            )
+            !allowedTrumpRanks
+              .includes(
+                selectedTrumpRank
+              )
           ) {
             throw new Error(
               'Invalid trump rank.'
@@ -2603,10 +3259,6 @@ io.on(
               handTexts
             );
 
-          /*
-            Finished players must
-            have no cards.
-          */
           for (
             const playerId of
             finishOrder
@@ -2625,10 +3277,6 @@ io.on(
             }
           }
 
-          /*
-            Active players must
-            actually have cards.
-          */
           for (
             let index = 0;
             index < 6;
@@ -2682,39 +3330,63 @@ io.on(
             'host_custom_redeal'
           );
 
-          startGameWithHands(
-            room,
-            {
-              hands:
-                custom.hands,
+          /*
+            Custom Deal deliberately
+            keeps manual starting player
+            selection for research input.
+          */
+          const startingPlayerInfo = {
+            startingPlayerIndex:
+              startIndex,
 
-              trumpRank:
-                selectedTrumpRank,
+            method:
+              'custom_selected',
 
-              startingPlayerIndex:
-                startIndex,
+            comparison:
+              [],
 
-              finishOrder,
+            fallbackUsed:
+              false,
+          };
 
-              dealSource:
-                'custom',
+          const result =
+            await startGameWithHands(
+              room,
+              {
+                hands:
+                  custom.hands,
 
-              unassignedCards:
-                custom.unassignedCards,
-            }
-          );
+                trumpRank:
+                  selectedTrumpRank,
+
+                startingPlayerIndex:
+                  startIndex,
+
+                finishOrder,
+
+                dealSource:
+                  'custom',
+
+                unassignedCards:
+                  custom
+                    .unassignedCards,
+
+                startingPlayerInfo,
+              }
+            );
+
+          if (
+            !result.success
+          ) {
+            callback(
+              result
+            );
+
+            return;
+          }
 
           callback({
-            success:
-              true,
-
-            gameId:
-              room.state
-                .gameId,
-
-            dealtAt:
-              room.state
-                .dealtAt,
+            ...result,
 
             unassignedCardCount:
               custom
@@ -2888,10 +3560,6 @@ io.on(
             targetSeatIndex:
               targetIndex,
 
-            /*
-              Backend research log
-              keeps the true value.
-            */
             actualCount,
 
             publicResponse:
@@ -2945,7 +3613,7 @@ io.on(
     );
 
     /* =====================================================
-       PLAY
+       PLAY CARDS
        ===================================================== */
 
     socket.on(
@@ -2988,7 +3656,10 @@ io.on(
               false,
 
             message:
-              'Game is paused because a player is disconnected.',
+              room.state.phase ===
+              'history-error'
+                ? 'Game paused because history could not be written to GitHub.'
+                : 'Game is paused because a player is disconnected.',
           });
 
           return;
@@ -3029,8 +3700,7 @@ io.on(
           !Array.isArray(
             cardIds
           ) ||
-          cardIds.length ===
-            0
+          cardIds.length === 0
         ) {
           callback({
             success:
@@ -3155,9 +3825,11 @@ io.on(
         let finished =
           false;
 
+        let becameHeadPlayer =
+          false;
+
         if (
-          handCountAfter ===
-          0
+          handCountAfter === 0
         ) {
           finished =
             true;
@@ -3179,6 +3851,25 @@ io.on(
                 playerId
               )
           ) {
+            /*
+              First person who finishes
+              becomes 头家.
+
+              Store their seat so they
+              start the next game.
+            */
+            if (
+              room.state
+                .finishOrder
+                .length === 0
+            ) {
+              becameHeadPlayer =
+                true;
+
+              room.previousHeadPlayerIndex =
+                playerSeatIndex;
+            }
+
             room.state
               .finishOrder
               .push(
@@ -3229,6 +3920,8 @@ io.on(
 
             finished,
 
+            becameHeadPlayer,
+
             currentFinishOrder:
               [
                 ...room.state
@@ -3236,6 +3929,29 @@ io.on(
               ],
           }
         );
+
+        if (
+          becameHeadPlayer
+        ) {
+          appendGameEvent(
+            room,
+            'head_player_determined',
+            {
+              playerId:
+                room.players[
+                  playerSeatIndex
+                ].id,
+
+              seatIndex:
+                playerSeatIndex,
+
+              nextGameStartingPlayerId:
+                room.players[
+                  playerSeatIndex
+                ].id,
+            }
+          );
+        }
 
         touchRoom(
           room
@@ -3298,7 +4014,10 @@ io.on(
               false,
 
             message:
-              'Game is paused because a player is disconnected.',
+              room.state.phase ===
+              'history-error'
+                ? 'Game paused because history could not be written to GitHub.'
+                : 'Game is paused because a player is disconnected.',
           });
 
           return;
@@ -3539,8 +4258,8 @@ io.on(
         }
 
         /*
-          Host leaves:
-          destroy room.
+          Host closes browser:
+          room is destroyed.
         */
         if (
           playerSeatIndex ===
