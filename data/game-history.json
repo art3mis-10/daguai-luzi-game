@@ -2876,6 +2876,87 @@
           },
           "trickEnded": true,
           "nextPlayerId": 6
+        },
+        {
+          "sequence": 34,
+          "timestamp": "2026-10-22T14:08:20.537Z",
+          "timestampMinute": "2026-10-22T14:08Z",
+          "type": "play",
+          "playerId": 6,
+          "seatIndex": 5,
+          "team": "B",
+          "cards": [
+            {
+              "id": "deck-2-clubs-6",
+              "deckNumber": 2,
+              "rank": "6",
+              "displayRank": null,
+              "suit": "clubs",
+              "symbol": "♣",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-3-hearts-7",
+              "deckNumber": 3,
+              "rank": "7",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-spades-8",
+              "deckNumber": 2,
+              "rank": "8",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-3-clubs-9",
+              "deckNumber": 3,
+              "rank": "9",
+              "displayRank": null,
+              "suit": "clubs",
+              "symbol": "♣",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-diamonds-10",
+              "deckNumber": 2,
+              "rank": "10",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "straight",
+            "subtype": null,
+            "cardCount": 5,
+            "primaryRank": "10",
+            "strength": 5,
+            "categoryStrength": 1,
+            "label": "Straight, 6-7-8-9-10",
+            "wildAssignments": []
+          },
+          "handCountBefore": 26,
+          "handCountAfter": 21,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -2885,5 +2966,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:08:00.681Z"
+  "lastUpdatedAt": "2026-10-22T14:08:20.537Z"
 }
