@@ -2601,6 +2601,43 @@
           "type": "turn_advance",
           "fromPlayerId": 4,
           "toPlayerId": 5
+        },
+        {
+          "sequence": 25,
+          "timestamp": "2026-10-22T14:07:23.907Z",
+          "timestampMinute": "2026-10-22T14:07Z",
+          "type": "play",
+          "playerId": 5,
+          "seatIndex": 4,
+          "team": "A",
+          "cards": [
+            {
+              "id": "deck-3-diamonds-10",
+              "deckNumber": 3,
+              "rank": "10",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "single",
+            "subtype": null,
+            "cardCount": 1,
+            "primaryRank": "10",
+            "strength": 66,
+            "categoryStrength": null,
+            "label": "10",
+            "wildAssignments": []
+          },
+          "handCountBefore": 25,
+          "handCountAfter": 24,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -2610,5 +2647,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:07:13.992Z"
+  "lastUpdatedAt": "2026-10-22T14:07:23.907Z"
 }
