@@ -4236,6 +4236,87 @@
           },
           "trickEnded": false,
           "nextPlayerId": 4
+        },
+        {
+          "sequence": 58,
+          "timestamp": "2026-10-22T14:13:34.446Z",
+          "timestampMinute": "2026-10-22T14:13Z",
+          "type": "pass",
+          "playerId": 4,
+          "seatIndex": 3,
+          "passSource": "manual",
+          "leadAtPass": {
+            "playerIndex": 0,
+            "combination": {
+              "type": "five-of-a-kind",
+              "subtype": null,
+              "cardCount": 5,
+              "primaryRank": "10",
+              "strength": 66,
+              "categoryStrength": 6,
+              "label": "Five 10s",
+              "wildAssignments": []
+            },
+            "cards": [
+              {
+                "id": "deck-2-spades-10",
+                "deckNumber": 2,
+                "rank": "10",
+                "displayRank": null,
+                "suit": "spades",
+                "symbol": "♠",
+                "color": "black",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-3-spades-10",
+                "deckNumber": 3,
+                "rank": "10",
+                "displayRank": null,
+                "suit": "spades",
+                "symbol": "♠",
+                "color": "black",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-3-hearts-10",
+                "deckNumber": 3,
+                "rank": "10",
+                "displayRank": null,
+                "suit": "hearts",
+                "symbol": "♥",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-2-hearts-10",
+                "deckNumber": 2,
+                "rank": "10",
+                "displayRank": null,
+                "suit": "hearts",
+                "symbol": "♥",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              },
+              {
+                "id": "deck-2-clubs-10",
+                "deckNumber": 2,
+                "rank": "10",
+                "displayRank": null,
+                "suit": "clubs",
+                "symbol": "♣",
+                "color": "black",
+                "isJoker": false,
+                "jokerType": null
+              }
+            ]
+          },
+          "trickEnded": false,
+          "nextPlayerId": 5
         }
       ],
       "headPlayerId": null,
@@ -4245,5 +4326,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:13:23.860Z"
+  "lastUpdatedAt": "2026-10-22T14:13:34.446Z"
 }
