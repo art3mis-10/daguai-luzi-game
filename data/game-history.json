@@ -2347,6 +2347,43 @@
           },
           "trickEnded": true,
           "nextPlayerId": 5
+        },
+        {
+          "sequence": 15,
+          "timestamp": "2026-10-22T14:06:20.244Z",
+          "timestampMinute": "2026-10-22T14:06Z",
+          "type": "play",
+          "playerId": 5,
+          "seatIndex": 4,
+          "team": "A",
+          "cards": [
+            {
+              "id": "deck-3-clubs-3",
+              "deckNumber": 3,
+              "rank": "3",
+              "displayRank": null,
+              "suit": "clubs",
+              "symbol": "♣",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "single",
+            "subtype": null,
+            "cardCount": 1,
+            "primaryRank": "3",
+            "strength": 59,
+            "categoryStrength": null,
+            "label": "3",
+            "wildAssignments": []
+          },
+          "handCountBefore": 26,
+          "handCountAfter": 25,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -2356,5 +2393,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:05:53.458Z"
+  "lastUpdatedAt": "2026-10-22T14:06:20.244Z"
 }
