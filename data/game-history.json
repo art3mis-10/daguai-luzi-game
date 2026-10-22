@@ -2027,6 +2027,43 @@
           "type": "turn_advance",
           "fromPlayerId": 2,
           "toPlayerId": 3
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-10-22T14:04:30.676Z",
+          "timestampMinute": "2026-10-22T14:04Z",
+          "type": "play",
+          "playerId": 3,
+          "seatIndex": 2,
+          "team": "A",
+          "cards": [
+            {
+              "id": "deck-2-clubs-Q",
+              "deckNumber": 2,
+              "rank": "Q",
+              "displayRank": null,
+              "suit": "clubs",
+              "symbol": "♣",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "single",
+            "subtype": null,
+            "cardCount": 1,
+            "primaryRank": "Q",
+            "strength": 68,
+            "categoryStrength": null,
+            "label": "Q",
+            "wildAssignments": []
+          },
+          "handCountBefore": 27,
+          "handCountAfter": 26,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -2036,5 +2073,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:04:22.063Z"
+  "lastUpdatedAt": "2026-10-22T14:04:30.676Z"
 }
