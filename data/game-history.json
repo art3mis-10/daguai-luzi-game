@@ -3483,6 +3483,87 @@
           "type": "turn_advance",
           "fromPlayerId": 6,
           "toPlayerId": 1
+        },
+        {
+          "sequence": 46,
+          "timestamp": "2026-10-22T14:10:54.958Z",
+          "timestampMinute": "2026-10-22T14:10Z",
+          "type": "play",
+          "playerId": 1,
+          "seatIndex": 0,
+          "team": "A",
+          "cards": [
+            {
+              "id": "deck-2-spades-3",
+              "deckNumber": 2,
+              "rank": "3",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-1-hearts-6",
+              "deckNumber": 1,
+              "rank": "6",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-3-clubs-6",
+              "deckNumber": 3,
+              "rank": "6",
+              "displayRank": null,
+              "suit": "clubs",
+              "symbol": "♣",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-1-clubs-6",
+              "deckNumber": 1,
+              "rank": "6",
+              "displayRank": null,
+              "suit": "clubs",
+              "symbol": "♣",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-diamonds-6",
+              "deckNumber": 2,
+              "rank": "6",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "four-plus-one",
+            "subtype": null,
+            "cardCount": 5,
+            "primaryRank": "6",
+            "strength": 62,
+            "categoryStrength": 4,
+            "label": "Four 6s + 1",
+            "wildAssignments": []
+          },
+          "handCountBefore": 26,
+          "handCountAfter": 21,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -3492,5 +3573,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:10:39.019Z"
+  "lastUpdatedAt": "2026-10-22T14:10:54.958Z"
 }
