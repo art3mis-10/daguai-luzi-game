@@ -2466,6 +2466,14 @@
           "finished": false,
           "becameHeadPlayer": false,
           "currentFinishOrder": []
+        },
+        {
+          "sequence": 19,
+          "timestamp": "2026-10-22T14:06:54.097Z",
+          "timestampMinute": "2026-10-22T14:06Z",
+          "type": "turn_advance",
+          "fromPlayerId": 1,
+          "toPlayerId": 2
         }
       ],
       "headPlayerId": null,
@@ -2475,5 +2483,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:06:52.095Z"
+  "lastUpdatedAt": "2026-10-22T14:06:54.097Z"
 }
