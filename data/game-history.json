@@ -2765,6 +2765,43 @@
           },
           "trickEnded": false,
           "nextPlayerId": 3
+        },
+        {
+          "sequence": 31,
+          "timestamp": "2026-10-22T14:07:45.072Z",
+          "timestampMinute": "2026-10-22T14:07Z",
+          "type": "pass",
+          "playerId": 3,
+          "seatIndex": 2,
+          "passSource": "manual",
+          "leadAtPass": {
+            "playerIndex": 5,
+            "combination": {
+              "type": "single",
+              "subtype": null,
+              "cardCount": 1,
+              "primaryRank": "2",
+              "strength": 80,
+              "categoryStrength": null,
+              "label": "2",
+              "wildAssignments": []
+            },
+            "cards": [
+              {
+                "id": "deck-2-diamonds-2",
+                "deckNumber": 2,
+                "rank": "2",
+                "displayRank": null,
+                "suit": "diamonds",
+                "symbol": "♦",
+                "color": "red",
+                "isJoker": false,
+                "jokerType": null
+              }
+            ]
+          },
+          "trickEnded": false,
+          "nextPlayerId": 4
         }
       ],
       "headPlayerId": null,
@@ -2774,5 +2811,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:07:42.812Z"
+  "lastUpdatedAt": "2026-10-22T14:07:45.072Z"
 }
