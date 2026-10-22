@@ -1982,6 +1982,43 @@
           ],
           "initialFinishOrder": [],
           "unassignedCardCount": 0
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-10-22T14:04:20.061Z",
+          "timestampMinute": "2026-10-22T14:04Z",
+          "type": "play",
+          "playerId": 2,
+          "seatIndex": 1,
+          "team": "B",
+          "cards": [
+            {
+              "id": "deck-1-spades-4",
+              "deckNumber": 1,
+              "rank": "4",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "single",
+            "subtype": null,
+            "cardCount": 1,
+            "primaryRank": "4",
+            "strength": 60,
+            "categoryStrength": null,
+            "label": "4",
+            "wildAssignments": []
+          },
+          "handCountBefore": 27,
+          "handCountAfter": 26,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -1991,5 +2028,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:01:32.097Z"
+  "lastUpdatedAt": "2026-10-22T14:04:20.061Z"
 }
