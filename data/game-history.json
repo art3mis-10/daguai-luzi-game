@@ -2556,6 +2556,43 @@
           },
           "trickEnded": false,
           "nextPlayerId": 4
+        },
+        {
+          "sequence": 23,
+          "timestamp": "2026-10-22T14:07:11.989Z",
+          "timestampMinute": "2026-10-22T14:07Z",
+          "type": "play",
+          "playerId": 4,
+          "seatIndex": 3,
+          "team": "B",
+          "cards": [
+            {
+              "id": "deck-3-spades-9",
+              "deckNumber": 3,
+              "rank": "9",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "single",
+            "subtype": null,
+            "cardCount": 1,
+            "primaryRank": "9",
+            "strength": 65,
+            "categoryStrength": null,
+            "label": "9",
+            "wildAssignments": []
+          },
+          "handCountBefore": 26,
+          "handCountAfter": 25,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -2565,5 +2602,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:07:06.799Z"
+  "lastUpdatedAt": "2026-10-22T14:07:11.989Z"
 }
