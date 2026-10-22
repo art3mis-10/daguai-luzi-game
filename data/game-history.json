@@ -2429,6 +2429,43 @@
           },
           "trickEnded": false,
           "nextPlayerId": 1
+        },
+        {
+          "sequence": 18,
+          "timestamp": "2026-10-22T14:06:52.095Z",
+          "timestampMinute": "2026-10-22T14:06Z",
+          "type": "play",
+          "playerId": 1,
+          "seatIndex": 0,
+          "team": "A",
+          "cards": [
+            {
+              "id": "deck-2-hearts-4",
+              "deckNumber": 2,
+              "rank": "4",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ],
+          "combination": {
+            "type": "single",
+            "subtype": null,
+            "cardCount": 1,
+            "primaryRank": "4",
+            "strength": 60,
+            "categoryStrength": null,
+            "label": "4",
+            "wildAssignments": []
+          },
+          "handCountBefore": 27,
+          "handCountAfter": 26,
+          "finished": false,
+          "becameHeadPlayer": false,
+          "currentFinishOrder": []
         }
       ],
       "headPlayerId": null,
@@ -2438,5 +2475,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:06:47.471Z"
+  "lastUpdatedAt": "2026-10-22T14:06:52.095Z"
 }
