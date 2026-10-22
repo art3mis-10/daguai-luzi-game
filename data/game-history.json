@@ -5767,7 +5767,7 @@
       "gameId": "WOIW35-14de7e67-bc9c-4380-9c6f-00f84597fcbb",
       "roomCode": "WOIW35",
       "gameNumber": 2,
-      "status": "ongoing",
+      "status": "aborted",
       "dealSource": "custom",
       "dealtAt": "2026-10-22T14:16:12.530Z",
       "dealtAtMinute": "2026-10-22T14:16Z",
@@ -7653,14 +7653,173 @@
           "startingPlayerComparison": [],
           "initialFinishOrder": [],
           "unassignedCardCount": 153
+        },
+        {
+          "sequence": 2,
+          "timestamp": "2026-10-22T14:17:15.388Z",
+          "timestampMinute": "2026-10-22T14:17Z",
+          "type": "player_disconnected",
+          "playerId": 2,
+          "seatIndex": 1
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-10-22T14:17:15.391Z",
+          "timestampMinute": "2026-10-22T14:17Z",
+          "type": "player_disconnected",
+          "playerId": 3,
+          "seatIndex": 2
+        },
+        {
+          "sequence": 4,
+          "timestamp": "2026-10-22T14:17:15.394Z",
+          "timestampMinute": "2026-10-22T14:17Z",
+          "type": "room_closed",
+          "reason": "host_disconnected"
         }
       ],
       "headPlayerId": null,
       "finishOrder": [],
-      "endedAt": null,
-      "endedReason": null,
-      "finalHands": null
+      "endedAt": "2026-10-22T14:17:15.396Z",
+      "endedReason": "host_disconnected",
+      "finalHands": [
+        {
+          "seatIndex": 0,
+          "playerId": 1,
+          "cards": [
+            {
+              "id": "deck-3-hearts-3",
+              "deckNumber": 3,
+              "rank": "3",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-spades-A",
+              "deckNumber": 2,
+              "rank": "A",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-2-spades-2",
+              "deckNumber": 2,
+              "rank": "2",
+              "displayRank": null,
+              "suit": "spades",
+              "symbol": "♠",
+              "color": "black",
+              "isJoker": false,
+              "jokerType": null
+            },
+            {
+              "id": "deck-1-big-joker",
+              "deckNumber": 1,
+              "rank": "big-joker",
+              "displayRank": "BJ",
+              "suit": null,
+              "symbol": "★",
+              "color": "red",
+              "isJoker": true,
+              "jokerType": "big"
+            }
+          ]
+        },
+        {
+          "seatIndex": 1,
+          "playerId": 2,
+          "cards": [
+            {
+              "id": "deck-1-hearts-K",
+              "deckNumber": 1,
+              "rank": "K",
+              "displayRank": null,
+              "suit": "hearts",
+              "symbol": "♥",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ]
+        },
+        {
+          "seatIndex": 2,
+          "playerId": 3,
+          "cards": [
+            {
+              "id": "deck-3-diamonds-10",
+              "deckNumber": 3,
+              "rank": "10",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ]
+        },
+        {
+          "seatIndex": 3,
+          "playerId": 4,
+          "cards": [
+            {
+              "id": "deck-2-diamonds-10",
+              "deckNumber": 2,
+              "rank": "10",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ]
+        },
+        {
+          "seatIndex": 4,
+          "playerId": 5,
+          "cards": [
+            {
+              "id": "deck-3-small-joker",
+              "deckNumber": 3,
+              "rank": "small-joker",
+              "displayRank": "SJ",
+              "suit": null,
+              "symbol": "★",
+              "color": "black",
+              "isJoker": true,
+              "jokerType": "small"
+            }
+          ]
+        },
+        {
+          "seatIndex": 5,
+          "playerId": 6,
+          "cards": [
+            {
+              "id": "deck-2-diamonds-2",
+              "deckNumber": 2,
+              "rank": "2",
+              "displayRank": null,
+              "suit": "diamonds",
+              "symbol": "♦",
+              "color": "red",
+              "isJoker": false,
+              "jokerType": null
+            }
+          ]
+        }
+      ]
     }
   ],
-  "lastUpdatedAt": "2026-10-22T14:16:12.530Z"
+  "lastUpdatedAt": "2026-10-22T14:17:15.396Z"
 }
