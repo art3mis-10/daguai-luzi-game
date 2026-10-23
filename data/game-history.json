@@ -876,6 +876,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C4"
+            ]
+          ]
         }
       ],
       "finishOrder": []
