@@ -147,7 +147,10 @@ function classifyPair(cards, trumpRank) {
 
   const normalCards = cards.filter((card) => !isJoker(card));
 
-  if (normalCards.length === 2 && normalCards[0].rank !== normalCards[1].rank) {
+  if (
+    normalCards.length === 2 &&
+    normalCards[0].rank !== normalCards[1].rank
+  ) {
     return {
       valid: false,
       reason: 'A pair must contain two cards of the same rank.',
@@ -157,109 +160,167 @@ function classifyPair(cards, trumpRank) {
   /*
     One normal card + one Joker.
   */
-  if (normalCards.length === 1 && jokers.length === 1) {
-    const primaryRank = normalCards[0].rank;
+  if (
+    normalCards.length === 1 &&
+    jokers.length === 1
+  ) {
+    const primaryRank =
+      normalCards[0].rank;
 
     return {
       valid: true,
       type: 'pair',
       cardCount: 2,
       primaryRank,
-      strength: getRankStrength(primaryRank, trumpRank),
+
+      strength:
+        getRankStrength(
+          primaryRank,
+          trumpRank
+        ),
+
       cards,
 
       wildAssignments: [
         {
-          cardId: jokers[0].id,
-          substitutedRank: primaryRank,
+          cardId:
+            jokers[0].id,
+
+          substitutedRank:
+            primaryRank,
         },
       ],
 
-      label: `Pair of ${primaryRank}s`,
+      label:
+        `Pair of ${primaryRank}s`,
     };
   }
 
   /*
     Natural pair.
   */
-  if (normalCards.length === 2) {
-    const primaryRank = normalCards[0].rank;
+  if (
+    normalCards.length === 2
+  ) {
+    const primaryRank =
+      normalCards[0].rank;
 
     return {
       valid: true,
       type: 'pair',
       cardCount: 2,
       primaryRank,
-      strength: getRankStrength(primaryRank, trumpRank),
+
+      strength:
+        getRankStrength(
+          primaryRank,
+          trumpRank
+        ),
+
       cards,
+
       wildAssignments: [],
-      label: `Pair of ${primaryRank}s`,
+
+      label:
+        `Pair of ${primaryRank}s`,
     };
   }
 
   /*
     Joker pair rule:
 
-    Big + Big
-        >
-    Big + Small
+    SJ + SJ
         =
-    Small + Small
+    BJ + SJ
+        <
+    BJ + BJ
   */
-  if (jokers.length === 2) {
-    const bigJokerCount = jokers.filter(isBigJoker).length;
+  if (
+    jokers.length === 2
+  ) {
+    const bigJokerCount =
+      jokers.filter(
+        isBigJoker
+      ).length;
 
-    const smallJokerCount = jokers.filter(isSmallJoker).length;
+    const smallJokerCount =
+      jokers.filter(
+        isSmallJoker
+      ).length;
 
-    if (bigJokerCount === 2) {
+    if (
+      bigJokerCount === 2
+    ) {
       return {
         valid: true,
-        type: 'pair',
-        subtype: 'big-joker-pair',
 
-        cardCount: 2,
+        type:
+          'pair',
 
-        primaryRank: 'big-joker',
+        subtype:
+          'big-joker-pair',
 
-        strength: 102,
+        cardCount:
+          2,
+
+        primaryRank:
+          'big-joker',
+
+        strength:
+          102,
 
         cards,
 
-        wildAssignments: [],
+        wildAssignments:
+          [],
 
-        label: 'Pair of Big Jokers',
+        label:
+          'Pair of Big Jokers',
       };
     }
 
     if (
       smallJokerCount === 2 ||
-      (bigJokerCount === 1 && smallJokerCount === 1)
+      (
+        bigJokerCount === 1 &&
+        smallJokerCount === 1
+      )
     ) {
       return {
         valid: true,
-        type: 'pair',
 
-        subtype: 'small-joker-level-pair',
+        type:
+          'pair',
 
-        cardCount: 2,
+        subtype:
+          'small-joker-level-pair',
 
-        primaryRank: 'small-joker',
+        cardCount:
+          2,
 
-        strength: 101,
+        primaryRank:
+          'small-joker',
+
+        strength:
+          101,
 
         cards,
 
-        wildAssignments: [],
+        wildAssignments:
+          [],
 
         label:
-          bigJokerCount === 1 ? 'Big-Small Joker Pair' : 'Pair of Small Jokers',
+          bigJokerCount === 1
+            ? 'Big-Small Joker Pair'
+            : 'Pair of Small Jokers',
       };
     }
   }
 
   return {
     valid: false,
-    reason: 'The selected cards do not form a legal pair.',
+    reason:
+      'The selected cards do not form a legal pair.',
   };
 }
 
@@ -268,48 +329,153 @@ function classifyPair(cards, trumpRank) {
    ========================================================= */
 
 function classifyTriple(cards, trumpRank) {
-  const jokers = cards.filter(isJoker);
+  const jokers =
+    cards.filter(
+      isJoker
+    );
 
-  const normalCards = cards.filter((card) => !isJoker(card));
+  const normalCards =
+    cards.filter(
+      (card) =>
+        !isJoker(card)
+    );
 
-  const normalRanks = new Set(normalCards.map((card) => card.rank));
+  const normalRanks =
+    new Set(
+      normalCards.map(
+        (card) =>
+          card.rank
+      )
+    );
 
-  if (normalRanks.size > 1) {
+  if (
+    normalRanks.size > 1
+  ) {
     return {
       valid: false,
-      reason: 'A triple must represent three cards of the same rank.',
+
+      reason:
+        'A triple must represent three cards of the same rank.',
     };
   }
 
   /*
-    We are deliberately not inventing
-    an all-Joker triple ranking yet.
+    Pure Joker triple rule:
+
+    SJ + SJ + SJ
+        =
+    BJ + SJ + SJ
+        =
+    BJ + BJ + SJ
+        <
+    BJ + BJ + BJ
+
+    All pure Joker triples are
+    above ordinary / trump triples.
   */
-  if (normalCards.length === 0) {
+  if (
+    normalCards.length === 0 &&
+    jokers.length === 3
+  ) {
+    const bigJokerCount =
+      jokers.filter(
+        isBigJoker
+      ).length;
+
+    if (
+      bigJokerCount === 3
+    ) {
+      return {
+        valid: true,
+
+        type:
+          'triple',
+
+        subtype:
+          'big-joker-triple',
+
+        cardCount:
+          3,
+
+        primaryRank:
+          'big-joker',
+
+        strength:
+          102,
+
+        cards,
+
+        wildAssignments:
+          [],
+
+        label:
+          'Triple Big Jokers',
+      };
+    }
+
     return {
-      valid: false,
-      reason: 'All-Joker triples still require a formal ranking rule.',
+      valid: true,
+
+      type:
+        'triple',
+
+      subtype:
+        'joker-level-triple',
+
+      cardCount:
+        3,
+
+      primaryRank:
+        'small-joker',
+
+      strength:
+        101,
+
+      cards,
+
+      wildAssignments:
+        [],
+
+      label:
+        'Joker Triple',
     };
   }
 
-  const primaryRank = normalCards[0].rank;
+  const primaryRank =
+    normalCards[0].rank;
 
   return {
     valid: true,
-    type: 'triple',
-    cardCount: 3,
+
+    type:
+      'triple',
+
+    cardCount:
+      3,
+
     primaryRank,
 
-    strength: getRankStrength(primaryRank, trumpRank),
+    strength:
+      getRankStrength(
+        primaryRank,
+        trumpRank
+      ),
 
     cards,
 
-    wildAssignments: jokers.map((joker) => ({
-      cardId: joker.id,
-      substitutedRank: primaryRank,
-    })),
+    wildAssignments:
+      jokers.map(
+        (joker) => ({
+          cardId:
+            joker.id,
 
-    label: `Triple ${primaryRank}s`,
+          substitutedRank:
+            primaryRank,
+        })
+      ),
+
+    label:
+      `Triple ${primaryRank}s`,
   };
 }
 
@@ -317,76 +483,134 @@ function classifyTriple(cards, trumpRank) {
    STRAIGHT SEARCH
    ========================================================= */
 
-function findBestStraight(cards, requireSameSuit = false) {
-  const jokers = cards.filter(isJoker);
+function findBestStraight(
+  cards,
+  requireSameSuit = false
+) {
+  const jokers =
+    cards.filter(
+      isJoker
+    );
 
-  const normalCards = cards.filter((card) => !isJoker(card));
+  const normalCards =
+    cards.filter(
+      (card) =>
+        !isJoker(card)
+    );
 
-  const normalRanks = normalCards.map((card) => card.rank);
+  const normalRanks =
+    normalCards.map(
+      (card) =>
+        card.rank
+    );
 
-  const uniqueNormalRanks = new Set(normalRanks);
+  const uniqueNormalRanks =
+    new Set(
+      normalRanks
+    );
 
   /*
     A straight cannot contain
     duplicate printed ranks.
   */
-  if (uniqueNormalRanks.size !== normalRanks.length) {
+  if (
+    uniqueNormalRanks.size !==
+    normalRanks.length
+  ) {
     return null;
   }
 
   /*
     Straight Flush:
     all non-Joker cards must
-    already share a suit.
+    share a suit.
   */
-  if (requireSameSuit && normalCards.length > 0) {
-    const suits = new Set(normalCards.map((card) => card.suit));
+  if (
+    requireSameSuit &&
+    normalCards.length > 0
+  ) {
+    const suits =
+      new Set(
+        normalCards.map(
+          (card) =>
+            card.suit
+        )
+      );
 
-    if (suits.size > 1) {
+    if (
+      suits.size > 1
+    ) {
       return null;
     }
   }
 
-  const candidates = [];
+  const candidates =
+    [];
 
-  STRAIGHT_SEQUENCES.forEach((sequence) => {
-    const sequenceSet = new Set(sequence);
+  STRAIGHT_SEQUENCES.forEach(
+    (sequence) => {
+      const sequenceSet =
+        new Set(
+          sequence
+        );
 
-    const allNormalRanksFit = normalRanks.every((rank) =>
-      sequenceSet.has(rank)
-    );
+      const allNormalRanksFit =
+        normalRanks.every(
+          (rank) =>
+            sequenceSet.has(
+              rank
+            )
+        );
 
-    if (!allNormalRanksFit) {
-      return;
+      if (
+        !allNormalRanksFit
+      ) {
+        return;
+      }
+
+      const missingRanks =
+        sequence.filter(
+          (rank) =>
+            !uniqueNormalRanks.has(
+              rank
+            )
+        );
+
+      if (
+        missingRanks.length !==
+        jokers.length
+      ) {
+        return;
+      }
+
+      candidates.push({
+        sequence,
+
+        missingRanks,
+
+        strength:
+          getStraightStrength(
+            sequence
+          ),
+      });
     }
+  );
 
-    const missingRanks = sequence.filter(
-      (rank) => !uniqueNormalRanks.has(rank)
-    );
-
-    if (missingRanks.length !== jokers.length) {
-      return;
-    }
-
-    candidates.push({
-      sequence,
-      missingRanks,
-
-      strength: getStraightStrength(sequence),
-    });
-  });
-
-  if (candidates.length === 0) {
+  if (
+    candidates.length === 0
+  ) {
     return null;
   }
 
   /*
-    Because wild cards must form
-    the strongest possible legal
-    combination, choose the
-    highest possible straight.
+    Wild cards form the strongest
+    possible legal straight.
   */
-  candidates.sort((a, b) => b.strength - a.strength);
+  candidates.sort(
+    (a, b) =>
+      b.strength -
+      a.strength
+  );
 
   return candidates[0];
 }
@@ -395,48 +619,144 @@ function findBestStraight(cards, requireSameSuit = false) {
    FIVE OF A KIND
    ========================================================= */
 
-function classifyFiveOfAKind(cards, trumpRank) {
-  const jokers = cards.filter(isJoker);
+function classifyFiveOfAKind(
+  cards,
+  trumpRank
+) {
+  const jokers =
+    cards.filter(
+      isJoker
+    );
 
-  const normalCards = cards.filter((card) => !isJoker(card));
+  const normalCards =
+    cards.filter(
+      (card) =>
+        !isJoker(card)
+    );
 
-  const normalRanks = new Set(normalCards.map((card) => card.rank));
+  const normalRanks =
+    new Set(
+      normalCards.map(
+        (card) =>
+          card.rank
+      )
+    );
 
   /*
-    Avoid inventing the ranking
-    of five cards that are ALL Jokers.
+    FIVE JOKERS
+
+    Any five Jokers together are
+    the absolute strongest possible
+    five-card play.
+
+    Examples:
+
+    SJ,SJ,SJ,SJ,SJ
+    BJ,SJ,SJ,SJ,SJ
+    BJ,BJ,SJ,SJ,SJ
+    BJ,BJ,BJ,SJ,SJ
+    BJ,BJ,BJ,BJ,SJ
+    BJ,BJ,BJ,BJ,BJ
+
+    ALL of them are exactly equal.
+
+    One five-Joker combination cannot
+    defeat another five-Joker combination,
+    because equal strength does not beat
+    the current lead.
   */
-  if (normalCards.length === 0) {
+  if (
+    normalCards.length === 0 &&
+    jokers.length === 5
+  ) {
+    return {
+      valid:
+        true,
+
+      type:
+        'five-of-a-kind',
+
+      subtype:
+        'five-jokers',
+
+      cardCount:
+        5,
+
+      categoryStrength:
+        FIVE_CARD_CATEGORY_STRENGTH[
+          'five-of-a-kind'
+        ],
+
+      primaryRank:
+        'joker',
+
+      /*
+        Higher than every ordinary
+        five-of-a-kind.
+
+        Every possible five-Joker mix
+        receives this SAME value.
+      */
+      strength:
+        1000,
+
+      cards,
+
+      wildAssignments:
+        [],
+
+      label:
+        'Five Jokers',
+    };
+  }
+
+  if (
+    normalRanks.size !== 1
+  ) {
     return null;
   }
 
-  if (normalRanks.size !== 1) {
-    return null;
-  }
-
-  const primaryRank = normalCards[0].rank;
+  const primaryRank =
+    normalCards[0].rank;
 
   return {
-    valid: true,
+    valid:
+      true,
 
-    type: 'five-of-a-kind',
+    type:
+      'five-of-a-kind',
 
-    cardCount: 5,
+    cardCount:
+      5,
 
-    categoryStrength: FIVE_CARD_CATEGORY_STRENGTH['five-of-a-kind'],
+    categoryStrength:
+      FIVE_CARD_CATEGORY_STRENGTH[
+        'five-of-a-kind'
+      ],
 
     primaryRank,
 
-    strength: getRankStrength(primaryRank, trumpRank),
+    strength:
+      getRankStrength(
+        primaryRank,
+        trumpRank
+      ),
 
     cards,
 
-    wildAssignments: jokers.map((joker) => ({
-      cardId: joker.id,
-      substitutedRank: primaryRank,
-    })),
+    wildAssignments:
+      jokers.map(
+        (joker) => ({
+          cardId:
+            joker.id,
 
-    label: `Five ${primaryRank}s`,
+          substitutedRank:
+            primaryRank,
+        })
+      ),
+
+    label:
+      `Five ${primaryRank}s`,
   };
 }
 
@@ -444,49 +764,87 @@ function classifyFiveOfAKind(cards, trumpRank) {
    STRAIGHT FLUSH
    ========================================================= */
 
-function classifyStraightFlush(cards) {
-  const result = findBestStraight(cards, true);
+function classifyStraightFlush(
+  cards
+) {
+  const result =
+    findBestStraight(
+      cards,
+      true
+    );
 
-  if (!result) {
+  if (
+    !result
+  ) {
     return null;
   }
 
-  const normalCards = cards.filter((card) => !isJoker(card));
+  const normalCards =
+    cards.filter(
+      (card) =>
+        !isJoker(card)
+    );
 
-  const suit = normalCards[0]?.suit ?? null;
+  const suit =
+    normalCards[0]
+      ?.suit ??
+    null;
 
-  /*
-    All-Joker interpretation
-    is left undefined for now.
-  */
-  if (!suit) {
+  if (
+    !suit
+  ) {
     return null;
   }
 
   return {
-    valid: true,
+    valid:
+      true,
 
-    type: 'straight-flush',
+    type:
+      'straight-flush',
 
-    cardCount: 5,
+    cardCount:
+      5,
 
-    categoryStrength: FIVE_CARD_CATEGORY_STRENGTH['straight-flush'],
+    categoryStrength:
+      FIVE_CARD_CATEGORY_STRENGTH[
+        'straight-flush'
+      ],
 
-    primaryRank: result.sequence[4],
+    primaryRank:
+      result.sequence[4],
 
-    strength: result.strength,
+    strength:
+      result.strength,
 
     cards,
 
-    wildAssignments: cards.filter(isJoker).map((joker, index) => ({
-      cardId: joker.id,
+    wildAssignments:
+      cards
+        .filter(
+          isJoker
+        )
+        .map(
+          (
+            joker,
+            index
+          ) => ({
+            cardId:
+              joker.id,
 
-      substitutedRank: result.missingRanks[index],
+            substitutedRank:
+              result
+                .missingRanks[
+                  index
+                ],
 
-      substitutedSuit: suit,
-    })),
+            substitutedSuit:
+              suit,
+          })
+        ),
 
-    label: `Straight Flush, ${result.sequence.join('-')}`,
+    label:
+      `Straight Flush, ${result.sequence.join('-')}`,
   };
 }
 
@@ -494,21 +852,48 @@ function classifyStraightFlush(cards) {
    FOUR + ONE
    ========================================================= */
 
-function classifyFourPlusOne(cards, trumpRank) {
-  const jokers = cards.filter(isJoker);
+function classifyFourPlusOne(
+  cards,
+  trumpRank
+) {
+  const jokers =
+    cards.filter(
+      isJoker
+    );
 
-  const rankCounts = countRanks(cards);
+  const rankCounts =
+    countRanks(
+      cards
+    );
 
-  const candidates = [];
+  const candidates =
+    [];
 
-  for (const [rank, count] of rankCounts.entries()) {
-    const jokersNeeded = Math.max(0, 4 - count);
+  for (
+    const [
+      rank,
+      count,
+    ] of
+    rankCounts.entries()
+  ) {
+    const jokersNeeded =
+      Math.max(
+        0,
+        4 - count
+      );
 
-    if (jokersNeeded > jokers.length) {
+    if (
+      jokersNeeded >
+      jokers.length
+    ) {
       continue;
     }
 
-    if (count + jokersNeeded !== 4) {
+    if (
+      count +
+        jokersNeeded !==
+      4
+    ) {
       continue;
     }
 
@@ -517,42 +902,71 @@ function classifyFourPlusOne(cards, trumpRank) {
 
       jokersNeeded,
 
-      strength: getRankStrength(rank, trumpRank),
+      strength:
+        getRankStrength(
+          rank,
+          trumpRank
+        ),
     });
   }
 
-  if (candidates.length === 0) {
+  if (
+    candidates.length === 0
+  ) {
     return null;
   }
 
-  candidates.sort((a, b) => b.strength - a.strength);
+  candidates.sort(
+    (a, b) =>
+      b.strength -
+      a.strength
+  );
 
-  const best = candidates[0];
+  const best =
+    candidates[0];
 
-  const usedJokers = jokers.slice(0, best.jokersNeeded);
+  const usedJokers =
+    jokers.slice(
+      0,
+      best.jokersNeeded
+    );
 
   return {
-    valid: true,
+    valid:
+      true,
 
-    type: 'four-plus-one',
+    type:
+      'four-plus-one',
 
-    cardCount: 5,
+    cardCount:
+      5,
 
-    categoryStrength: FIVE_CARD_CATEGORY_STRENGTH['four-plus-one'],
+    categoryStrength:
+      FIVE_CARD_CATEGORY_STRENGTH[
+        'four-plus-one'
+      ],
 
-    primaryRank: best.rank,
+    primaryRank:
+      best.rank,
 
-    strength: best.strength,
+    strength:
+      best.strength,
 
     cards,
 
-    wildAssignments: usedJokers.map((joker) => ({
-      cardId: joker.id,
+    wildAssignments:
+      usedJokers.map(
+        (joker) => ({
+          cardId:
+            joker.id,
 
-      substitutedRank: best.rank,
-    })),
+          substitutedRank:
+            best.rank,
+        })
+      ),
 
-    label: `Four ${best.rank}s + 1`,
+    label:
+      `Four ${best.rank}s + 1`,
   };
 }
 
@@ -560,124 +974,230 @@ function classifyFourPlusOne(cards, trumpRank) {
    FULL HOUSE
    ========================================================= */
 
-function classifyFullHouse(cards, trumpRank) {
-  const jokers = cards.filter(isJoker);
+function classifyFullHouse(
+  cards,
+  trumpRank
+) {
+  const jokers =
+    cards.filter(
+      isJoker
+    );
 
-  const normalCards = cards.filter((card) => !isJoker(card));
+  const normalCards =
+    cards.filter(
+      (card) =>
+        !isJoker(card)
+    );
 
-  const rankCounts = countRanks(cards);
+  const rankCounts =
+    countRanks(
+      cards
+    );
 
-  const candidateTripleRanks = [...rankCounts.keys()];
+  const candidateTripleRanks =
+    [
+      ...rankCounts.keys(),
+    ];
 
-  const candidates = [];
+  const candidates =
+    [];
 
-  for (const tripleRank of candidateTripleRanks) {
-    const tripleNaturalCount = rankCounts.get(tripleRank) ?? 0;
+  for (
+    const tripleRank of
+    candidateTripleRanks
+  ) {
+    const tripleNaturalCount =
+      rankCounts.get(
+        tripleRank
+      ) ??
+      0;
 
-    if (tripleNaturalCount > 3) {
+    if (
+      tripleNaturalCount > 3
+    ) {
       continue;
     }
 
-    const jokersForTriple = Math.max(0, 3 - tripleNaturalCount);
+    const jokersForTriple =
+      Math.max(
+        0,
+        3 -
+          tripleNaturalCount
+      );
 
-    if (jokersForTriple > jokers.length) {
+    if (
+      jokersForTriple >
+      jokers.length
+    ) {
       continue;
     }
 
-    const remainingJokers = jokers.length - jokersForTriple;
+    const remainingJokers =
+      jokers.length -
+      jokersForTriple;
 
-    const remainingNormalCards = [];
+    const remainingNormalCards =
+      [];
 
-    let tripleCardsToRemove = 3 - jokersForTriple;
+    let tripleCardsToRemove =
+      3 -
+      jokersForTriple;
 
-    normalCards.forEach((card) => {
-      if (card.rank === tripleRank && tripleCardsToRemove > 0) {
-        tripleCardsToRemove -= 1;
-      } else {
-        remainingNormalCards.push(card);
+    normalCards.forEach(
+      (card) => {
+        if (
+          card.rank ===
+            tripleRank &&
+          tripleCardsToRemove >
+            0
+        ) {
+          tripleCardsToRemove -=
+            1;
+        } else {
+          remainingNormalCards.push(
+            card
+          );
+        }
       }
-    });
+    );
 
-    if (remainingNormalCards.length + remainingJokers !== 2) {
+    if (
+      remainingNormalCards.length +
+        remainingJokers !==
+      2
+    ) {
       continue;
     }
 
-    let pairPossible = false;
-    let pairRank = null;
+    let pairPossible =
+      false;
+
+    let pairRank =
+      null;
 
     /*
       Natural pair.
     */
-    if (remainingNormalCards.length === 2) {
+    if (
+      remainingNormalCards.length ===
+      2
+    ) {
       if (
-        remainingNormalCards[0].rank === remainingNormalCards[1].rank &&
-        remainingNormalCards[0].rank !== tripleRank
+        remainingNormalCards[0]
+          .rank ===
+          remainingNormalCards[1]
+            .rank &&
+        remainingNormalCards[0]
+          .rank !==
+          tripleRank
       ) {
-        pairPossible = true;
-        pairRank = remainingNormalCards[0].rank;
-      }
-    } else if (remainingNormalCards.length === 1 && remainingJokers === 1) {
+        pairPossible =
+          true;
 
-    /*
-      One natural card + Joker.
-    */
-      if (remainingNormalCards[0].rank !== tripleRank) {
-        pairPossible = true;
-        pairRank = remainingNormalCards[0].rank;
+        pairRank =
+          remainingNormalCards[0]
+            .rank;
       }
-    } else if (remainingNormalCards.length === 0 && remainingJokers === 2) {
+    } else if (
+      remainingNormalCards.length ===
+        1 &&
+      remainingJokers ===
+        1
+    ) {
+      /*
+        One natural card + Joker.
+      */
+      if (
+        remainingNormalCards[0]
+          .rank !==
+        tripleRank
+      ) {
+        pairPossible =
+          true;
 
-    /*
-      Two remaining Jokers
-      may complete the pair.
-    */
-      pairPossible = true;
-      pairRank = 'wild-pair';
+        pairRank =
+          remainingNormalCards[0]
+            .rank;
+      }
+    } else if (
+      remainingNormalCards.length ===
+        0 &&
+      remainingJokers ===
+        2
+    ) {
+      /*
+        Two remaining Jokers
+        complete the pair.
+      */
+      pairPossible =
+        true;
+
+      pairRank =
+        'wild-pair';
     }
 
-    if (!pairPossible) {
+    if (
+      !pairPossible
+    ) {
       continue;
     }
 
     candidates.push({
       tripleRank,
+
       pairRank,
+
       jokersForTriple,
 
-      strength: getRankStrength(tripleRank, trumpRank),
+      strength:
+        getRankStrength(
+          tripleRank,
+          trumpRank
+        ),
     });
   }
 
-  if (candidates.length === 0) {
+  if (
+    candidates.length === 0
+  ) {
     return null;
   }
 
-  /*
-    If wild cards allow more than
-    one Full House interpretation,
-    choose the stronger triple.
-  */
-  candidates.sort((a, b) => b.strength - a.strength);
+  candidates.sort(
+    (a, b) =>
+      b.strength -
+      a.strength
+  );
 
-  const best = candidates[0];
+  const best =
+    candidates[0];
 
   return {
-    valid: true,
+    valid:
+      true,
 
-    type: 'full-house',
+    type:
+      'full-house',
 
-    cardCount: 5,
+    cardCount:
+      5,
 
-    categoryStrength: FIVE_CARD_CATEGORY_STRENGTH['full-house'],
+    categoryStrength:
+      FIVE_CARD_CATEGORY_STRENGTH[
+        'full-house'
+      ],
 
-    primaryRank: best.tripleRank,
+    primaryRank:
+      best.tripleRank,
 
-    strength: best.strength,
+    strength:
+      best.strength,
 
     cards,
 
     label:
-      best.pairRank === 'wild-pair'
+      best.pairRank ===
+      'wild-pair'
         ? `Full House, triple ${best.tripleRank}s`
         : `Full House, ${best.tripleRank}s over ${best.pairRank}s`,
   };
@@ -687,66 +1207,103 @@ function classifyFullHouse(cards, trumpRank) {
    FLUSH
    ========================================================= */
 
-function classifyFlush(cards) {
-  const jokers = cards.filter(isJoker);
+function classifyFlush(
+  cards
+) {
+  const jokers =
+    cards.filter(
+      isJoker
+    );
 
-  const normalCards = cards.filter((card) => !isJoker(card));
+  const normalCards =
+    cards.filter(
+      (card) =>
+        !isJoker(card)
+    );
 
-  if (normalCards.length === 0) {
+  if (
+    normalCards.length === 0
+  ) {
     return null;
   }
 
-  const suits = new Set(normalCards.map((card) => card.suit));
+  const suits =
+    new Set(
+      normalCards.map(
+        (card) =>
+          card.suit
+      )
+    );
 
-  if (suits.size !== 1) {
+  if (
+    suits.size !== 1
+  ) {
     return null;
   }
 
-  const suit = normalCards[0].suit;
+  const suit =
+    normalCards[0].suit;
 
-  /*
-    Wild cards may substitute
-    another card of this suit.
-
-    Since combinations are interpreted
-    as strongly as possible, a Joker
-    can make the Flush Ace-high.
-  */
   let primaryRank;
 
-  if (jokers.length > 0) {
-    primaryRank = 'A';
+  if (
+    jokers.length > 0
+  ) {
+    primaryRank =
+      'A';
   } else {
-    primaryRank = [...normalCards].sort(
-      (a, b) =>
-        getOrdinaryRankStrength(b.rank) - getOrdinaryRankStrength(a.rank)
-    )[0].rank;
+    primaryRank =
+      [
+        ...normalCards,
+      ].sort(
+        (a, b) =>
+          getOrdinaryRankStrength(
+            b.rank
+          ) -
+          getOrdinaryRankStrength(
+            a.rank
+          )
+      )[0].rank;
   }
 
   return {
-    valid: true,
+    valid:
+      true,
 
-    type: 'flush',
+    type:
+      'flush',
 
-    cardCount: 5,
+    cardCount:
+      5,
 
-    categoryStrength: FIVE_CARD_CATEGORY_STRENGTH.flush,
+    categoryStrength:
+      FIVE_CARD_CATEGORY_STRENGTH.flush,
 
     primaryRank,
 
-    strength: getOrdinaryRankStrength(primaryRank),
+    strength:
+      getOrdinaryRankStrength(
+        primaryRank
+      ),
 
     cards,
 
-    wildAssignments: jokers.map((joker) => ({
-      cardId: joker.id,
+    wildAssignments:
+      jokers.map(
+        (joker) => ({
+          cardId:
+            joker.id,
 
-      substitutedRank: 'A',
+          substitutedRank:
+            'A',
 
-      substitutedSuit: suit,
-    })),
+          substitutedSuit:
+            suit,
+        })
+      ),
 
-    label: `Flush, ${primaryRank} high`,
+    label:
+      `Flush, ${primaryRank} high`,
   };
 }
 
@@ -754,35 +1311,65 @@ function classifyFlush(cards) {
    STRAIGHT
    ========================================================= */
 
-function classifyStraight(cards) {
-  const result = findBestStraight(cards, false);
+function classifyStraight(
+  cards
+) {
+  const result =
+    findBestStraight(
+      cards,
+      false
+    );
 
-  if (!result) {
+  if (
+    !result
+  ) {
     return null;
   }
 
   return {
-    valid: true,
+    valid:
+      true,
 
-    type: 'straight',
+    type:
+      'straight',
 
-    cardCount: 5,
+    cardCount:
+      5,
 
-    categoryStrength: FIVE_CARD_CATEGORY_STRENGTH.straight,
+    categoryStrength:
+      FIVE_CARD_CATEGORY_STRENGTH.straight,
 
-    primaryRank: result.sequence[4],
+    primaryRank:
+      result.sequence[4],
 
-    strength: result.strength,
+    strength:
+      result.strength,
 
     cards,
 
-    wildAssignments: cards.filter(isJoker).map((joker, index) => ({
-      cardId: joker.id,
+    wildAssignments:
+      cards
+        .filter(
+          isJoker
+        )
+        .map(
+          (
+            joker,
+            index
+          ) => ({
+            cardId:
+              joker.id,
 
-      substitutedRank: result.missingRanks[index],
-    })),
+            substitutedRank:
+              result
+                .missingRanks[
+                  index
+                ],
+          })
+        ),
 
-    label: `Straight, ${result.sequence.join('-')}`,
+    label:
+      `Straight, ${result.sequence.join('-')}`,
   };
 }
 
@@ -790,42 +1377,71 @@ function classifyStraight(cards) {
    FIVE-CARD MASTER CLASSIFIER
    ========================================================= */
 
-function classifyFiveCardPlay(cards, trumpRank) {
+function classifyFiveCardPlay(
+  cards,
+  trumpRank
+) {
   /*
-    IMPORTANT:
+    Strongest category first.
 
-    We test from strongest category
-    to weakest category.
-
-    This implements the rule that
-    wild cards must form the strongest
-    legal interpretation.
+    This also guarantees that
+    five Jokers are recognized as
+    the maximum Five of a Kind
+    before they can be interpreted
+    as another wild-card combination.
   */
-
   const classifiers = [
-    () => classifyFiveOfAKind(cards, trumpRank),
+    () =>
+      classifyFiveOfAKind(
+        cards,
+        trumpRank
+      ),
 
-    () => classifyStraightFlush(cards),
+    () =>
+      classifyStraightFlush(
+        cards
+      ),
 
-    () => classifyFourPlusOne(cards, trumpRank),
+    () =>
+      classifyFourPlusOne(
+        cards,
+        trumpRank
+      ),
 
-    () => classifyFullHouse(cards, trumpRank),
+    () =>
+      classifyFullHouse(
+        cards,
+        trumpRank
+      ),
 
-    () => classifyFlush(cards),
+    () =>
+      classifyFlush(
+        cards
+      ),
 
-    () => classifyStraight(cards),
+    () =>
+      classifyStraight(
+        cards
+      ),
   ];
 
-  for (const runClassifier of classifiers) {
-    const result = runClassifier();
+  for (
+    const runClassifier of
+    classifiers
+  ) {
+    const result =
+      runClassifier();
 
-    if (result) {
+    if (
+      result
+    ) {
       return result;
     }
   }
 
   return {
-    valid: false,
+    valid:
+      false,
 
     reason:
       'The selected five cards do not form a legal five-card combination.',
@@ -836,34 +1452,67 @@ function classifyFiveCardPlay(cards, trumpRank) {
    MASTER PLAY CLASSIFIER
    ========================================================= */
 
-export function classifyPlay(cards, trumpRank) {
-  if (!Array.isArray(cards) || cards.length === 0) {
+export function classifyPlay(
+  cards,
+  trumpRank
+) {
+  if (
+    !Array.isArray(
+      cards
+    ) ||
+    cards.length === 0
+  ) {
     return {
-      valid: false,
-      reason: 'Select at least one card.',
+      valid:
+        false,
+
+      reason:
+        'Select at least one card.',
     };
   }
 
-  if (cards.length === 1) {
-    return classifySingle(cards, trumpRank);
+  if (
+    cards.length === 1
+  ) {
+    return classifySingle(
+      cards,
+      trumpRank
+    );
   }
 
-  if (cards.length === 2) {
-    return classifyPair(cards, trumpRank);
+  if (
+    cards.length === 2
+  ) {
+    return classifyPair(
+      cards,
+      trumpRank
+    );
   }
 
-  if (cards.length === 3) {
-    return classifyTriple(cards, trumpRank);
+  if (
+    cards.length === 3
+  ) {
+    return classifyTriple(
+      cards,
+      trumpRank
+    );
   }
 
-  if (cards.length === 5) {
-    return classifyFiveCardPlay(cards, trumpRank);
+  if (
+    cards.length === 5
+  ) {
+    return classifyFiveCardPlay(
+      cards,
+      trumpRank
+    );
   }
 
   return {
-    valid: false,
+    valid:
+      false,
 
-    reason: 'A legal play must contain 1, 2, 3, or 5 cards.',
+    reason:
+      'A legal play must contain 1, 2, 3, or 5 cards.',
   };
 }
 
@@ -871,12 +1520,21 @@ export function classifyPlay(cards, trumpRank) {
    PLAY COMPARISON
    ========================================================= */
 
-export function comparePlays(challenger, currentLead) {
-  if (!challenger?.valid) {
+export function comparePlays(
+  challenger,
+  currentLead
+) {
+  if (
+    !challenger?.valid
+  ) {
     return {
-      valid: false,
+      valid:
+        false,
 
-      reason: challenger?.reason ?? 'Invalid play.',
+      reason:
+        challenger
+          ?.reason ??
+        'Invalid play.',
     };
   }
 
@@ -884,21 +1542,31 @@ export function comparePlays(challenger, currentLead) {
     Leading player can play
     any legal combination.
   */
-  if (!currentLead) {
+  if (
+    !currentLead
+  ) {
     return {
-      valid: true,
-      result: 1,
+      valid:
+        true,
+
+      result:
+        1,
     };
   }
 
   /*
     Same card count required.
   */
-  if (challenger.cardCount !== currentLead.cardCount) {
+  if (
+    challenger.cardCount !==
+    currentLead.cardCount
+  ) {
     return {
-      valid: false,
+      valid:
+        false,
 
-      reason: `You must play exactly ${currentLead.cardCount} card(s).`,
+      reason:
+        `You must play exactly ${currentLead.cardCount} card(s).`,
     };
   }
 
@@ -906,65 +1574,117 @@ export function comparePlays(challenger, currentLead) {
     FIVE-CARD COMPARISON
 
     Category first.
-    Rank second.
+    Strength second.
+
+    Equal strength does NOT beat
+    the current lead.
+
+    Therefore:
+    any five Jokers cannot beat
+    another five Jokers.
   */
-  if (challenger.cardCount === 5) {
-    if (challenger.categoryStrength > currentLead.categoryStrength) {
+  if (
+    challenger.cardCount === 5
+  ) {
+    if (
+      challenger
+        .categoryStrength >
+      currentLead
+        .categoryStrength
+    ) {
       return {
-        valid: true,
-        result: 1,
+        valid:
+          true,
+
+        result:
+          1,
       };
     }
 
-    if (challenger.categoryStrength < currentLead.categoryStrength) {
+    if (
+      challenger
+        .categoryStrength <
+      currentLead
+        .categoryStrength
+    ) {
       return {
-        valid: false,
+        valid:
+          false,
 
-        reason: `${challenger.label} does not defeat ${currentLead.label}.`,
+        reason:
+          `${challenger.label} does not defeat ${currentLead.label}.`,
       };
     }
 
-    /*
-      Same five-card category:
-      compare determining rank.
-    */
-    if (challenger.strength <= currentLead.strength) {
+    if (
+      challenger.strength <=
+      currentLead.strength
+    ) {
       return {
-        valid: false,
+        valid:
+          false,
 
-        reason: `${challenger.label} does not defeat ${currentLead.label}.`,
+        reason:
+          `${challenger.label} does not defeat ${currentLead.label}.`,
       };
     }
 
     return {
-      valid: true,
-      result: 1,
+      valid:
+        true,
+
+      result:
+        1,
     };
   }
 
   /*
     Single / Pair / Triple:
-    same combination type required.
+    same type required.
   */
-  if (challenger.type !== currentLead.type) {
+  if (
+    challenger.type !==
+    currentLead.type
+  ) {
     return {
-      valid: false,
+      valid:
+        false,
 
-      reason: `A ${challenger.type} cannot defeat a ${currentLead.type}.`,
+      reason:
+        `A ${challenger.type} cannot defeat a ${currentLead.type}.`,
     };
   }
 
-  if (challenger.strength <= currentLead.strength) {
-    return {
-      valid: false,
+  /*
+    Equal strength does not beat.
 
-      reason: `${challenger.label} does not defeat ${currentLead.label}.`,
+    This is important for:
+
+    SJ+SJ = BJ+SJ
+
+    and
+
+    SSS = BSS = BBS
+  */
+  if (
+    challenger.strength <=
+    currentLead.strength
+  ) {
+    return {
+      valid:
+        false,
+
+      reason:
+        `${challenger.label} does not defeat ${currentLead.label}.`,
     };
   }
 
   return {
-    valid: true,
-    result: 1,
+    valid:
+      true,
+
+    result:
+      1,
   };
 }
 
@@ -972,28 +1692,53 @@ export function comparePlays(challenger, currentLead) {
    PUBLIC VALIDATION FUNCTION
    ========================================================= */
 
-export function validatePlay(cards, trumpRank, currentLead) {
-  const combination = classifyPlay(cards, trumpRank);
+export function validatePlay(
+  cards,
+  trumpRank,
+  currentLead
+) {
+  const combination =
+    classifyPlay(
+      cards,
+      trumpRank
+    );
 
-  if (!combination.valid) {
+  if (
+    !combination.valid
+  ) {
     return {
-      valid: false,
-      reason: combination.reason,
+      valid:
+        false,
+
+      reason:
+        combination.reason,
     };
   }
 
-  const comparison = comparePlays(combination, currentLead);
+  const comparison =
+    comparePlays(
+      combination,
+      currentLead
+    );
 
-  if (!comparison.valid) {
+  if (
+    !comparison.valid
+  ) {
     return {
-      valid: false,
-      reason: comparison.reason,
+      valid:
+        false,
+
+      reason:
+        comparison.reason,
+
       combination,
     };
   }
 
   return {
-    valid: true,
+    valid:
+      true,
+
     combination,
   };
 }
