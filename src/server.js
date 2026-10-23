@@ -1018,10 +1018,12 @@ function compactHands(
           Array.isArray(
             entry?.cards
           )
-            ? entry.cards.map(
-                cardCode
-              )
-            : [];
+            ? entry.cards
+                .map(
+                  cardCode
+                )
+                .join(',')
+            : '';
       }
     );
   }
@@ -1217,16 +1219,18 @@ function compactRoundsFromEvents(
         Array.isArray(
           event.cards
         )
-          ? event.cards.map(
-              (card) =>
-                typeof card ===
-                  'string'
-                  ? card
-                  : cardCode(
-                      card
-                    )
-            )
-          : [];
+          ? event.cards
+             .map(
+                (card) =>
+                 typeof card ===
+                    'string'
+                    ? card
+                    : cardCode(
+                        card
+                      )
+              )
+              .join(',')
+         : '';
 
       ensureRound()
         .actions
@@ -1744,9 +1748,11 @@ function buildCompactGameRecord({
       compactHands[key] =
         hands[
           seatIndex
-        ].map(
-          cardCode
-        );
+        ]
+          .map(
+            cardCode
+          )
+          .join(',');
     }
   );
 
@@ -4201,7 +4207,8 @@ io.on(
             selectedCards
               .map(
                 cardCode
-              ),
+              )
+              .join(','),
           ]
         );
 
