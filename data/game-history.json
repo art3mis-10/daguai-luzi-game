@@ -9838,6 +9838,14 @@
           "finished": false,
           "becameHeadPlayer": false,
           "currentFinishOrder": []
+        },
+        {
+          "sequence": 3,
+          "timestamp": "2026-10-23T02:44:27.766Z",
+          "timestampMinute": "2026-10-23T02:44Z",
+          "type": "turn_advance",
+          "fromPlayerId": 5,
+          "toPlayerId": 6
         }
       ],
       "headPlayerId": null,
@@ -9847,5 +9855,5 @@
       "finalHands": null
     }
   ],
-  "lastUpdatedAt": "2026-10-23T02:44:25.761Z"
+  "lastUpdatedAt": "2026-10-23T02:44:27.766Z"
 }
