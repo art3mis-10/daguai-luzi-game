@@ -773,6 +773,50 @@
         }
       ],
       "finishOrder": []
+    },
+    {
+      "gameId": "S0MFYM-727b5792-b3e1-4071-b13d-db53be810368",
+      "time": "2026-10-23T03:04:06.345Z",
+      "deal": "random",
+      "trump": "2",
+      "starter": "P6",
+      "starterReason": "spade-tiebreak",
+      "players": {
+        "P1": {
+          "name": "Player 1",
+          "team": "A"
+        },
+        "P2": {
+          "name": "Player 2",
+          "team": "B"
+        },
+        "P3": {
+          "name": "Player 3",
+          "team": "A"
+        },
+        "P4": {
+          "name": "Player 4",
+          "team": "B"
+        },
+        "P5": {
+          "name": "Player 5",
+          "team": "A"
+        },
+        "P6": {
+          "name": "Player 6",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "H6,SJ,H3,C10,C8,D3,C5,S10,H8,HA,DA,H3,BJ,H10,C8,S7,H8,SK,D8,H2,D4,D5,HJ,D8,SQ,DJ,D9",
+        "P2": "S7,HK,H5,S10,C9,SA,H5,C5,H10,BJ,C5,H4,D9,SJ,HA,S6,S2,DK,H5,HK,S3,D4,H9,C6,S6,C4,D5",
+        "P3": "CK,S9,D4,D6,C3,S2,D3,D9,D10,S3,SK,H7,HQ,C4,C3,DQ,CJ,C10,H2,CA,S8,C6,H6,HJ,C2,H9,CA",
+        "P4": "C9,DK,CQ,H4,BJ,D2,CJ,H3,CJ,S8,SJ,S9,H2,D7,D6,HQ,DA,HJ,DJ,H4,C3,CQ,HK,C8,C2,CA,S5",
+        "P5": "S9,CQ,S5,C4,DK,C10,SJ,SJ,D10,DQ,D8,C2,HQ,HA,SA,H8,S6,S4,DA,H7,SQ,D2,CK,D3,C9,S4,D6",
+        "P6": "DQ,D7,CK,DJ,H9,H6,S5,D5,S10,SK,C7,S7,SJ,SQ,S3,SA,S4,D7,C7,H7,C6,S8,H10,C7,D2,D10,S2"
+      },
+      "rounds": [],
+      "finishOrder": []
     }
   ]
 }
