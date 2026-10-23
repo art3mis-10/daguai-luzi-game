@@ -92,7 +92,7 @@ const githubSyncEnabled =
   );
 
 const LOGGER_VERSION =
-  'compact-v6-migrating';
+  'compact-v7-sorted-hands';
 
 /* =========================================================
    COMPACT HISTORY STORAGE
@@ -113,7 +113,7 @@ if (
 
 function emptyHistory() {
   return {
-    schemaVersion: 6,
+    schemaVersion: 7,
     games: [],
   };
 }
@@ -183,24 +183,13 @@ let githubSyncTimer =
   null;
 
 function writeLocalHistory() {
-  /*
-    IMPORTANT:
-
-    Always normalize the in-memory
-    history before writing.
-
-    This prevents an old schema-3
-    history loaded from GitHub from
-    being written back in the giant
-    format.
-  */
   gameHistory =
     compactifyHistory(
       gameHistory
     );
 
   gameHistory.schemaVersion =
-    6;
+    7;
 
   writeFileSync(
     historyFile,
@@ -429,11 +418,6 @@ async function pushHistorySnapshot(
       );
     }
 
-    /*
-      On Deal we verify that the
-      exact gameId can be read
-      back from GitHub.
-    */
     if (
       verifyGameId
     ) {
@@ -614,21 +598,6 @@ async function initializeHistory() {
           remote.history
         );
 
-      /*
-        THIS IS THE IMPORTANT FIX.
-
-        GitHub may still contain an
-        old schema-3 record with:
-
-        - initialHands
-        - complete card objects
-        - events
-        - startingPlayerComparison
-        - engine metadata
-
-        Convert it immediately instead
-        of loading it unchanged.
-      */
       gameHistory =
         compactifyHistory(
           remote.history
@@ -640,7 +609,7 @@ async function initializeHistory() {
         needsMigration
       ) {
         console.log(
-          'Migrating old game history to compact schema...'
+          'Migrating old game history to compact sorted-hand schema...'
         );
 
         const migrated =
@@ -684,23 +653,12 @@ async function initializeHistory() {
       error
     );
 
-    /*
-      Do not delete local data if
-      GitHub is temporarily down.
-    */
     writeLocalHistory();
   }
 }
 
 /* =========================================================
    COMPACT CARD CODES
-
-   S3  = Spade 3
-   H10 = Heart 10
-   DQ  = Diamond Queen
-   CA  = Club Ace
-   BJ  = Big Joker
-   SJ  = Small Joker
    ========================================================= */
 
 function jokerText(
@@ -786,6 +744,226 @@ function cardCode(
   );
 }
 
+/*
+  Converts a compact card code
+  back into the same basic card
+  shape used by sortCards().
+
+  This is used for old compact
+  histories whose hands are already
+  strings but may not be sorted.
+*/
+function cardFromCode(
+  code,
+  index = 0
+) {
+  const normalized =
+    String(
+      code ||
+      ''
+    )
+      .trim()
+      .toUpperCase();
+
+  if (
+    normalized ===
+    'BJ'
+  ) {
+    return {
+      id:
+        `compact-big-${index}`,
+
+      deckNumber:
+        1,
+
+      rank:
+        'big-joker',
+
+      displayRank:
+        'BJ',
+
+      suit:
+        null,
+
+      symbol:
+        '★',
+
+      color:
+        'red',
+
+      isJoker:
+        true,
+
+      jokerType:
+        'big',
+    };
+  }
+
+  if (
+    normalized ===
+    'SJ'
+  ) {
+    return {
+      id:
+        `compact-small-${index}`,
+
+      deckNumber:
+        1,
+
+      rank:
+        'small-joker',
+
+      displayRank:
+        'SJ',
+
+      suit:
+        null,
+
+      symbol:
+        '★',
+
+      color:
+        'black',
+
+      isJoker:
+        true,
+
+      jokerType:
+        'small',
+    };
+  }
+
+  const suitCode =
+    normalized[0];
+
+  const rank =
+    normalized.slice(
+      1
+    );
+
+  const suitMap = {
+    S:
+      'spades',
+
+    H:
+      'hearts',
+
+    D:
+      'diamonds',
+
+    C:
+      'clubs',
+  };
+
+  const symbolMap = {
+    S:
+      '♠',
+
+    H:
+      '♥',
+
+    D:
+      '♦',
+
+    C:
+      '♣',
+  };
+
+  const colorMap = {
+    S:
+      'black',
+
+    H:
+      'red',
+
+    D:
+      'red',
+
+    C:
+      'black',
+  };
+
+  return {
+    id:
+      `compact-${index}-${normalized}`,
+
+    deckNumber:
+      1,
+
+    rank,
+
+    displayRank:
+      null,
+
+    suit:
+      suitMap[
+        suitCode
+      ],
+
+    symbol:
+      symbolMap[
+        suitCode
+      ],
+
+    color:
+      colorMap[
+        suitCode
+      ],
+
+    isJoker:
+      false,
+
+    jokerType:
+      null,
+  };
+}
+
+function sortCompactHand(
+  value
+) {
+  const codes =
+    Array.isArray(
+      value
+    )
+      ? value
+      : String(
+          value ||
+          ''
+        )
+          .split(',');
+
+  const cards =
+    codes
+      .map(
+        (code) =>
+          String(
+            code
+          )
+            .trim()
+      )
+      .filter(
+        Boolean
+      )
+      .map(
+        (
+          code,
+          index
+        ) =>
+          cardFromCode(
+            code,
+            index
+          )
+      );
+
+  return sortCards(
+    cards
+  )
+    .map(
+      cardCode
+    )
+    .join(',');
+}
+
 function playerKeyFromSeat(
   seatIndex
 ) {
@@ -796,16 +974,6 @@ function playerKeyFromSeat(
 
 /* =========================================================
    HISTORY MIGRATION
-
-   Older builds used schema 3 and stored:
-   - initialHands with full card objects
-   - players as arrays
-   - long event objects
-   - startingPlayerComparison
-   - internal engine metadata
-
-   This converts those records into the
-   compact research format automatically.
    ========================================================= */
 
 function playerKeyFromId(
@@ -914,9 +1082,6 @@ function compactStarterReason(
 function compactPlayers(
   game
 ) {
-  /*
-    Already compact.
-  */
   if (
     game.players &&
     !Array.isArray(
@@ -967,9 +1132,29 @@ function compactPlayers(
   return players;
 }
 
+/*
+  IMPORTANT:
+
+  Every hand goes through sortCards()
+  before becoming the one-line string.
+
+  This applies to:
+  - new games
+  - old schema 3
+  - old compact strings
+*/
 function compactHands(
   game
 ) {
+  const hands = {
+    P1: '',
+    P2: '',
+    P3: '',
+    P4: '',
+    P5: '',
+    P6: '',
+  };
+
   /*
     Already compact.
   */
@@ -979,18 +1164,33 @@ function compactHands(
       game.hands
     )
   ) {
-    return game.hands;
+    for (
+      const playerKey of
+      [
+        'P1',
+        'P2',
+        'P3',
+        'P4',
+        'P5',
+        'P6',
+      ]
+    ) {
+      hands[
+        playerKey
+      ] =
+        sortCompactHand(
+          game.hands[
+            playerKey
+          ]
+        );
+    }
+
+    return hands;
   }
 
-  const hands = {
-    P1: [],
-    P2: [],
-    P3: [],
-    P4: [],
-    P5: [],
-    P6: [],
-  };
-
+  /*
+    Old schema with real card objects.
+  */
   if (
     Array.isArray(
       game.initialHands
@@ -1018,7 +1218,11 @@ function compactHands(
           Array.isArray(
             entry?.cards
           )
-            ? entry.cards
+            ? sortCards(
+                [
+                  ...entry.cards,
+                ]
+              )
                 .map(
                   cardCode
                 )
@@ -1112,9 +1316,6 @@ function compactPublicResponse(
 function compactRoundsFromEvents(
   game
 ) {
-  /*
-    Already compact.
-  */
   if (
     Array.isArray(
       game.rounds
@@ -1195,10 +1396,6 @@ function compactRoundsFromEvents(
       continue;
     }
 
-    /* -------------------------
-       PLAY
-       ------------------------- */
-
     if (
       event.type ===
       'play'
@@ -1220,9 +1417,9 @@ function compactRoundsFromEvents(
           event.cards
         )
           ? event.cards
-             .map(
+              .map(
                 (card) =>
-                 typeof card ===
+                  typeof card ===
                     'string'
                     ? card
                     : cardCode(
@@ -1230,7 +1427,7 @@ function compactRoundsFromEvents(
                       )
               )
               .join(',')
-         : '';
+          : '';
 
       ensureRound()
         .actions
@@ -1260,10 +1457,6 @@ function compactRoundsFromEvents(
 
       continue;
     }
-
-    /* -------------------------
-       PASS
-       ------------------------- */
 
     if (
       event.type ===
@@ -1313,10 +1506,6 @@ function compactRoundsFromEvents(
       continue;
     }
 
-    /* -------------------------
-       ASK
-       ------------------------- */
-
     if (
       event.type ===
       'ask_card_count'
@@ -1355,14 +1544,6 @@ function compactRoundsFromEvents(
     }
   }
 
-  /*
-    If an old game ended before
-    a formal trickEnded flag was
-    written, keep the unfinished
-    round rather than deleting
-    useful action data.
-  */
-
   return rounds;
 }
 
@@ -1371,6 +1552,10 @@ function compactGameRecord(
 ) {
   /*
     Already compact.
+
+    Still run the hands through
+    compactHands() so an old compact
+    file with unsorted strings gets fixed.
   */
   if (
     game &&
@@ -1380,6 +1565,11 @@ function compactGameRecord(
   ) {
     return {
       ...game,
+
+      hands:
+        compactHands(
+          game
+        ),
 
       starterReason:
         compactStarterReason(
@@ -1509,7 +1699,7 @@ function compactifyHistory(
 
   return {
     schemaVersion:
-      6,
+      7,
 
     games,
   };
@@ -1518,10 +1708,17 @@ function compactifyHistory(
 function historyNeedsCompaction(
   history
 ) {
+  /*
+    Bumping to schema 7 is deliberate.
+
+    Even schema 6 compact files need
+    one more migration because their
+    hand strings may not be sorted.
+  */
   if (
     Number(
       history?.schemaVersion
-    ) !== 6
+    ) !== 7
   ) {
     return true;
   }
@@ -1745,10 +1942,21 @@ function buildCompactGameRecord({
           player.team,
       };
 
+      /*
+        IMPORTANT:
+
+        Sort first.
+        Then convert to S3/H4/etc.
+        Then join onto ONE line.
+      */
       compactHands[key] =
-        hands[
-          seatIndex
-        ]
+        sortCards(
+          [
+            ...hands[
+              seatIndex
+            ],
+          ]
+        )
           .map(
             cardCode
           )
@@ -1961,11 +2169,6 @@ app.get(
       logging:
         true,
 
-      /*
-        These two fields let us
-        verify exactly which logger
-        Render is running.
-      */
       loggerVersion:
         LOGGER_VERSION,
 
@@ -2315,15 +2518,6 @@ function passesNeeded(
 
 /* =========================================================
    STARTING PLAYER RULE
-
-   Game 1:
-   compare number of ♠3.
-   Tie -> compare ♠4.
-   Tie -> ♠5...
-   through ♠2.
-
-   Game 2 onward:
-   previous 头家 starts.
    ========================================================= */
 
 const openingSpadeRanks = [
@@ -3959,13 +4153,6 @@ io.on(
             };
         }
 
-        /*
-          Compact format:
-          ["P2","ask","P5","NR"]
-
-          or:
-          ["P2","ask","P5",8]
-        */
         addRoundAction(
           room,
           [
@@ -4192,8 +4379,10 @@ io.on(
           0;
 
         /*
-          Compact:
-          ["P4","play",["S3"]]
+          Played cards stay on ONE line.
+
+          Example:
+          ["P4","play","S7,H7,C7"]
         */
         addRoundAction(
           room,
