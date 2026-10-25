@@ -1200,6 +1200,50 @@
         }
       ],
       "finishOrder": []
+    },
+    {
+      "gameId": "3VC2Y2-1e822696-2ec6-495c-bc3a-ad145347696d",
+      "time": "2026-10-25T07:43:44.895Z",
+      "deal": "custom",
+      "trump": "2",
+      "starter": "P1",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "Player 1",
+          "team": "A"
+        },
+        "P2": {
+          "name": "Player 2",
+          "team": "B"
+        },
+        "P3": {
+          "name": "Player 3",
+          "team": "A"
+        },
+        "P4": {
+          "name": "Player 4",
+          "team": "B"
+        },
+        "P5": {
+          "name": "Player 5",
+          "team": "A"
+        },
+        "P6": {
+          "name": "Player 6",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,H3,C3,S4,C4,D4,S5,H5,C5,C8,H9,C9,C10,HJ,DJ,DQ,CK,CK,DK,SA,DA,S2,H2,H2,D2,D2,BJ",
+        "P2": "H3,C3,D3,S4,H4,H5,D5,H6,H6,C6,S7,H7,D7,S8,H8,S9,S9,C10,D10,HJ,CJ,SQ,HQ,SK,HK,SA,H2",
+        "P3": "H3,C3,D3,C4,D4,D4,C5,S6,S6,S7,C7,S8,C8,C8,D8,H9,HJ,CJ,CJ,SQ,DQ,CK,DK,SJ,SJ,SJ,BJ",
+        "P4": "D3,S4,H4,H4,H5,D5,H6,D6,D6,S7,D7,D8,H9,D9,S10,S10,H10,D10,DJ,HQ,HK,SA,HA,CA,S2,C2,SJ",
+        "P5": "S3,S5,C5,S6,C6,D6,H7,H8,D8,C9,D9,D9,S10,H10,H10,C10,D10,HQ,DQ,SK,SK,CA,DA,C2,C2,D2,SJ",
+        "P6": "S3,C4,S5,D5,C6,H7,C7,C7,D7,S8,H8,S9,C9,DJ,SQ,CQ,CQ,CQ,HK,DK,HA,HA,CA,DA,S2,SJ,BJ"
+      },
+      "rounds": [],
+      "finishOrder": []
     }
   ]
 }
