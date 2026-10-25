@@ -2110,7 +2110,9 @@
         "P1",
         "P3",
         "P5"
-      ]
+      ],
+      "ended": "2026-10-25T14:26:23.028Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
