@@ -2,648 +2,185 @@ import express from 'express';
 import { createServer } from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  writeFileSync,
+} from 'fs';
 import { randomUUID } from 'crypto';
 import { Server } from 'socket.io';
 
-import { createNewDeal, sortCards } from './game/deck.js';
-import { validatePlay } from './game/rules.js';
+import {
+  createNewDeal,
+  sortCards,
+} from './game/deck.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import {
+  validatePlay,
+} from './game/rules.js';
 
-const publicDir = path.join(__dirname, 'public');
-const gameDir = path.join(__dirname, 'game');
-const dataDir = path.join(__dirname, '..', 'data');
-const historyFile = path.join(dataDir, 'game-history.json');
+/* =========================================================
+   PATHS
+   ========================================================= */
 
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
-const GITHUB_OWNER = process.env.GITHUB_OWNER || 'art3mis-10';
-const GITHUB_REPO = process.env.GITHUB_REPO || 'daguai-luzi-game';
-const GITHUB_BRANCH = process.env.GITHUB_BRANCH || 'main';
+const __filename =
+  fileURLToPath(
+    import.meta.url
+  );
+
+const __dirname =
+  path.dirname(
+    __filename
+  );
+
+const publicDir =
+  path.join(
+    __dirname,
+    'public'
+  );
+
+const gameDir =
+  path.join(
+    __dirname,
+    'game'
+  );
+
+const dataDir =
+  path.join(
+    __dirname,
+    '..',
+    'data'
+  );
+
+const historyFile =
+  path.join(
+    dataDir,
+    'game-history.json'
+  );
+
+/* =========================================================
+   GITHUB CONFIG
+   ========================================================= */
+
+const GITHUB_TOKEN =
+  process.env.GITHUB_TOKEN ||
+  '';
+
+const GITHUB_OWNER =
+  process.env.GITHUB_OWNER ||
+  'art3mis-10';
+
+const GITHUB_REPO =
+  process.env.GITHUB_REPO ||
+  'daguai-luzi-game';
+
+const GITHUB_BRANCH =
+  process.env.GITHUB_BRANCH ||
+  'main';
+
 const GITHUB_HISTORY_PATH =
-  process.env.GITHUB_HISTORY_PATH || 'data/game-history.json';
+  process.env
+    .GITHUB_HISTORY_PATH ||
+  'data/game-history.json';
 
-const githubSyncEnabled = Boolean(
-  GITHUB_TOKEN && GITHUB_OWNER && GITHUB_REPO
-);
+const githubSyncEnabled =
+  Boolean(
+    GITHUB_TOKEN &&
+    GITHUB_OWNER &&
+    GITHUB_REPO
+  );
 
-const LOGGER_VERSION = 'compact-v7-sorted-hands-team-finish';
-const HISTORY_SCHEMA_VERSION = 7;
+const LOGGER_VERSION =
+  'compact-v7-sorted-hands-team-finish-record-toggle';
 
-if (!existsSync(dataDir)) {
-  mkdirSync(dataDir, { recursive: true });
+/* =========================================================
+   COMPACT HISTORY STORAGE
+   ========================================================= */
+
+if (
+  !existsSync(
+    dataDir
+  )
+) {
+  mkdirSync(
+    dataDir,
+    {
+      recursive: true,
+    }
+  );
 }
 
 function emptyHistory() {
   return {
-    schemaVersion: HISTORY_SCHEMA_VERSION,
+    schemaVersion: 7,
     games: [],
   };
 }
 
 function loadLocalHistory() {
-  if (!existsSync(historyFile)) {
+  if (
+    !existsSync(
+      historyFile
+    )
+  ) {
     return emptyHistory();
   }
 
   try {
-    const parsed = JSON.parse(readFileSync(historyFile, 'utf8'));
+    const parsed =
+      JSON.parse(
+        readFileSync(
+          historyFile,
+          'utf8'
+        )
+      );
 
-    if (!parsed || !Array.isArray(parsed.games)) {
+    if (
+      !parsed ||
+      !Array.isArray(
+        parsed.games
+      )
+    ) {
       return emptyHistory();
     }
 
     return parsed;
   } catch (error) {
-    console.error('Could not read local history:', error);
+    console.error(
+      'Could not read local history:',
+      error
+    );
+
     return emptyHistory();
   }
 }
 
 const historyStatus = {
-  lastLocalSave: null,
-  lastGitHubSyncAttempt: null,
-  lastGitHubSync: null,
-  lastGitHubSyncSuccess: null,
-  lastGitHubError: null,
+  lastLocalSave:
+    null,
+
+  lastGitHubSyncAttempt:
+    null,
+
+  lastGitHubSync:
+    null,
+
+  lastGitHubSyncSuccess:
+    null,
+
+  lastGitHubError:
+    null,
 };
 
-let gameHistory = loadLocalHistory();
-let githubSyncChain = Promise.resolve();
-let githubSyncTimer = null;
+let gameHistory =
+  loadLocalHistory();
 
-function jokerText(card) {
-  return [card?.rank, card?.displayRank, card?.jokerType, card?.id]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
+let githubSyncChain =
+  Promise.resolve();
 
-function cardCode(card) {
-  if (card?.isJoker) {
-    const text = jokerText(card);
-
-    if (
-      text.includes('big') ||
-      text.includes('大怪') ||
-      text.includes('bj')
-    ) {
-      return 'BJ';
-    }
-
-    return 'SJ';
-  }
-
-  const suitMap = {
-    spades: 'S',
-    hearts: 'H',
-    diamonds: 'D',
-    clubs: 'C',
-  };
-
-  const suit = suitMap[String(card?.suit || '').toLowerCase()] || '?';
-  const rank = String(card?.rank ?? card?.displayRank ?? '?').toUpperCase();
-
-  return `${suit}${rank}`;
-}
-
-function cardFromCode(code, index = 0) {
-  const normalized = String(code || '').trim().toUpperCase();
-
-  if (normalized === 'BJ') {
-    return {
-      id: `compact-big-${index}`,
-      deckNumber: 1,
-      rank: 'big-joker',
-      displayRank: 'BJ',
-      suit: null,
-      symbol: '★',
-      color: 'red',
-      isJoker: true,
-      jokerType: 'big',
-    };
-  }
-
-  if (normalized === 'SJ') {
-    return {
-      id: `compact-small-${index}`,
-      deckNumber: 1,
-      rank: 'small-joker',
-      displayRank: 'SJ',
-      suit: null,
-      symbol: '★',
-      color: 'black',
-      isJoker: true,
-      jokerType: 'small',
-    };
-  }
-
-  const suitCode = normalized[0];
-  const rank = normalized.slice(1);
-
-  const suitMap = {
-    S: 'spades',
-    H: 'hearts',
-    D: 'diamonds',
-    C: 'clubs',
-  };
-
-  const symbolMap = {
-    S: '♠',
-    H: '♥',
-    D: '♦',
-    C: '♣',
-  };
-
-  const colorMap = {
-    S: 'black',
-    H: 'red',
-    D: 'red',
-    C: 'black',
-  };
-
-  return {
-    id: `compact-${index}-${normalized}`,
-    deckNumber: 1,
-    rank,
-    displayRank: null,
-    suit: suitMap[suitCode],
-    symbol: symbolMap[suitCode],
-    color: colorMap[suitCode],
-    isJoker: false,
-    jokerType: null,
-  };
-}
-
-function sortCompactHand(value) {
-  const codes = Array.isArray(value)
-    ? value
-    : String(value || '').split(',');
-
-  const cards = codes
-    .map((code) => String(code).trim())
-    .filter(Boolean)
-    .map((code, index) => cardFromCode(code, index));
-
-  return sortCards(cards).map(cardCode).join(',');
-}
-
-function playerKeyFromSeat(seatIndex) {
-  return `P${seatIndex + 1}`;
-}
-
-function playerKeyFromId(playerId) {
-  const numeric = Number(playerId);
-
-  if (Number.isInteger(numeric) && numeric >= 1 && numeric <= 6) {
-    return `P${numeric}`;
-  }
-
-  return null;
-}
-
-function normalizePlayerKey(value, seatIndex = null) {
-  if (typeof value === 'string' && /^P[1-6]$/.test(value)) {
-    return value;
-  }
-
-  const fromId = playerKeyFromId(value);
-  if (fromId) return fromId;
-
-  if (
-    Number.isInteger(seatIndex) &&
-    seatIndex >= 0 &&
-    seatIndex < 6
-  ) {
-    return playerKeyFromSeat(seatIndex);
-  }
-
-  return null;
-}
-
-function compactStarterReason(value) {
-  const reason = String(value || '');
-
-  if (
-    reason === 'first_game_spade_tiebreak' ||
-    reason === 'spade-tiebreak'
-  ) {
-    return 'spade-tiebreak';
-  }
-
-  if (
-    reason === 'previous_head_player' ||
-    reason === 'previous-head'
-  ) {
-    return 'previous-head';
-  }
-
-  if (reason === 'custom_selected' || reason === 'custom') {
-    return 'custom';
-  }
-
-  return reason || 'unknown';
-}
-
-function compactPlayers(game) {
-  if (game.players && !Array.isArray(game.players)) {
-    return game.players;
-  }
-
-  const players = {};
-
-  if (Array.isArray(game.players)) {
-    game.players.forEach((player, index) => {
-      const key = normalizePlayerKey(
-        player?.playerId,
-        player?.seatIndex ?? index
-      );
-
-      if (!key) return;
-
-      players[key] = {
-        name: player?.name || key,
-        team: player?.team || null,
-      };
-    });
-  }
-
-  return players;
-}
-
-function compactHands(game) {
-  const hands = {
-    P1: '',
-    P2: '',
-    P3: '',
-    P4: '',
-    P5: '',
-    P6: '',
-  };
-
-  if (game.hands && !Array.isArray(game.hands)) {
-    for (const playerKey of ['P1', 'P2', 'P3', 'P4', 'P5', 'P6']) {
-      hands[playerKey] = sortCompactHand(game.hands[playerKey]);
-    }
-
-    return hands;
-  }
-
-  if (Array.isArray(game.initialHands)) {
-    game.initialHands.forEach((entry, index) => {
-      const key = normalizePlayerKey(
-        entry?.playerId,
-        entry?.seatIndex ?? index
-      );
-
-      if (!key) return;
-
-      hands[key] = Array.isArray(entry?.cards)
-        ? sortCards([...entry.cards]).map(cardCode).join(',')
-        : '';
-    });
-  }
-
-  return hands;
-}
-
-function compactFinishOrder(order) {
-  if (!Array.isArray(order)) {
-    return [];
-  }
-
-  return order
-    .map((value) => {
-      if (typeof value === 'string' && /^P[1-6]$/.test(value)) {
-        return value;
-      }
-
-      return playerKeyFromId(value);
-    })
-    .filter(Boolean);
-}
-
-function compactPublicResponse(event) {
-  if (
-    event.publicResponse === 'not-reported' ||
-    event.publicResponse === 'NR'
-  ) {
-    return 'NR';
-  }
-
-  if (Number.isFinite(Number(event.publicResponse))) {
-    return Number(event.publicResponse);
-  }
-
-  if (
-    Number.isFinite(Number(event.actualCount)) &&
-    Number(event.actualCount) <= 10
-  ) {
-    return Number(event.actualCount);
-  }
-
-  return 'NR';
-}
-
-function compactRoundsFromEvents(game) {
-  if (Array.isArray(game.rounds)) {
-    return game.rounds;
-  }
-
-  if (!Array.isArray(game.events)) {
-    return [];
-  }
-
-  const rounds = [];
-  let currentRound = null;
-  let lastPlayPlayer = null;
-
-  function ensureRound() {
-    if (!currentRound) {
-      currentRound = {
-        r: rounds.length + 1,
-        actions: [],
-      };
-
-      rounds.push(currentRound);
-    }
-
-    return currentRound;
-  }
-
-  function finishRound(winner = null) {
-    if (!currentRound) return;
-
-    if (winner) {
-      currentRound.winner = winner;
-    }
-
-    currentRound = null;
-    lastPlayPlayer = null;
-  }
-
-  for (const event of game.events) {
-    if (!event || typeof event !== 'object') continue;
-
-    if (event.type === 'play') {
-      const player = normalizePlayerKey(
-        event.playerId,
-        event.seatIndex
-      );
-
-      if (!player) continue;
-
-      const cards = Array.isArray(event.cards)
-        ? event.cards
-            .map((card) =>
-              typeof card === 'string'
-                ? card
-                : cardCode(card)
-            )
-            .join(',')
-        : '';
-
-      ensureRound().actions.push([
-        player,
-        'play',
-        cards,
-      ]);
-
-      lastPlayPlayer = player;
-
-      if (event.finished) {
-        ensureRound().actions.push([
-          player,
-          'out',
-        ]);
-      }
-
-      continue;
-    }
-
-    if (event.type === 'pass') {
-      const player = normalizePlayerKey(
-        event.playerId,
-        event.seatIndex
-      );
-
-      if (player) {
-        ensureRound().actions.push([
-          player,
-          'pass',
-        ]);
-      }
-
-      if (event.trickEnded) {
-        const leadSeat =
-          event?.leadAtPass?.playerIndex;
-
-        const winner =
-          Number.isInteger(leadSeat)
-            ? playerKeyFromSeat(leadSeat)
-            : lastPlayPlayer;
-
-        finishRound(winner);
-      }
-
-      continue;
-    }
-
-    if (event.type === 'ask_card_count') {
-      const requester = normalizePlayerKey(
-        event.requesterPlayerId,
-        event.requesterSeatIndex
-      );
-
-      const target = normalizePlayerKey(
-        event.targetPlayerId,
-        event.targetSeatIndex
-      );
-
-      if (requester && target) {
-        ensureRound().actions.push([
-          requester,
-          'ask',
-          target,
-          compactPublicResponse(event),
-        ]);
-      }
-    }
-  }
-
-  return rounds;
-}
-
-function compactGameRecord(game) {
-  if (
-    game &&
-    game.hands &&
-    game.rounds &&
-    !game.initialHands
-  ) {
-    const compact = {
-      ...game,
-
-      hands: compactHands(game),
-
-      starterReason:
-        compactStarterReason(
-          game.starterReason
-        ),
-
-      finishOrder:
-        compactFinishOrder(
-          game.finishOrder
-        ),
-    };
-
-    if (game.startingFinishOrder) {
-      compact.startingFinishOrder =
-        compactFinishOrder(
-          game.startingFinishOrder
-        );
-    }
-
-    return compact;
-  }
-
-  const starter =
-    normalizePlayerKey(
-      game?.startingPlayerId,
-      game?.startingPlayerSeatIndex
-    ) ||
-    normalizePlayerKey(
-      game?.starter
-    ) ||
-    'P1';
-
-  const compact = {
-    gameId:
-      game?.gameId ||
-      randomUUID(),
-
-    time:
-      game?.time ||
-      game?.dealtAt ||
-      new Date().toISOString(),
-
-    deal:
-      game?.deal ||
-      game?.dealSource ||
-      'unknown',
-
-    trump:
-      game?.trump ||
-      game?.trumpRank ||
-      null,
-
-    starter,
-
-    starterReason:
-      compactStarterReason(
-        game?.starterReason ||
-        game?.startingPlayerMethod
-      ),
-
-    players:
-      compactPlayers(
-        game || {}
-      ),
-
-    hands:
-      compactHands(
-        game || {}
-      ),
-
-    rounds:
-      compactRoundsFromEvents(
-        game || {}
-      ),
-
-    finishOrder:
-      compactFinishOrder(
-        game?.finishOrder
-      ),
-  };
-
-  const startingFinishOrder =
-    compactFinishOrder(
-      game?.startingFinishOrder
-    );
-
-  if (startingFinishOrder.length > 0) {
-    compact.startingFinishOrder =
-      startingFinishOrder;
-  }
-
-  const ended =
-    game?.ended ||
-    game?.endedAt;
-
-  if (ended) {
-    compact.ended = ended;
-  }
-
-  const endReason =
-    game?.endReason ||
-    game?.endedReason;
-
-  if (endReason) {
-    compact.endReason = endReason;
-  }
-
-  if (game?.winnerTeam) {
-    compact.winnerTeam =
-      game.winnerTeam;
-  }
-
-  return compact;
-}
-
-function compactifyHistory(history) {
-  const games =
-    Array.isArray(history?.games)
-      ? history.games.map(
-          compactGameRecord
-        )
-      : [];
-
-  return {
-    schemaVersion:
-      HISTORY_SCHEMA_VERSION,
-
-    games,
-  };
-}
-
-function historyNeedsCompaction(history) {
-  if (
-    Number(
-      history?.schemaVersion
-    ) !==
-    HISTORY_SCHEMA_VERSION
-  ) {
-    return true;
-  }
-
-  if (
-    !Array.isArray(
-      history?.games
-    )
-  ) {
-    return true;
-  }
-
-  return history.games.some((game) =>
-    Boolean(
-      game?.initialHands ||
-      game?.events ||
-      game?.startingPlayerComparison ||
-      game?.dealtAtMinute
-    )
-  );
-}
+let githubSyncTimer =
+  null;
 
 function writeLocalHistory() {
   gameHistory =
@@ -652,21 +189,29 @@ function writeLocalHistory() {
     );
 
   gameHistory.schemaVersion =
-    HISTORY_SCHEMA_VERSION;
+    7;
 
   writeFileSync(
     historyFile,
+
     JSON.stringify(
       gameHistory,
       null,
       2
     ),
+
     'utf8'
   );
 
-  historyStatus.lastLocalSave =
-    new Date().toISOString();
+  historyStatus
+    .lastLocalSave =
+    new Date()
+      .toISOString();
 }
+
+/* =========================================================
+   GITHUB API
+   ========================================================= */
 
 function githubHeaders() {
   return {
@@ -716,7 +261,9 @@ function githubWriteUrl() {
 }
 
 async function readRemoteHistory() {
-  if (!githubSyncEnabled) {
+  if (
+    !githubSyncEnabled
+  ) {
     return null;
   }
 
@@ -729,16 +276,23 @@ async function readRemoteHistory() {
       }
     );
 
-  if (response.status === 404) {
+  if (
+    response.status ===
+    404
+  ) {
     return null;
   }
 
-  if (!response.ok) {
+  if (
+    !response.ok
+  ) {
     const body =
       await response.text();
 
     throw new Error(
-      `GitHub GET failed: ${response.status} ${body}`
+      `GitHub GET failed: ` +
+      `${response.status} ` +
+      `${body}`
     );
   }
 
@@ -751,10 +305,14 @@ async function readRemoteHistory() {
         data.content || '',
         'base64'
       )
-      .toString('utf8');
+      .toString(
+        'utf8'
+      );
 
   const parsed =
-    JSON.parse(text);
+    JSON.parse(
+      text
+    );
 
   if (
     !parsed ||
@@ -766,8 +324,12 @@ async function readRemoteHistory() {
   }
 
   return {
-    history: parsed,
-    sha: data.sha || null,
+    history:
+      parsed,
+
+    sha:
+      data.sha ||
+      null,
   };
 }
 
@@ -775,12 +337,16 @@ async function pushHistorySnapshot(
   snapshot,
   verifyGameId = null
 ) {
-  if (!githubSyncEnabled) {
+  if (
+    !githubSyncEnabled
+  ) {
     return true;
   }
 
-  historyStatus.lastGitHubSyncAttempt =
-    new Date().toISOString();
+  historyStatus
+    .lastGitHubSyncAttempt =
+    new Date()
+      .toISOString();
 
   try {
     const remote =
@@ -788,7 +354,9 @@ async function pushHistorySnapshot(
 
     const body = {
       message:
-        `Update compact Daguai history ${new Date().toISOString()}`,
+        `Update compact Daguai history ` +
+        new Date()
+          .toISOString(),
 
       branch:
         GITHUB_BRANCH,
@@ -801,20 +369,27 @@ async function pushHistorySnapshot(
               null,
               2
             ),
+
             'utf8'
           )
-          .toString('base64'),
+          .toString(
+            'base64'
+          ),
     };
 
-    if (remote?.sha) {
-      body.sha = remote.sha;
+    if (
+      remote?.sha
+    ) {
+      body.sha =
+        remote.sha;
     }
 
     const response =
       await fetch(
         githubWriteUrl(),
         {
-          method: 'PUT',
+          method:
+            'PUT',
 
           headers: {
             ...githubHeaders(),
@@ -824,20 +399,28 @@ async function pushHistorySnapshot(
           },
 
           body:
-            JSON.stringify(body),
+            JSON.stringify(
+              body
+            ),
         }
       );
 
-    if (!response.ok) {
+    if (
+      !response.ok
+    ) {
       const responseBody =
         await response.text();
 
       throw new Error(
-        `GitHub PUT failed: ${response.status} ${responseBody}`
+        `GitHub PUT failed: ` +
+        `${response.status} ` +
+        `${responseBody}`
       );
     }
 
-    if (verifyGameId) {
+    if (
+      verifyGameId
+    ) {
       const verifiedRemote =
         await readRemoteHistory();
 
@@ -853,26 +436,33 @@ async function pushHistorySnapshot(
 
       if (!exists) {
         throw new Error(
-          `GitHub write succeeded but game ${verifyGameId} was not found when read back.`
+          `GitHub write succeeded but game ` +
+          `${verifyGameId} was not found when read back.`
         );
       }
     }
 
-    historyStatus.lastGitHubSync =
-      new Date().toISOString();
+    historyStatus
+      .lastGitHubSync =
+      new Date()
+        .toISOString();
 
-    historyStatus.lastGitHubSyncSuccess =
+    historyStatus
+      .lastGitHubSyncSuccess =
       true;
 
-    historyStatus.lastGitHubError =
+    historyStatus
+      .lastGitHubError =
       null;
 
     return true;
   } catch (error) {
-    historyStatus.lastGitHubSyncSuccess =
+    historyStatus
+      .lastGitHubSyncSuccess =
       false;
 
-    historyStatus.lastGitHubError =
+    historyStatus
+      .lastGitHubError =
       error.message;
 
     console.error(
@@ -886,11 +476,16 @@ async function pushHistorySnapshot(
 
 function enqueueGitHubSync(
   {
-    verifyGameId = null,
+    verifyGameId =
+      null,
   } = {}
 ) {
-  if (!githubSyncEnabled) {
-    return Promise.resolve(true);
+  if (
+    !githubSyncEnabled
+  ) {
+    return Promise.resolve(
+      true
+    );
   }
 
   const snapshot =
@@ -901,19 +496,22 @@ function enqueueGitHubSync(
     );
 
   githubSyncChain =
-    githubSyncChain.then(
-      () =>
-        pushHistorySnapshot(
-          snapshot,
-          verifyGameId
-        )
-    );
+    githubSyncChain
+      .then(
+        () =>
+          pushHistorySnapshot(
+            snapshot,
+            verifyGameId
+          )
+      );
 
   return githubSyncChain;
 }
 
 function queueGitHubSync() {
-  if (!githubSyncEnabled) {
+  if (
+    !githubSyncEnabled
+  ) {
     return;
   }
 
@@ -924,33 +522,45 @@ function queueGitHubSync() {
   githubSyncTimer =
     setTimeout(
       () => {
-        githubSyncTimer = null;
+        githubSyncTimer =
+          null;
 
         void enqueueGitHubSync();
       },
+
       600
     );
 }
 
 async function saveHistory(
   {
-    immediate = false,
-    verifyGameId = null,
+    immediate =
+      false,
+
+    verifyGameId =
+      null,
   } = {}
 ) {
   writeLocalHistory();
 
-  if (!githubSyncEnabled) {
+  if (
+    !githubSyncEnabled
+  ) {
     return true;
   }
 
-  if (immediate) {
-    if (githubSyncTimer) {
+  if (
+    immediate
+  ) {
+    if (
+      githubSyncTimer
+    ) {
       clearTimeout(
         githubSyncTimer
       );
 
-      githubSyncTimer = null;
+      githubSyncTimer =
+        null;
     }
 
     return enqueueGitHubSync({
@@ -963,9 +573,16 @@ async function saveHistory(
   return true;
 }
 
+/* =========================================================
+   HISTORY INITIALIZATION + AUTOMATIC MIGRATION
+   ========================================================= */
+
 async function initializeHistory() {
-  if (!githubSyncEnabled) {
+  if (
+    !githubSyncEnabled
+  ) {
     writeLocalHistory();
+
     return;
   }
 
@@ -973,7 +590,9 @@ async function initializeHistory() {
     const remote =
       await readRemoteHistory();
 
-    if (remote?.history) {
+    if (
+      remote?.history
+    ) {
       const needsMigration =
         historyNeedsCompaction(
           remote.history
@@ -986,17 +605,22 @@ async function initializeHistory() {
 
       writeLocalHistory();
 
-      if (needsMigration) {
+      if (
+        needsMigration
+      ) {
         console.log(
           'Migrating old game history to compact sorted-hand schema...'
         );
 
         const migrated =
           await saveHistory({
-            immediate: true,
+            immediate:
+              true,
           });
 
-        if (!migrated) {
+        if (
+          !migrated
+        ) {
           console.error(
             'Compact history migration could not be pushed to GitHub.'
           );
@@ -1011,14 +635,17 @@ async function initializeHistory() {
         emptyHistory();
 
       await saveHistory({
-        immediate: true,
+        immediate:
+          true,
       });
     }
   } catch (error) {
-    historyStatus.lastGitHubSyncSuccess =
+    historyStatus
+      .lastGitHubSyncSuccess =
       false;
 
-    historyStatus.lastGitHubError =
+    historyStatus
+      .lastGitHubError =
       error.message;
 
     console.error(
@@ -1030,8 +657,1108 @@ async function initializeHistory() {
   }
 }
 
-function getCompactGame(room) {
-  if (!room.state.gameId) {
+/* =========================================================
+   COMPACT CARD CODES
+   ========================================================= */
+
+function jokerText(
+  card
+) {
+  return [
+    card?.rank,
+    card?.displayRank,
+    card?.jokerType,
+    card?.id,
+  ]
+    .filter(
+      Boolean
+    )
+    .join(
+      ' '
+    )
+    .toLowerCase();
+}
+
+function cardCode(
+  card
+) {
+  if (
+    card?.isJoker
+  ) {
+    const text =
+      jokerText(
+        card
+      );
+
+    if (
+      text.includes(
+        'big'
+      ) ||
+      text.includes(
+        '大怪'
+      ) ||
+      text.includes(
+        'bj'
+      )
+    ) {
+      return 'BJ';
+    }
+
+    return 'SJ';
+  }
+
+  const suitMap = {
+    spades:
+      'S',
+
+    hearts:
+      'H',
+
+    diamonds:
+      'D',
+
+    clubs:
+      'C',
+  };
+
+  const suit =
+    suitMap[
+      String(
+        card?.suit ||
+        ''
+      )
+        .toLowerCase()
+    ] ||
+    '?';
+
+  const rank =
+    String(
+      card?.rank ??
+      card?.displayRank ??
+      '?'
+    )
+      .toUpperCase();
+
+  return (
+    `${suit}${rank}`
+  );
+}
+
+/*
+  Converts a compact card code
+  back into the same basic card
+  shape used by sortCards().
+
+  This is used for old compact
+  histories whose hands are already
+  strings but may not be sorted.
+*/
+function cardFromCode(
+  code,
+  index = 0
+) {
+  const normalized =
+    String(
+      code ||
+      ''
+    )
+      .trim()
+      .toUpperCase();
+
+  if (
+    normalized ===
+    'BJ'
+  ) {
+    return {
+      id:
+        `compact-big-${index}`,
+
+      deckNumber:
+        1,
+
+      rank:
+        'big-joker',
+
+      displayRank:
+        'BJ',
+
+      suit:
+        null,
+
+      symbol:
+        '★',
+
+      color:
+        'red',
+
+      isJoker:
+        true,
+
+      jokerType:
+        'big',
+    };
+  }
+
+  if (
+    normalized ===
+    'SJ'
+  ) {
+    return {
+      id:
+        `compact-small-${index}`,
+
+      deckNumber:
+        1,
+
+      rank:
+        'small-joker',
+
+      displayRank:
+        'SJ',
+
+      suit:
+        null,
+
+      symbol:
+        '★',
+
+      color:
+        'black',
+
+      isJoker:
+        true,
+
+      jokerType:
+        'small',
+    };
+  }
+
+  const suitCode =
+    normalized[0];
+
+  const rank =
+    normalized.slice(
+      1
+    );
+
+  const suitMap = {
+    S:
+      'spades',
+
+    H:
+      'hearts',
+
+    D:
+      'diamonds',
+
+    C:
+      'clubs',
+  };
+
+  const symbolMap = {
+    S:
+      '♠',
+
+    H:
+      '♥',
+
+    D:
+      '♦',
+
+    C:
+      '♣',
+  };
+
+  const colorMap = {
+    S:
+      'black',
+
+    H:
+      'red',
+
+    D:
+      'red',
+
+    C:
+      'black',
+  };
+
+  return {
+    id:
+      `compact-${index}-${normalized}`,
+
+    deckNumber:
+      1,
+
+    rank,
+
+    displayRank:
+      null,
+
+    suit:
+      suitMap[
+        suitCode
+      ],
+
+    symbol:
+      symbolMap[
+        suitCode
+      ],
+
+    color:
+      colorMap[
+        suitCode
+      ],
+
+    isJoker:
+      false,
+
+    jokerType:
+      null,
+  };
+}
+
+function sortCompactHand(
+  value
+) {
+  const codes =
+    Array.isArray(
+      value
+    )
+      ? value
+      : String(
+          value ||
+          ''
+        )
+          .split(',');
+
+  const cards =
+    codes
+      .map(
+        (code) =>
+          String(
+            code
+          )
+            .trim()
+      )
+      .filter(
+        Boolean
+      )
+      .map(
+        (
+          code,
+          index
+        ) =>
+          cardFromCode(
+            code,
+            index
+          )
+      );
+
+  return sortCards(
+    cards
+  )
+    .map(
+      cardCode
+    )
+    .join(',');
+}
+
+function playerKeyFromSeat(
+  seatIndex
+) {
+  return (
+    `P${seatIndex + 1}`
+  );
+}
+
+/* =========================================================
+   HISTORY MIGRATION
+   ========================================================= */
+
+function playerKeyFromId(
+  playerId
+) {
+  const numeric =
+    Number(
+      playerId
+    );
+
+  if (
+    Number.isInteger(
+      numeric
+    ) &&
+    numeric >= 1 &&
+    numeric <= 6
+  ) {
+    return `P${numeric}`;
+  }
+
+  return null;
+}
+
+function normalizePlayerKey(
+  value,
+  seatIndex = null
+) {
+  if (
+    typeof value ===
+      'string' &&
+    /^P[1-6]$/.test(
+      value
+    )
+  ) {
+    return value;
+  }
+
+  const fromId =
+    playerKeyFromId(
+      value
+    );
+
+  if (
+    fromId
+  ) {
+    return fromId;
+  }
+
+  if (
+    Number.isInteger(
+      seatIndex
+    ) &&
+    seatIndex >= 0 &&
+    seatIndex < 6
+  ) {
+    return playerKeyFromSeat(
+      seatIndex
+    );
+  }
+
+  return null;
+}
+
+function compactStarterReason(
+  value
+) {
+  const reason =
+    String(
+      value ||
+      ''
+    );
+
+  if (
+    reason ===
+      'first_game_spade_tiebreak' ||
+    reason ===
+      'spade-tiebreak'
+  ) {
+    return 'spade-tiebreak';
+  }
+
+  if (
+    reason ===
+      'previous_head_player' ||
+    reason ===
+      'previous-head'
+  ) {
+    return 'previous-head';
+  }
+
+  if (
+    reason ===
+      'custom_selected' ||
+    reason ===
+      'custom'
+  ) {
+    return 'custom';
+  }
+
+  return (
+    reason ||
+    'unknown'
+  );
+}
+
+function compactPlayers(
+  game
+) {
+  if (
+    game.players &&
+    !Array.isArray(
+      game.players
+    )
+  ) {
+    return game.players;
+  }
+
+  const players = {};
+
+  if (
+    Array.isArray(
+      game.players
+    )
+  ) {
+    game.players.forEach(
+      (
+        player,
+        index
+      ) => {
+        const key =
+          normalizePlayerKey(
+            player?.playerId,
+            player?.seatIndex ??
+              index
+          );
+
+        if (
+          !key
+        ) {
+          return;
+        }
+
+        players[key] = {
+          name:
+            player?.name ||
+            key,
+
+          team:
+            player?.team ||
+            null,
+        };
+      }
+    );
+  }
+
+  return players;
+}
+
+/*
+  IMPORTANT:
+
+  Every hand goes through sortCards()
+  before becoming the one-line string.
+
+  This applies to:
+  - new games
+  - old schema 3
+  - old compact strings
+*/
+function compactHands(
+  game
+) {
+  const hands = {
+    P1: '',
+    P2: '',
+    P3: '',
+    P4: '',
+    P5: '',
+    P6: '',
+  };
+
+  /*
+    Already compact.
+  */
+  if (
+    game.hands &&
+    !Array.isArray(
+      game.hands
+    )
+  ) {
+    for (
+      const playerKey of
+      [
+        'P1',
+        'P2',
+        'P3',
+        'P4',
+        'P5',
+        'P6',
+      ]
+    ) {
+      hands[
+        playerKey
+      ] =
+        sortCompactHand(
+          game.hands[
+            playerKey
+          ]
+        );
+    }
+
+    return hands;
+  }
+
+  /*
+    Old schema with real card objects.
+  */
+  if (
+    Array.isArray(
+      game.initialHands
+    )
+  ) {
+    game.initialHands.forEach(
+      (
+        entry,
+        index
+      ) => {
+        const key =
+          normalizePlayerKey(
+            entry?.playerId,
+            entry?.seatIndex ??
+              index
+          );
+
+        if (
+          !key
+        ) {
+          return;
+        }
+
+        hands[key] =
+          Array.isArray(
+            entry?.cards
+          )
+            ? sortCards(
+                [
+                  ...entry.cards,
+                ]
+              )
+                .map(
+                  cardCode
+                )
+                .join(',')
+            : '';
+      }
+    );
+  }
+
+  return hands;
+}
+
+function compactFinishOrder(
+  order
+) {
+  if (
+    !Array.isArray(
+      order
+    )
+  ) {
+    return [];
+  }
+
+  return order
+    .map(
+      (
+        value
+      ) => {
+        if (
+          typeof value ===
+            'string' &&
+          /^P[1-6]$/.test(
+            value
+          )
+        ) {
+          return value;
+        }
+
+        return playerKeyFromId(
+          value
+        );
+      }
+    )
+    .filter(
+      Boolean
+    );
+}
+
+function compactPublicResponse(
+  event
+) {
+  if (
+    event.publicResponse ===
+      'not-reported' ||
+    event.publicResponse ===
+      'NR'
+  ) {
+    return 'NR';
+  }
+
+  if (
+    Number.isFinite(
+      Number(
+        event.publicResponse
+      )
+    )
+  ) {
+    return Number(
+      event.publicResponse
+    );
+  }
+
+  if (
+    Number.isFinite(
+      Number(
+        event.actualCount
+      )
+    ) &&
+    Number(
+      event.actualCount
+    ) <= 10
+  ) {
+    return Number(
+      event.actualCount
+    );
+  }
+
+  return 'NR';
+}
+
+function compactRoundsFromEvents(
+  game
+) {
+  if (
+    Array.isArray(
+      game.rounds
+    )
+  ) {
+    return game.rounds;
+  }
+
+  if (
+    !Array.isArray(
+      game.events
+    )
+  ) {
+    return [];
+  }
+
+  const rounds = [];
+
+  let currentRound =
+    null;
+
+  let lastPlayPlayer =
+    null;
+
+  function ensureRound() {
+    if (
+      !currentRound
+    ) {
+      currentRound = {
+        r:
+          rounds.length +
+          1,
+
+        actions:
+          [],
+      };
+
+      rounds.push(
+        currentRound
+      );
+    }
+
+    return currentRound;
+  }
+
+  function finishRound(
+    winner = null
+  ) {
+    if (
+      !currentRound
+    ) {
+      return;
+    }
+
+    if (
+      winner
+    ) {
+      currentRound.winner =
+        winner;
+    }
+
+    currentRound =
+      null;
+
+    lastPlayPlayer =
+      null;
+  }
+
+  for (
+    const event of
+    game.events
+  ) {
+    if (
+      !event ||
+      typeof event !==
+        'object'
+    ) {
+      continue;
+    }
+
+    if (
+      event.type ===
+      'play'
+    ) {
+      const player =
+        normalizePlayerKey(
+          event.playerId,
+          event.seatIndex
+        );
+
+      if (
+        !player
+      ) {
+        continue;
+      }
+
+      const cards =
+        Array.isArray(
+          event.cards
+        )
+          ? event.cards
+              .map(
+                (card) =>
+                  typeof card ===
+                    'string'
+                    ? card
+                    : cardCode(
+                        card
+                      )
+              )
+              .join(',')
+          : '';
+
+      ensureRound()
+        .actions
+        .push(
+          [
+            player,
+            'play',
+            cards,
+          ]
+        );
+
+      lastPlayPlayer =
+        player;
+
+      if (
+        event.finished
+      ) {
+        ensureRound()
+          .actions
+          .push(
+            [
+              player,
+              'out',
+            ]
+          );
+      }
+
+      continue;
+    }
+
+    if (
+      event.type ===
+      'pass'
+    ) {
+      const player =
+        normalizePlayerKey(
+          event.playerId,
+          event.seatIndex
+        );
+
+      if (
+        player
+      ) {
+        ensureRound()
+          .actions
+          .push(
+            [
+              player,
+              'pass',
+            ]
+          );
+      }
+
+      if (
+        event.trickEnded
+      ) {
+        const leadSeat =
+          event
+            ?.leadAtPass
+            ?.playerIndex;
+
+        const winner =
+          Number.isInteger(
+            leadSeat
+          )
+            ? playerKeyFromSeat(
+                leadSeat
+              )
+            : lastPlayPlayer;
+
+        finishRound(
+          winner
+        );
+      }
+
+      continue;
+    }
+
+    if (
+      event.type ===
+      'ask_card_count'
+    ) {
+      const requester =
+        normalizePlayerKey(
+          event.requesterPlayerId,
+          event.requesterSeatIndex
+        );
+
+      const target =
+        normalizePlayerKey(
+          event.targetPlayerId,
+          event.targetSeatIndex
+        );
+
+      if (
+        requester &&
+        target
+      ) {
+        ensureRound()
+          .actions
+          .push(
+            [
+              requester,
+              'ask',
+              target,
+              compactPublicResponse(
+                event
+              ),
+            ]
+          );
+      }
+
+      continue;
+    }
+  }
+
+  return rounds;
+}
+
+function compactGameRecord(
+  game
+) {
+  /*
+    Already compact.
+
+    Still run the hands through
+    compactHands() so an old compact
+    file with unsorted strings gets fixed.
+  */
+  if (
+    game &&
+    game.hands &&
+    game.rounds &&
+    !game.initialHands
+  ) {
+    return {
+      ...game,
+
+      hands:
+        compactHands(
+          game
+        ),
+
+      starterReason:
+        compactStarterReason(
+          game.starterReason
+        ),
+
+      finishOrder:
+        compactFinishOrder(
+          game.finishOrder
+        ),
+    };
+  }
+
+  const starter =
+    normalizePlayerKey(
+      game?.startingPlayerId,
+      game?.startingPlayerSeatIndex
+    ) ||
+    normalizePlayerKey(
+      game?.starter
+    ) ||
+    'P1';
+
+  const compact = {
+    gameId:
+      game?.gameId ||
+      randomUUID(),
+
+    time:
+      game?.time ||
+      game?.dealtAt ||
+      new Date()
+        .toISOString(),
+
+    deal:
+      game?.deal ||
+      game?.dealSource ||
+      'unknown',
+
+    trump:
+      game?.trump ||
+      game?.trumpRank ||
+      null,
+
+    starter,
+
+    starterReason:
+      compactStarterReason(
+        game?.starterReason ||
+        game?.startingPlayerMethod
+      ),
+
+    players:
+      compactPlayers(
+        game ||
+        {}
+      ),
+
+    hands:
+      compactHands(
+        game ||
+        {}
+      ),
+
+    rounds:
+      compactRoundsFromEvents(
+        game ||
+        {}
+      ),
+
+    finishOrder:
+      compactFinishOrder(
+        game?.finishOrder
+      ),
+  };
+
+  const startingFinishOrder =
+    compactFinishOrder(
+      game?.startingFinishOrder
+    );
+
+  if (
+    startingFinishOrder.length >
+      0
+  ) {
+    compact
+      .startingFinishOrder =
+      startingFinishOrder;
+  }
+
+  const ended =
+    game?.ended ||
+    game?.endedAt;
+
+  if (
+    ended
+  ) {
+    compact.ended =
+      ended;
+  }
+
+  const endReason =
+    game?.endReason ||
+    game?.endedReason;
+
+  if (
+    endReason
+  ) {
+    compact.endReason =
+      endReason;
+  }
+
+  if (
+    game?.winnerTeam
+  ) {
+    compact.winnerTeam =
+      game.winnerTeam;
+  }
+
+  return compact;
+}
+
+function compactifyHistory(
+  history
+) {
+  const games =
+    Array.isArray(
+      history?.games
+    )
+      ? history.games.map(
+          compactGameRecord
+        )
+      : [];
+
+  return {
+    schemaVersion:
+      7,
+
+    games,
+  };
+}
+
+function historyNeedsCompaction(
+  history
+) {
+  /*
+    Bumping to schema 7 is deliberate.
+
+    Even schema 6 compact files need
+    one more migration because their
+    hand strings may not be sorted.
+  */
+  if (
+    Number(
+      history?.schemaVersion
+    ) !== 7
+  ) {
+    return true;
+  }
+
+  if (
+    !Array.isArray(
+      history?.games
+    )
+  ) {
+    return true;
+  }
+
+  return history.games.some(
+    (game) =>
+      Boolean(
+        game?.initialHands ||
+        game?.events ||
+        game?.startingPlayerComparison ||
+        game?.dealtAtMinute
+      )
+  );
+}
+
+/* =========================================================
+   COMPACT ROUND LOGGING
+   ========================================================= */
+
+function getCompactGame(
+  room
+) {
+  if (
+    !room.state.gameId
+  ) {
     return null;
   }
 
@@ -1045,21 +1772,31 @@ function getCompactGame(room) {
   );
 }
 
-function ensureOpenRound(game) {
+function ensureOpenRound(
+  game
+) {
   let round =
     game.rounds[
-      game.rounds.length - 1
+      game.rounds.length -
+      1
     ];
 
-  if (!round || round.winner) {
+  if (
+    !round ||
+    round.winner
+  ) {
     round = {
       r:
-        game.rounds.length + 1,
+        game.rounds.length +
+        1,
 
-      actions: [],
+      actions:
+        [],
     };
 
-    game.rounds.push(round);
+    game.rounds.push(
+      round
+    );
   }
 
   return round;
@@ -1070,19 +1807,30 @@ function addRoundAction(
   action
 ) {
   const game =
-    getCompactGame(room);
+    getCompactGame(
+      room
+    );
 
-  if (!game) return;
+  if (!game) {
+    return;
+  }
 
   const round =
-    ensureOpenRound(game);
+    ensureOpenRound(
+      game
+    );
 
-  round.actions.push(action);
+  round.actions.push(
+    action
+  );
 
   game.finishOrder =
-    room.state.finishOrder.map(
-      (id) => `P${id}`
-    );
+    room.state
+      .finishOrder
+      .map(
+        (id) =>
+          `P${id}`
+      );
 
   void saveHistory();
 }
@@ -1092,56 +1840,73 @@ function closeCurrentRound(
   winnerSeatIndex
 ) {
   const game =
-    getCompactGame(room);
+    getCompactGame(
+      room
+    );
 
   if (
     !game ||
-    game.rounds.length === 0
+    game.rounds.length ===
+      0
   ) {
     return;
   }
 
   const round =
     game.rounds[
-      game.rounds.length - 1
+      game.rounds.length -
+      1
     ];
 
-  if (!round || round.winner) {
+  if (
+    !round ||
+    round.winner
+  ) {
     return;
   }
 
-  if (
-    Number.isInteger(
+  round.winner =
+    playerKeyFromSeat(
       winnerSeatIndex
-    )
-  ) {
-    round.winner =
-      playerKeyFromSeat(
-        winnerSeatIndex
+    );
+
+  game.finishOrder =
+    room.state
+      .finishOrder
+      .map(
+        (id) =>
+          `P${id}`
       );
+
+  void saveHistory();
+}
+
+function updateCompactGameFinishOrder(
+  room
+) {
+  const game =
+    getCompactGame(
+      room
+    );
+
+  if (!game) {
+    return;
   }
 
   game.finishOrder =
-    room.state.finishOrder.map(
-      (id) => `P${id}`
-    );
+    room.state
+      .finishOrder
+      .map(
+        (id) =>
+          `P${id}`
+      );
 
   void saveHistory();
 }
 
-function updateCompactGameFinishOrder(room) {
-  const game =
-    getCompactGame(room);
-
-  if (!game) return;
-
-  game.finishOrder =
-    room.state.finishOrder.map(
-      (id) => `P${id}`
-    );
-
-  void saveHistory();
-}
+/* =========================================================
+   NEW COMPACT GAME RECORD
+   ========================================================= */
 
 function buildCompactGameRecord({
   room,
@@ -1153,40 +1918,69 @@ function buildCompactGameRecord({
   startingFinishOrder = [],
 }) {
   const gameId =
-    `${room.code}-${randomUUID()}`;
+    `${room.code}-` +
+    randomUUID();
 
   const time =
-    new Date().toISOString();
+    new Date()
+      .toISOString();
 
-  const players = {};
-  const compactHands = {};
+  const players =
+    {};
+
+  const compactHands =
+    {};
 
   room.players.forEach(
-    (player, seatIndex) => {
+    (
+      player,
+      seatIndex
+    ) => {
       const key =
         playerKeyFromSeat(
           seatIndex
         );
 
       players[key] = {
-        name: player.name,
-        team: player.team,
+        name:
+          player.name,
+
+        team:
+          player.team,
       };
 
+      /*
+        IMPORTANT:
+
+        Sort first.
+        Then convert to S3/H4/etc.
+        Then join onto ONE line.
+      */
       compactHands[key] =
         sortCards(
-          [...hands[seatIndex]]
+          [
+            ...hands[
+              seatIndex
+            ],
+          ]
         )
-          .map(cardCode)
+          .map(
+            cardCode
+          )
           .join(',');
     }
   );
 
   const record = {
     gameId,
+
     time,
-    deal: dealSource,
-    trump: trumpRank,
+
+    deal:
+      dealSource,
+
+    trump:
+      trumpRank,
 
     starter:
       playerKeyFromSeat(
@@ -1197,22 +1991,32 @@ function buildCompactGameRecord({
       startingReason,
 
     players,
-    hands: compactHands,
-    rounds: [],
+
+    hands:
+      compactHands,
+
+    rounds:
+      [],
 
     finishOrder:
-      startingFinishOrder.map(
-        (id) => `P${id}`
-      ),
+      startingFinishOrder
+        .map(
+          (id) =>
+            `P${id}`
+        ),
   };
 
   if (
-    startingFinishOrder.length > 0
+    startingFinishOrder
+      .length > 0
   ) {
-    record.startingFinishOrder =
-      startingFinishOrder.map(
-        (id) => `P${id}`
-      );
+    record
+      .startingFinishOrder =
+      startingFinishOrder
+        .map(
+          (id) =>
+            `P${id}`
+        );
   }
 
   return record;
@@ -1230,31 +2034,43 @@ async function registerNewCompactGame({
   const record =
     buildCompactGameRecord({
       room,
+
       dealSource,
+
       startingPlayerIndex,
+
       startingReason,
+
       hands,
+
       trumpRank,
+
       startingFinishOrder,
     });
 
-  gameHistory.games.push(record);
+  gameHistory.games.push(
+    record
+  );
 
   writeLocalHistory();
 
   const ok =
     await saveHistory({
-      immediate: true,
-      verifyGameId: record.gameId,
+      immediate:
+        true,
+
+      verifyGameId:
+        record.gameId,
     });
 
   if (!ok) {
     gameHistory.games =
-      gameHistory.games.filter(
-        (game) =>
-          game.gameId !==
-          record.gameId
-      );
+      gameHistory.games
+        .filter(
+          (game) =>
+            game.gameId !==
+            record.gameId
+        );
 
     writeLocalHistory();
 
@@ -1269,22 +2085,38 @@ function markGameEnded(
   reason,
   winnerTeam = null
 ) {
+  /*
+    Unrecorded games deliberately do not
+    exist in gameHistory. In that case this
+    function becomes a no-op.
+  */
   const game =
-    getCompactGame(room);
-
-  if (!game) return;
-
-  game.finishOrder =
-    room.state.finishOrder.map(
-      (id) => `P${id}`
+    getCompactGame(
+      room
     );
 
+  if (!game) {
+    return;
+  }
+
+  game.finishOrder =
+    room.state
+      .finishOrder
+      .map(
+        (id) =>
+          `P${id}`
+      );
+
   game.ended =
-    new Date().toISOString();
+    new Date()
+      .toISOString();
 
-  game.endReason = reason;
+  game.endReason =
+    reason;
 
-  if (winnerTeam) {
+  if (
+    winnerTeam
+  ) {
     game.winnerTeam =
       winnerTeam;
   }
@@ -1292,17 +2124,25 @@ function markGameEnded(
   void saveHistory();
 }
 
-const app = express();
+/* =========================================================
+   EXPRESS / SOCKET.IO
+   ========================================================= */
+
+const app =
+  express();
 
 const httpServer =
-  createServer(app);
+  createServer(
+    app
+  );
 
 const io =
   new Server(
     httpServer,
     {
       cors: {
-        origin: '*',
+        origin:
+          '*',
       },
     }
   );
@@ -1322,7 +2162,10 @@ app.use(
 
 app.get(
   '/',
-  (_req, res) => {
+  (
+    _req,
+    res
+  ) => {
     res.sendFile(
       path.join(
         publicDir,
@@ -1332,38 +2175,54 @@ app.get(
   }
 );
 
+/* =========================================================
+   HISTORY STATUS
+   ========================================================= */
+
 app.get(
   '/api/history-status',
-  (_req, res) => {
+  (
+    _req,
+    res
+  ) => {
     res.json({
-      logging: true,
+      logging:
+        true,
 
       loggerVersion:
         LOGGER_VERSION,
 
       schemaVersion:
-        gameHistory.schemaVersion,
+        gameHistory
+          .schemaVersion,
 
       githubSync:
         githubSyncEnabled,
 
       gameCount:
-        gameHistory.games.length,
+        gameHistory
+          .games
+          .length,
 
       lastLocalSave:
-        historyStatus.lastLocalSave,
+        historyStatus
+          .lastLocalSave,
 
       lastGitHubSyncAttempt:
-        historyStatus.lastGitHubSyncAttempt,
+        historyStatus
+          .lastGitHubSyncAttempt,
 
       lastGitHubSync:
-        historyStatus.lastGitHubSync,
+        historyStatus
+          .lastGitHubSync,
 
       lastGitHubSyncSuccess:
-        historyStatus.lastGitHubSyncSuccess,
+        historyStatus
+          .lastGitHubSyncSuccess,
 
       lastGitHubError:
-        historyStatus.lastGitHubError,
+        historyStatus
+          .lastGitHubError,
 
       githubRepository:
         `${GITHUB_OWNER}/${GITHUB_REPO}`,
@@ -1377,7 +2236,12 @@ app.get(
   }
 );
 
-const rooms = new Map();
+/* =========================================================
+   ROOM HELPERS
+   ========================================================= */
+
+const rooms =
+  new Map();
 
 function generateRoomCode() {
   let code;
@@ -1386,10 +2250,19 @@ function generateRoomCode() {
     code =
       Math
         .random()
-        .toString(36)
-        .slice(2, 8)
+        .toString(
+          36
+        )
+        .slice(
+          2,
+          8
+        )
         .toUpperCase();
-  } while (rooms.has(code));
+  } while (
+    rooms.has(
+      code
+    )
+  );
 
   return code;
 }
@@ -1410,12 +2283,14 @@ function makeReportedCount(
   askedByPlayerId = null
 ) {
   return {
-    status: 'reported',
+    status:
+      'reported',
 
     count,
 
     askedAt:
-      new Date().toISOString(),
+      new Date()
+        .toISOString(),
 
     askedByPlayerId,
   };
@@ -1427,9 +2302,11 @@ function createRoom(
   hostSocketId
 ) {
   return {
-    code: roomCode,
+    code:
+      roomCode,
 
-    advanceTimer: null,
+    advanceTimer:
+      null,
 
     previousHeadPlayerIndex:
       null,
@@ -1442,7 +2319,8 @@ function createRoom(
           hostName ||
           'Player 1',
 
-        team: 'A',
+        team:
+          'A',
 
         socketId:
           hostSocketId,
@@ -1544,6 +2422,21 @@ function createRoom(
       dealSource:
         null,
 
+      /*
+        Whether the CURRENT game is being
+        written to game-history.json/GitHub.
+      */
+      recordGame:
+        true,
+
+      /*
+        Host preference for the NEXT Deal or
+        Custom Deal. Frontend can update this
+        with setRecordGamePreference.
+      */
+      recordNextGame:
+        true,
+
       winnerTeam:
         null,
 
@@ -1553,57 +2446,101 @@ function createRoom(
   };
 }
 
-function touchRoom(room) {
-  room.state.revision += 1;
+function touchRoom(
+  room
+) {
+  room.state.revision +=
+    1;
 }
 
-function connectedCount(room) {
-  return room.players.filter(
-    (player) =>
-      Boolean(player.socketId)
-  ).length;
-}
-
-function activeCount(room) {
-  return room.players.filter(
-    (player) =>
-      Boolean(player.socketId) &&
-      !player.hasFinished
-  ).length;
-}
-
-function getCompletedTeam(room) {
-  const completedTeams =
-    ['A', 'B'].filter(
-      (team) => {
-        const members =
-          room.players.filter(
-            (player) =>
-              player.team === team
-          );
-
-        return (
-          members.length === 3 &&
-          members.every(
-            (player) =>
-              player.hasFinished
+function connectedCount(
+  room
+) {
+  return (
+    room.players
+      .filter(
+        (player) =>
+          Boolean(
+            player.socketId
           )
-        );
-      }
-    );
+      )
+      .length
+  );
+}
+
+function activeCount(
+  room
+) {
+  return (
+    room.players
+      .filter(
+        (player) =>
+          Boolean(
+            player.socketId
+          ) &&
+          !player.hasFinished
+      )
+      .length
+  );
+}
+
+/* =========================================================
+   TEAM COMPLETION
+
+   Team A = P1, P3, P5
+   Team B = P2, P4, P6
+
+   The game ends immediately when all three
+   members of either team have finished.
+   ========================================================= */
+
+function getCompletedTeam(
+  room
+) {
+  const completedTeams =
+    ['A', 'B']
+      .filter(
+        (team) => {
+          const members =
+            room.players
+              .filter(
+                (player) =>
+                  player.team ===
+                  team
+              );
+
+          return (
+            members.length ===
+              3 &&
+            members.every(
+              (player) =>
+                player.hasFinished
+            )
+          );
+        }
+      );
 
   if (
-    completedTeams.length === 0
+    completedTeams.length ===
+    0
   ) {
     return null;
   }
 
   if (
-    completedTeams.length === 1
+    completedTeams.length ===
+    1
   ) {
     return completedTeams[0];
   }
 
+  /*
+    This can only realistically happen in a
+    Custom Deal checkpoint where both teams
+    are entered as finished. Use finishOrder
+    to identify which team's third player
+    finished first.
+  */
   const counts = {
     A: 0,
     B: 0,
@@ -1620,12 +2557,20 @@ function getCompletedTeam(room) {
           playerId
       );
 
-    if (!player) continue;
+    if (
+      !player
+    ) {
+      continue;
+    }
 
-    counts[player.team] += 1;
+    counts[
+      player.team
+    ] += 1;
 
     if (
-      counts[player.team] === 3
+      counts[
+        player.team
+      ] === 3
     ) {
       return player.team;
     }
@@ -1650,7 +2595,9 @@ function nextActivePlayer(
       ) % 6;
 
     const player =
-      room.players[index];
+      room.players[
+        index
+      ];
 
     if (
       player.socketId &&
@@ -1663,8 +2610,12 @@ function nextActivePlayer(
   return null;
 }
 
-function passesNeeded(room) {
-  if (!room.state.currentLead) {
+function passesNeeded(
+  room
+) {
+  if (
+    !room.state.currentLead
+  ) {
     return 0;
   }
 
@@ -1687,7 +2638,9 @@ function passesNeeded(room) {
   return Math.max(
     1,
 
-    activeCount(room) -
+    activeCount(
+      room
+    ) -
       (
         leaderStillActive
           ? 1
@@ -1695,6 +2648,10 @@ function passesNeeded(room) {
       )
   );
 }
+
+/* =========================================================
+   STARTING PLAYER RULE
+   ========================================================= */
 
 const openingSpadeRanks = [
   '3',
@@ -1712,15 +2669,20 @@ const openingSpadeRanks = [
   '2',
 ];
 
-function isSpade(card) {
+function isSpade(
+  card
+) {
   return (
     String(
-      card?.suit || ''
-    ).toLowerCase() ===
+      card?.suit ||
+      ''
+    )
+      .toLowerCase() ===
       'spades' ||
 
     String(
-      card?.symbol || ''
+      card?.symbol ||
+      ''
     ) ===
       '♠'
   );
@@ -1730,17 +2692,26 @@ function countSpadeRank(
   hand,
   rank
 ) {
-  return hand.filter(
-    (card) =>
-      isSpade(card) &&
-      String(
-        card.rank
-      ).toUpperCase() ===
-        rank
-  ).length;
+  return (
+    hand.filter(
+      (card) =>
+        isSpade(
+          card
+        ) &&
+
+        String(
+          card.rank
+        )
+          .toUpperCase() ===
+          rank
+    )
+      .length
+  );
 }
 
-function determineFirstGameStarter(hands) {
+function determineFirstGameStarter(
+  hands
+) {
   let candidates = [
     0,
     1,
@@ -1765,20 +2736,28 @@ function determineFirstGameStarter(hands) {
 
     const max =
       Math.max(
-        ...candidates.map(
-          (seat) =>
-            counts[seat]
-        )
+        ...candidates
+          .map(
+            (seat) =>
+              counts[
+                seat
+              ]
+          )
       );
 
     candidates =
-      candidates.filter(
-        (seat) =>
-          counts[seat] === max
-      );
+      candidates
+        .filter(
+          (seat) =>
+            counts[
+              seat
+            ] ===
+            max
+        );
 
     if (
-      candidates.length === 1
+      candidates.length ===
+      1
     ) {
       break;
     }
@@ -1793,12 +2772,14 @@ function determineRandomStarter(
 ) {
   if (
     Number.isInteger(
-      room.previousHeadPlayerIndex
+      room
+        .previousHeadPlayerIndex
     )
   ) {
     return {
       seatIndex:
-        room.previousHeadPlayerIndex,
+        room
+          .previousHeadPlayerIndex,
 
       reason:
         'previous-head',
@@ -1816,24 +2797,53 @@ function determineRandomStarter(
   };
 }
 
-function normalizeCardToken(rawToken) {
+/* =========================================================
+   CUSTOM DEAL PARSING
+   ========================================================= */
+
+function normalizeCardToken(
+  rawToken
+) {
   let token =
-    String(rawToken || '')
+    String(
+      rawToken ||
+      ''
+    )
       .trim()
       .toUpperCase()
-      .replaceAll('♠', 'S')
-      .replaceAll('♥', 'H')
-      .replaceAll('♣', 'C')
-      .replaceAll('♦', 'D')
-      .replaceAll('-', '')
-      .replaceAll('_', '');
+      .replaceAll(
+        '♠',
+        'S'
+      )
+      .replaceAll(
+        '♥',
+        'H'
+      )
+      .replaceAll(
+        '♣',
+        'C'
+      )
+      .replaceAll(
+        '♦',
+        'D'
+      )
+      .replaceAll(
+        '-',
+        ''
+      )
+      .replaceAll(
+        '_',
+        ''
+      );
 
   if (
     [
       'BIGJOKER',
       'BIG',
       '大怪',
-    ].includes(token)
+    ].includes(
+      token
+    )
   ) {
     return 'BJ';
   }
@@ -1843,7 +2853,9 @@ function normalizeCardToken(rawToken) {
       'SMALLJOKER',
       'SMALL',
       '小怪',
-    ].includes(token)
+    ].includes(
+      token
+    )
   ) {
     return 'SJ';
   }
@@ -1851,35 +2863,58 @@ function normalizeCardToken(rawToken) {
   return token;
 }
 
-function tokenizeHandText(text) {
-  return String(text || '')
-    .replace(
-      /BIG\s+JOKER/gi,
-      'BJ'
+function tokenizeHandText(
+  text
+) {
+  return (
+    String(
+      text ||
+      ''
     )
-    .replace(
-      /SMALL\s+JOKER/gi,
-      'SJ'
-    )
-    .replace(
-      /[,;\n\r\t]+/g,
-      ' '
-    )
-    .split(/\s+/)
-    .map(normalizeCardToken)
-    .filter(Boolean);
+      .replace(
+        /BIG\s+JOKER/gi,
+        'BJ'
+      )
+      .replace(
+        /SMALL\s+JOKER/gi,
+        'SJ'
+      )
+      .replace(
+        /[,;\n\r\t]+/g,
+        ' '
+      )
+      .split(
+        /\s+/
+      )
+      .map(
+        normalizeCardToken
+      )
+      .filter(
+        Boolean
+      )
+  );
 }
 
-function parseCardToken(token) {
-  if (token === 'BJ') {
+function parseCardToken(
+  token
+) {
+  if (
+    token ===
+    'BJ'
+  ) {
     return {
-      kind: 'big-joker',
+      kind:
+        'big-joker',
     };
   }
 
-  if (token === 'SJ') {
+  if (
+    token ===
+    'SJ'
+  ) {
     return {
-      kind: 'small-joker',
+      kind:
+        'small-joker',
     };
   }
 
@@ -1888,11 +2923,18 @@ function parseCardToken(token) {
       /^(10|[2-9JQKA])([SHCD])$/
     );
 
-  if (match) {
+  if (
+    match
+  ) {
     return {
-      kind: 'ordinary',
-      rank: match[1],
-      suitCode: match[2],
+      kind:
+        'ordinary',
+
+      rank:
+        match[1],
+
+      suitCode:
+        match[2],
     };
   }
 
@@ -1901,25 +2943,42 @@ function parseCardToken(token) {
       /^([SHCD])(10|[2-9JQKA])$/
     );
 
-  if (match) {
+  if (
+    match
+  ) {
     return {
-      kind: 'ordinary',
-      rank: match[2],
-      suitCode: match[1],
+      kind:
+        'ordinary',
+
+      rank:
+        match[2],
+
+      suitCode:
+        match[1],
     };
   }
 
   throw new Error(
-    `Invalid card token "${token}". Use S3, H10, DQ, CA, BJ, or SJ.`
+    `Invalid card token "${token}". ` +
+    `Use S3, H10, DQ, CA, BJ, or SJ.`
   );
 }
 
-function suitCodeToName(code) {
+function suitCodeToName(
+  code
+) {
   return {
-    S: 'spades',
-    H: 'hearts',
-    D: 'diamonds',
-    C: 'clubs',
+    S:
+      'spades',
+
+    H:
+      'hearts',
+
+    D:
+      'diamonds',
+
+    C:
+      'clubs',
   }[code];
 }
 
@@ -1931,37 +2990,52 @@ function cardMatchesRequest(
     request.kind ===
     'big-joker'
   ) {
-    return cardCode(card) ===
-      'BJ';
+    return (
+      cardCode(
+        card
+      ) ===
+      'BJ'
+    );
   }
 
   if (
     request.kind ===
     'small-joker'
   ) {
-    return cardCode(card) ===
-      'SJ';
+    return (
+      cardCode(
+        card
+      ) ===
+      'SJ'
+    );
   }
 
   return (
     String(
       card.rank
-    ).toUpperCase() ===
+    )
+      .toUpperCase() ===
       request.rank &&
 
     String(
       card.suit
-    ).toLowerCase() ===
+    )
+      .toLowerCase() ===
       suitCodeToName(
         request.suitCode
       )
   );
 }
 
-function buildCustomHands(handTexts) {
+function buildCustomHands(
+  handTexts
+) {
   if (
-    !Array.isArray(handTexts) ||
-    handTexts.length !== 6
+    !Array.isArray(
+      handTexts
+    ) ||
+    handTexts.length !==
+      6
   ) {
     throw new Error(
       'Custom deal must contain exactly six hands.'
@@ -1979,9 +3053,12 @@ function buildCustomHands(handTexts) {
   const hands =
     Array.from(
       {
-        length: 6,
+        length:
+          6,
       },
-      () => []
+
+      () =>
+        []
     );
 
   for (
@@ -1992,11 +3069,15 @@ function buildCustomHands(handTexts) {
     for (
       const token of
       tokenizeHandText(
-        handTexts[seatIndex]
+        handTexts[
+          seatIndex
+        ]
       )
     ) {
       const request =
-        parseCardToken(token);
+        parseCardToken(
+          token
+        );
 
       const card =
         pool.find(
@@ -2004,6 +3085,7 @@ function buildCustomHands(handTexts) {
             !usedIds.has(
               candidate.id
             ) &&
+
             cardMatchesRequest(
               candidate,
               request
@@ -2012,13 +3094,20 @@ function buildCustomHands(handTexts) {
 
       if (!card) {
         throw new Error(
-          `Player ${seatIndex + 1}: ${token} is unavailable or used too many times.`
+          `Player ${seatIndex + 1}: ` +
+          `${token} is unavailable or used too many times.`
         );
       }
 
-      usedIds.add(card.id);
+      usedIds.add(
+        card.id
+      );
 
-      hands[seatIndex].push(card);
+      hands[
+        seatIndex
+      ].push(
+        card
+      );
     }
   }
 
@@ -2026,14 +3115,22 @@ function buildCustomHands(handTexts) {
     hands:
       hands.map(
         (hand) =>
-          sortCards(hand)
+          sortCards(
+            hand
+          )
       ),
   };
 }
 
-function parseFinishOrder(raw) {
+function parseFinishOrder(
+  raw
+) {
   const text =
-    String(raw || '').trim();
+    String(
+      raw ||
+      ''
+    )
+      .trim();
 
   if (!text) {
     return [];
@@ -2041,9 +3138,15 @@ function parseFinishOrder(raw) {
 
   const values =
     text
-      .split(/[\s,;]+/)
-      .filter(Boolean)
-      .map(Number);
+      .split(
+        /[\s,;]+/
+      )
+      .filter(
+        Boolean
+      )
+      .map(
+        Number
+      );
 
   if (
     values.some(
@@ -2061,7 +3164,9 @@ function parseFinishOrder(raw) {
   }
 
   if (
-    new Set(values).size !==
+    new Set(
+      values
+    ).size !==
     values.length
   ) {
     throw new Error(
@@ -2072,19 +3177,29 @@ function parseFinishOrder(raw) {
   return values;
 }
 
+/* =========================================================
+   CLIENT-SAFE STATE
+   ========================================================= */
+
 function buildClientRoomState(
   room,
   viewerSeatIndex
 ) {
   return {
-    code: room.code,
+    code:
+      room.code,
 
     players:
       room.players.map(
         (player) => ({
-          id: player.id,
-          name: player.name,
-          team: player.team,
+          id:
+            player.id,
+
+          name:
+            player.name,
+
+          team:
+            player.team,
 
           connected:
             Boolean(
@@ -2098,23 +3213,30 @@ function buildClientRoomState(
 
     state: {
       hands:
-        room.state.hands.map(
-          (hand, index) =>
-            index ===
-            viewerSeatIndex
-              ? hand
-              : []
-        ),
+        room.state
+          .hands
+          .map(
+            (
+              hand,
+              index
+            ) =>
+              index ===
+              viewerSeatIndex
+                ? hand
+                : []
+          ),
 
       currentPlayerIndex:
         room.state
           .currentPlayerIndex,
 
       trumpRank:
-        room.state.trumpRank,
+        room.state
+          .trumpRank,
 
       currentLead:
-        room.state.currentLead,
+        room.state
+          .currentLead,
 
       lastSuccessfulPlayerIndex:
         room.state
@@ -2126,36 +3248,53 @@ function buildClientRoomState(
 
       finishOrder:
         [
-          ...room.state.finishOrder,
+          ...room.state
+            .finishOrder,
         ],
 
       hasStarted:
-        room.state.hasStarted,
+        room.state
+          .hasStarted,
 
       paused:
-        room.state.paused,
+        room.state
+          .paused,
 
       phase:
-        room.state.phase,
+        room.state
+          .phase,
 
       turnLockedUntil:
         room.state
           .turnLockedUntil,
 
       revision:
-        room.state.revision,
+        room.state
+          .revision,
 
       gameId:
-        room.state.gameId,
+        room.state
+          .gameId,
 
       dealtAt:
-        room.state.dealtAt,
+        room.state
+          .dealtAt,
 
       dealSource:
-        room.state.dealSource,
+        room.state
+          .dealSource,
+
+      recordGame:
+        room.state
+          .recordGame,
+
+      recordNextGame:
+        room.state
+          .recordNextGame,
 
       winnerTeam:
-        room.state.winnerTeam,
+        room.state
+          .winnerTeam,
 
       publicReports:
         room.state
@@ -2178,15 +3317,23 @@ function emitRoomState(
     'roomStateUpdate'
 ) {
   room.players.forEach(
-    (player, seatIndex) => {
-      if (!player.socketId) {
+    (
+      player,
+      seatIndex
+    ) => {
+      if (
+        !player.socketId
+      ) {
         return;
       }
 
       io
-        .to(player.socketId)
+        .to(
+          player.socketId
+        )
         .emit(
           eventName,
+
           buildClientRoomState(
             room,
             seatIndex
@@ -2196,6 +3343,10 @@ function emitRoomState(
   );
 }
 
+/* =========================================================
+   START GAME
+   ========================================================= */
+
 async function startGame({
   room,
   hands,
@@ -2204,34 +3355,70 @@ async function startGame({
   startingReason,
   finishOrder = [],
   dealSource,
+  recordGame = true,
 }) {
-  const record =
-    await registerNewCompactGame({
-      room,
-      dealSource,
-      startingPlayerIndex,
-      startingReason,
-      hands,
-      trumpRank,
+  const shouldRecord =
+    recordGame !== false;
 
-      startingFinishOrder:
-        finishOrder,
-    });
+  /*
+    Recorded games are created in history and
+    immediately synced to GitHub exactly as before.
 
-  if (!record) {
-    return {
-      success: false,
+    Unrecorded games still need a runtime gameId and
+    dealtAt value so all normal multiplayer logic can
+    run, but NOTHING is appended to gameHistory.
+  */
+  let record;
 
-      message:
-        'Deal cancelled because the history could not be written to GitHub. ' +
-        'Check /api/history-status.',
+  if (
+    shouldRecord
+  ) {
+    record =
+      await registerNewCompactGame({
+        room,
+
+        dealSource,
+
+        startingPlayerIndex,
+
+        startingReason,
+
+        hands,
+
+        trumpRank,
+
+        startingFinishOrder:
+          finishOrder,
+      });
+
+    if (!record) {
+      return {
+        success:
+          false,
+
+        message:
+          'Deal cancelled because the history could not be written to GitHub. ' +
+          'Check /api/history-status.',
+      };
+    }
+  } else {
+    record = {
+      gameId:
+        `${room.code}-` +
+        randomUUID(),
+
+      time:
+        new Date()
+          .toISOString(),
     };
   }
 
   room.state.hands =
     hands.map(
       (hand) =>
-        sortCards(hand)
+        sortCards(
+          hand
+        )
     );
 
   room.state.trumpRank =
@@ -2250,7 +3437,9 @@ async function startGame({
     0;
 
   room.state.finishOrder =
-    [...finishOrder];
+    [
+      ...finishOrder,
+    ];
 
   room.state.hasStarted =
     true;
@@ -2273,6 +3462,12 @@ async function startGame({
   room.state.dealSource =
     dealSource;
 
+  room.state.recordGame =
+    shouldRecord;
+
+  room.state.recordNextGame =
+    shouldRecord;
+
   room.state.winnerTeam =
     null;
 
@@ -2288,10 +3483,19 @@ async function startGame({
     }
   );
 
+  /*
+    Custom Deal can load a checkpoint where a team
+    has already completely finished. Such a state is
+    already game-over and must not continue playing.
+  */
   const completedTeam =
-    getCompletedTeam(room);
+    getCompletedTeam(
+      room
+    );
 
-  if (completedTeam) {
+  if (
+    completedTeam
+  ) {
     room.state.hasStarted =
       false;
 
@@ -2313,7 +3517,9 @@ async function startGame({
       completedTeam
     );
 
-    touchRoom(room);
+    touchRoom(
+      room
+    );
 
     emitRoomState(
       room,
@@ -2321,7 +3527,8 @@ async function startGame({
     );
 
     return {
-      success: true,
+      success:
+        true,
 
       gameId:
         record.gameId,
@@ -2329,14 +3536,20 @@ async function startGame({
       dealtAt:
         record.time,
 
-      ended: true,
+      recorded:
+        shouldRecord,
+
+      ended:
+        true,
 
       winnerTeam:
         completedTeam,
     };
   }
 
-  touchRoom(room);
+  touchRoom(
+    room
+  );
 
   emitRoomState(
     room,
@@ -2344,23 +3557,32 @@ async function startGame({
   );
 
   return {
-    success: true,
+    success:
+      true,
 
     gameId:
       record.gameId,
 
     dealtAt:
       record.time,
+
+    recorded:
+      shouldRecord,
   };
 }
 
-function stopAdvanceTimer(room) {
-  if (room.advanceTimer) {
+function stopAdvanceTimer(
+  room
+) {
+  if (
+    room.advanceTimer
+  ) {
     clearTimeout(
       room.advanceTimer
     );
 
-    room.advanceTimer = null;
+    room.advanceTimer =
+      null;
   }
 }
 
@@ -2368,12 +3590,21 @@ function abortCurrentGame(
   room,
   reason
 ) {
-  if (!room.state.gameId) {
+  if (
+    !room.state.gameId
+  ) {
     return;
   }
 
-  stopAdvanceTimer(room);
+  stopAdvanceTimer(
+    room
+  );
 
+  /*
+    A completed game may later be replaced by a new
+    Deal. Do not overwrite its real endReason with
+    host-redeal / host-custom-redeal.
+  */
   if (
     room.state.phase ===
     'finished'
@@ -2398,7 +3629,9 @@ function destroyRoom(
   );
 
   io
-    .to(room.code)
+    .to(
+      room.code
+    )
     .emit(
       'roomClosed',
       {
@@ -2407,22 +3640,33 @@ function destroyRoom(
     );
 
   io
-    .in(room.code)
+    .in(
+      room.code
+    )
     .socketsLeave(
       room.code
     );
 
-  rooms.delete(room.code);
+  rooms.delete(
+    room.code
+  );
 }
+
+/* =========================================================
+   TWO SECOND PLAY DISPLAY
+   ========================================================= */
 
 function scheduleAdvanceAfterPlay(
   room,
   playerSeatIndex
 ) {
-  stopAdvanceTimer(room);
+  stopAdvanceTimer(
+    room
+  );
 
   const gameId =
-    room.state.gameId;
+    room.state
+      .gameId;
 
   room.advanceTimer =
     setTimeout(
@@ -2434,7 +3678,8 @@ function scheduleAdvanceAfterPlay(
 
         if (
           !currentRoom ||
-          currentRoom.state.gameId !==
+          currentRoom.state
+            .gameId !==
             gameId
         ) {
           return;
@@ -2443,33 +3688,51 @@ function scheduleAdvanceAfterPlay(
         currentRoom.advanceTimer =
           null;
 
-        currentRoom.state.turnLockedUntil =
+        currentRoom.state
+          .turnLockedUntil =
           null;
 
+        /*
+          PRIMARY END CONDITION:
+
+          As soon as all three members of Team A or
+          Team B have finished, the game is over.
+
+          The last successful play remains visible for
+          the normal two-second display before this
+          block runs.
+        */
         const completedTeam =
           getCompletedTeam(
             currentRoom
           );
 
-        if (completedTeam) {
+        if (
+          completedTeam
+        ) {
           closeCurrentRound(
             currentRoom,
             playerSeatIndex
           );
 
-          currentRoom.state.hasStarted =
+          currentRoom.state
+            .hasStarted =
             false;
 
-          currentRoom.state.paused =
+          currentRoom.state
+            .paused =
             false;
 
-          currentRoom.state.phase =
+          currentRoom.state
+            .phase =
             'finished';
 
-          currentRoom.state.turnLockedUntil =
+          currentRoom.state
+            .turnLockedUntil =
             null;
 
-          currentRoom.state.winnerTeam =
+          currentRoom.state
+            .winnerTeam =
             completedTeam;
 
           markGameEnded(
@@ -2488,7 +3751,9 @@ function scheduleAdvanceAfterPlay(
           );
 
           io
-            .to(currentRoom.code)
+            .to(
+              currentRoom.code
+            )
             .emit(
               'publicMessage',
               `Team ${completedTeam} has finished all three players. Game over.`
@@ -2497,23 +3762,34 @@ function scheduleAdvanceAfterPlay(
           return;
         }
 
-        const nextIndex =
-          nextActivePlayer(
+        /*
+          Safety fallback for malformed checkpoint states.
+          Under normal rules the team-finish condition above
+          should end the game before this is ever necessary.
+        */
+        if (
+          activeCount(
+            currentRoom
+          ) <= 1
+        ) {
+          closeCurrentRound(
             currentRoom,
             playerSeatIndex
           );
 
-        if (nextIndex === null) {
-          currentRoom.state.hasStarted =
+          currentRoom.state
+            .hasStarted =
             false;
 
-          currentRoom.state.phase =
+          currentRoom.state
+            .phase =
             'finished';
 
           markGameEnded(
             currentRoom,
-            'no-active-next-player',
-            currentRoom.state.winnerTeam
+            'one-player-remaining',
+            currentRoom.state
+              .winnerTeam
           );
 
           touchRoom(
@@ -2528,10 +3804,59 @@ function scheduleAdvanceAfterPlay(
           return;
         }
 
-        currentRoom.state.currentPlayerIndex =
+        const nextIndex =
+          nextActivePlayer(
+            currentRoom,
+            playerSeatIndex
+          );
+
+        if (
+          nextIndex ===
+          null
+        ) {
+          const fallbackWinnerTeam =
+            getCompletedTeam(
+              currentRoom
+            );
+
+          currentRoom.state
+            .hasStarted =
+            false;
+
+          currentRoom.state
+            .phase =
+            'finished';
+
+          currentRoom.state
+            .winnerTeam =
+            fallbackWinnerTeam;
+
+          markGameEnded(
+            currentRoom,
+            fallbackWinnerTeam
+              ? 'team-finished'
+              : 'no-active-next-player',
+            fallbackWinnerTeam
+          );
+
+          touchRoom(
+            currentRoom
+          );
+
+          emitRoomState(
+            currentRoom,
+            'gameStateUpdate'
+          );
+
+          return;
+        }
+
+        currentRoom.state
+          .currentPlayerIndex =
           nextIndex;
 
-        currentRoom.state.phase =
+        currentRoom.state
+          .phase =
           'turn';
 
         touchRoom(
@@ -2543,18 +3868,29 @@ function scheduleAdvanceAfterPlay(
           'gameStateUpdate'
         );
       },
+
       2000
     );
 }
 
+/* =========================================================
+   SOCKET CONNECTION
+   ========================================================= */
+
 io.on(
   'connection',
-  (socket) => {
+  (
+    socket
+  ) => {
     let currentRoomCode =
       null;
 
     let playerSeatIndex =
       null;
+
+    /* =====================================================
+       CREATE ROOM
+       ===================================================== */
 
     socket.on(
       'createRoom',
@@ -2603,17 +3939,29 @@ io.on(
           roomCode
         );
 
-        touchRoom(room);
+        touchRoom(
+          room
+        );
 
         callback({
-          success: true,
+          success:
+            true,
+
           roomCode,
-          seatIndex: 0,
+
+          seatIndex:
+            0,
         });
 
-        emitRoomState(room);
+        emitRoomState(
+          room
+        );
       }
     );
+
+    /* =====================================================
+       JOIN ROOM
+       ===================================================== */
 
     socket.on(
       'joinRoom',
@@ -2630,20 +3978,27 @@ io.on(
       ) => {
         const code =
           String(
-            roomCode || ''
+            roomCode ||
+            ''
           )
             .trim()
             .toUpperCase();
 
         const parsedSeatIndex =
-          Number(seatIndex);
+          Number(
+            seatIndex
+          );
 
         const room =
-          rooms.get(code);
+          rooms.get(
+            code
+          );
 
         if (!room) {
           callback({
-            success: false,
+            success:
+              false,
+
             message:
               'Room not found.',
           });
@@ -2659,7 +4014,8 @@ io.on(
           parsedSeatIndex > 5
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Choose Player 2 to Player 6.',
@@ -2673,9 +4029,12 @@ io.on(
             parsedSeatIndex
           ];
 
-        if (seat.socketId) {
+        if (
+          seat.socketId
+        ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'That seat is already occupied.',
@@ -2708,20 +4067,28 @@ io.on(
         playerSeatIndex =
           parsedSeatIndex;
 
-        socket.join(code);
+        socket.join(
+          code
+        );
 
         if (
-          room.state.hasStarted &&
-          connectedCount(room) === 6
+          room.state
+            .hasStarted &&
+          connectedCount(
+            room
+          ) === 6
         ) {
           room.state.paused =
             false;
         }
 
-        touchRoom(room);
+        touchRoom(
+          room
+        );
 
         callback({
-          success: true,
+          success:
+            true,
 
           roomCode:
             code,
@@ -2730,23 +4097,149 @@ io.on(
             parsedSeatIndex,
         });
 
-        emitRoomState(room);
+        emitRoomState(
+          room
+        );
       }
     );
 
-    socket.on(
-      'dealCards',
+    /* =====================================================
+       HOST RECORDING PREFERENCE
 
-      async (
+       This controls whether the NEXT game is saved to
+       data/game-history.json and synced to GitHub.
+
+       Only Player 1 may change it.
+       ===================================================== */
+
+    socket.on(
+      'setRecordGamePreference',
+
+      (
+        {
+          recordGame,
+        } = {},
+
         callback =
           () => {}
       ) => {
         if (
           !currentRoomCode ||
-          playerSeatIndex !== 0
+          playerSeatIndex !==
+            0
         ) {
           callback({
-            success: false,
+            success:
+              false,
+
+            message:
+              'Only Player 1 can change the recording setting.',
+          });
+
+          return;
+        }
+
+        const room =
+          rooms.get(
+            currentRoomCode
+          );
+
+        if (!room) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Room not found.',
+          });
+
+          return;
+        }
+
+        if (
+          typeof recordGame !==
+          'boolean'
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'recordGame must be true or false.',
+          });
+
+          return;
+        }
+
+        room.state.recordNextGame =
+          recordGame;
+
+        touchRoom(
+          room
+        );
+
+        emitRoomState(
+          room
+        );
+
+        callback({
+          success:
+            true,
+
+          recordGame:
+            room.state.recordNextGame,
+        });
+      }
+    );
+
+    /* =====================================================
+       RANDOM DEAL
+       ===================================================== */
+
+    socket.on(
+      'dealCards',
+
+      async (
+        optionsOrCallback = {},
+        maybeCallback =
+          () => {}
+      ) => {
+        /*
+          Backward-compatible with the OLD frontend:
+
+          socket.emit('dealCards', callback)
+
+          and supports the NEW frontend:
+
+          socket.emit(
+            'dealCards',
+            { recordGame: false },
+            callback
+          )
+        */
+        const options =
+          typeof optionsOrCallback ===
+          'function'
+            ? {}
+            : (
+                optionsOrCallback ||
+                {}
+              );
+
+        const callback =
+          typeof optionsOrCallback ===
+          'function'
+            ? optionsOrCallback
+            : maybeCallback;
+
+        if (
+          !currentRoomCode ||
+          playerSeatIndex !==
+            0
+        ) {
+          callback({
+            success:
+              false,
 
             message:
               'Only Player 1 can deal.',
@@ -2762,7 +4255,8 @@ io.on(
 
         if (!room) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Room not found.',
@@ -2772,10 +4266,13 @@ io.on(
         }
 
         if (
-          connectedCount(room) !== 6
+          connectedCount(
+            room
+          ) !== 6
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'All 6 players must be connected before dealing.',
@@ -2784,8 +4281,20 @@ io.on(
           return;
         }
 
+        const shouldRecord =
+          typeof options.recordGame ===
+          'boolean'
+            ? options.recordGame
+            : room.state
+                .recordNextGame !==
+              false;
+
+        room.state.recordNextGame =
+          shouldRecord;
+
         if (
-          room.state.hasStarted
+          room.state
+            .hasStarted
         ) {
           abortCurrentGame(
             room,
@@ -2810,25 +4319,37 @@ io.on(
               deal.hands,
 
             trumpRank:
-              room.state.trumpRank ||
+              room.state
+                .trumpRank ||
               '2',
 
             startingPlayerIndex:
-              starter.seatIndex,
+              starter
+                .seatIndex,
 
             startingReason:
-              starter.reason,
+              starter
+                .reason,
 
             finishOrder:
               [],
 
             dealSource:
               'random',
+
+            recordGame:
+              shouldRecord,
           });
 
-        callback(result);
+        callback(
+          result
+        );
       }
     );
+
+    /* =====================================================
+       CUSTOM DEAL
+       ===================================================== */
 
     socket.on(
       'customDeal',
@@ -2839,6 +4360,7 @@ io.on(
           trumpRank,
           startingPlayerIndex,
           finishOrderText,
+          recordGame,
         } = {},
 
         callback =
@@ -2846,10 +4368,12 @@ io.on(
       ) => {
         if (
           !currentRoomCode ||
-          playerSeatIndex !== 0
+          playerSeatIndex !==
+            0
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Only Player 1 can create a custom deal.',
@@ -2865,7 +4389,9 @@ io.on(
 
         if (!room) {
           callback({
-            success: false,
+            success:
+              false,
+
             message:
               'Room not found.',
           });
@@ -2874,10 +4400,13 @@ io.on(
         }
 
         if (
-          connectedCount(room) !== 6
+          connectedCount(
+            room
+          ) !== 6
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'All 6 players must be connected before custom deal.',
@@ -2885,6 +4414,17 @@ io.on(
 
           return;
         }
+
+        const shouldRecord =
+          typeof recordGame ===
+          'boolean'
+            ? recordGame
+            : room.state
+                .recordNextGame !==
+              false;
+
+        room.state.recordNextGame =
+          shouldRecord;
 
         try {
           const finishOrder =
@@ -2901,7 +4441,8 @@ io.on(
             String(
               trumpRank ||
               '2'
-            ).toUpperCase();
+            )
+              .toUpperCase();
 
           const custom =
             buildCustomHands(
@@ -2937,7 +4478,8 @@ io.on(
             if (
               custom.hands[
                 playerId - 1
-              ].length !== 0
+              ].length !==
+              0
             ) {
               throw new Error(
                 `Player ${playerId} is listed as finished but still has cards.`
@@ -2946,7 +4488,8 @@ io.on(
           }
 
           if (
-            room.state.hasStarted
+            room.state
+              .hasStarted
           ) {
             abortCurrentGame(
               room,
@@ -2974,12 +4517,20 @@ io.on(
 
               dealSource:
                 'custom',
+
+              recordGame:
+                shouldRecord,
             });
 
-          callback(result);
-        } catch (error) {
+          callback(
+            result
+          );
+        } catch (
+          error
+        ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               error.message,
@@ -2987,6 +4538,10 @@ io.on(
         }
       }
     );
+
+    /* =====================================================
+       ASK CARD COUNT
+       ===================================================== */
 
     socket.on(
       'askCardCount',
@@ -3006,10 +4561,12 @@ io.on(
 
         if (
           !room ||
-          !room.state.gameId
+          !room.state
+            .gameId
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'No game has been dealt yet.',
@@ -3019,12 +4576,14 @@ io.on(
         }
 
         if (
-          !room.state.hasStarted ||
+          !room.state
+            .hasStarted ||
           room.state.phase ===
             'finished'
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'The game has already finished.',
@@ -3048,7 +4607,8 @@ io.on(
             playerSeatIndex
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Invalid player.',
@@ -3114,15 +4674,20 @@ io.on(
             playerKeyFromSeat(
               playerSeatIndex
             ),
+
             'ask',
+
             playerKeyFromSeat(
               targetIndex
             ),
+
             response,
           ]
         );
 
-        touchRoom(room);
+        touchRoom(
+          room
+        );
 
         emitRoomState(
           room,
@@ -3130,7 +4695,9 @@ io.on(
         );
 
         io
-          .to(room.code)
+          .to(
+            room.code
+          )
           .emit(
             'publicMessage',
 
@@ -3140,10 +4707,15 @@ io.on(
           );
 
         callback({
-          success: true,
+          success:
+            true,
         });
       }
     );
+
+    /* =====================================================
+       PLAY CARDS
+       ===================================================== */
 
     socket.on(
       'playCards',
@@ -3163,10 +4735,12 @@ io.on(
 
         if (
           !room ||
-          !room.state.hasStarted
+          !room.state
+            .hasStarted
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'No active game.',
@@ -3179,7 +4753,8 @@ io.on(
           room.state.paused
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Game is paused.',
@@ -3191,11 +4766,13 @@ io.on(
         if (
           room.state.phase !==
             'turn' ||
-          room.state.currentPlayerIndex !==
+          room.state
+            .currentPlayerIndex !==
             playerSeatIndex
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               "It's not your turn.",
@@ -3208,10 +4785,12 @@ io.on(
           !Array.isArray(
             cardIds
           ) ||
-          cardIds.length === 0
+          cardIds.length ===
+            0
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Select at least one card.',
@@ -3222,7 +4801,9 @@ io.on(
 
         const uniqueIds =
           [
-            ...new Set(cardIds),
+            ...new Set(
+              cardIds
+            ),
           ];
 
         const hand =
@@ -3243,7 +4824,8 @@ io.on(
           uniqueIds.length
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'One or more selected cards are not in your hand.',
@@ -3255,16 +4837,22 @@ io.on(
         const validation =
           validatePlay(
             selectedCards,
-            room.state.trumpRank,
+
+            room.state
+              .trumpRank,
+
             room.state
               .currentLead
               ?.combination ??
               null
           );
 
-        if (!validation.valid) {
+        if (
+          !validation.valid
+        ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               validation.reason,
@@ -3278,28 +4866,39 @@ io.on(
         ] =
           hand.filter(
             (card) =>
-              !uniqueIds.includes(
-                card.id
-              )
+              !uniqueIds
+                .includes(
+                  card.id
+                )
           );
 
-        room.state.currentLead = {
-          playerIndex:
-            playerSeatIndex,
+        room.state.currentLead =
+          {
+            playerIndex:
+              playerSeatIndex,
 
-          combination:
-            validation.combination,
+            combination:
+              validation
+                .combination,
 
-          cards:
-            selectedCards,
-        };
+            cards:
+              selectedCards,
+          };
 
-        room.state.lastSuccessfulPlayerIndex =
+        room.state
+          .lastSuccessfulPlayerIndex =
           playerSeatIndex;
 
-        room.state.consecutivePasses =
+        room.state
+          .consecutivePasses =
           0;
 
+        /*
+          Played cards stay on ONE line.
+
+          Example:
+          ["P4","play","S7,H7,C7"]
+        */
         addRoundAction(
           room,
           [
@@ -3310,7 +4909,9 @@ io.on(
             'play',
 
             selectedCards
-              .map(cardCode)
+              .map(
+                cardCode
+              )
               .join(','),
           ]
         );
@@ -3320,7 +4921,9 @@ io.on(
             playerSeatIndex
           ].length;
 
-        if (remaining === 0) {
+        if (
+          remaining === 0
+        ) {
           room.players[
             playerSeatIndex
           ].hasFinished =
@@ -3396,24 +4999,33 @@ io.on(
             };
         }
 
-        if (remaining === 0) {
+        if (
+          remaining === 0
+        ) {
           room.state
             .publicReports[
               playerSeatIndex
             ] =
-            makeReportedCount(0);
+            makeReportedCount(
+              0
+            );
         }
 
         room.state.phase =
           'showing-play';
 
-        room.state.turnLockedUntil =
-          Date.now() + 2000;
+        room.state
+          .turnLockedUntil =
+          Date.now() +
+          2000;
 
-        touchRoom(room);
+        touchRoom(
+          room
+        );
 
         callback({
-          success: true,
+          success:
+            true,
         });
 
         emitRoomState(
@@ -3427,6 +5039,10 @@ io.on(
         );
       }
     );
+
+    /* =====================================================
+       PASS
+       ===================================================== */
 
     socket.on(
       'passTurn',
@@ -3442,10 +5058,12 @@ io.on(
 
         if (
           !room ||
-          !room.state.hasStarted
+          !room.state
+            .hasStarted
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'No active game.',
@@ -3458,7 +5076,8 @@ io.on(
           room.state.paused
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'Game is paused.',
@@ -3470,11 +5089,13 @@ io.on(
         if (
           room.state.phase !==
             'turn' ||
-          room.state.currentPlayerIndex !==
+          room.state
+            .currentPlayerIndex !==
             playerSeatIndex
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               "It's not your turn.",
@@ -3484,10 +5105,12 @@ io.on(
         }
 
         if (
-          !room.state.currentLead
+          !room.state
+            .currentLead
         ) {
           callback({
-            success: false,
+            success:
+              false,
 
             message:
               'The leading player cannot pass.',
@@ -3502,15 +5125,19 @@ io.on(
             playerKeyFromSeat(
               playerSeatIndex
             ),
+
             'pass',
           ]
         );
 
-        room.state.consecutivePasses +=
+        room.state
+          .consecutivePasses +=
           1;
 
         const needed =
-          passesNeeded(room);
+          passesNeeded(
+            room
+          );
 
         let nextIndex =
           null;
@@ -3532,7 +5159,8 @@ io.on(
           room.state.currentLead =
             null;
 
-          room.state.consecutivePasses =
+          room.state
+            .consecutivePasses =
             0;
 
           if (
@@ -3551,6 +5179,7 @@ io.on(
             nextIndex =
               nextActivePlayer(
                 room,
+
                 winnerSeatIndex ??
                   playerSeatIndex
               );
@@ -3563,40 +5192,50 @@ io.on(
             );
         }
 
-        if (nextIndex === null) {
+        if (
+          nextIndex ===
+          null
+        ) {
           const completedTeam =
-            getCompletedTeam(room);
+            getCompletedTeam(
+              room
+            );
 
-          room.state.hasStarted =
+          room.state
+            .hasStarted =
             false;
 
-          room.state.phase =
+          room.state
+            .phase =
             'finished';
 
-          room.state.winnerTeam =
+          room.state
+            .winnerTeam =
             completedTeam;
 
           markGameEnded(
             room,
-
             completedTeam
               ? 'team-finished'
               : 'no-active-next-player',
-
             completedTeam
           );
         } else {
-          room.state.currentPlayerIndex =
+          room.state
+            .currentPlayerIndex =
             nextIndex;
 
           room.state.phase =
             'turn';
         }
 
-        touchRoom(room);
+        touchRoom(
+          room
+        );
 
         callback({
-          success: true,
+          success:
+            true,
         });
 
         emitRoomState(
@@ -3605,6 +5244,10 @@ io.on(
         );
       }
     );
+
+    /* =====================================================
+       DISCONNECT
+       ===================================================== */
 
     socket.on(
       'disconnect',
@@ -3623,10 +5266,13 @@ io.on(
             currentRoomCode
           );
 
-        if (!room) return;
+        if (!room) {
+          return;
+        }
 
         if (
-          playerSeatIndex === 0
+          playerSeatIndex ===
+          0
         ) {
           destroyRoom(
             room,
@@ -3642,13 +5288,16 @@ io.on(
           null;
 
         if (
-          room.state.hasStarted
+          room.state
+            .hasStarted
         ) {
           room.state.paused =
             true;
 
           io
-            .to(room.code)
+            .to(
+              room.code
+            )
             .emit(
               'toast',
 
@@ -3656,13 +5305,21 @@ io.on(
             );
         }
 
-        touchRoom(room);
+        touchRoom(
+          room
+        );
 
-        emitRoomState(room);
+        emitRoomState(
+          room
+        );
       }
     );
   }
 );
+
+/* =========================================================
+   START SERVER
+   ========================================================= */
 
 await initializeHistory();
 
