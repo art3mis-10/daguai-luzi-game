@@ -2612,9 +2612,25 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "DJ"
+            ],
+            [
+              "P1",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P1"
+      ]
     }
   ]
 }
