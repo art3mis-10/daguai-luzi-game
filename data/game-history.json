@@ -2498,6 +2498,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "C8,C9,C10,HJ,DQ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
