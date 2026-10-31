@@ -3363,7 +3363,9 @@
       ],
       "finishOrder": [
         "P4"
-      ]
+      ],
+      "ended": "2026-10-31T15:16:16.334Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
