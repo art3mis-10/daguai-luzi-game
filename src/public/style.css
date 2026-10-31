@@ -33,13 +33,15 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
 button:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+textarea:focus-visible {
   outline: 3px solid rgba(255, 211, 106, 0.8);
   outline-offset: 3px;
 }
@@ -193,6 +195,106 @@ select:focus-visible {
   gap: 12px;
 
   min-width: max-content;
+}
+
+.record-toggle {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  min-height: 42px;
+
+  padding: 7px 10px;
+
+  border: 1px solid rgba(126, 203, 156, 0.28);
+
+  border-radius: 10px;
+
+  background: rgba(126, 203, 156, 0.08);
+
+  cursor: pointer;
+
+  user-select: none;
+}
+
+.record-toggle:hover {
+  background: rgba(126, 203, 156, 0.13);
+}
+
+.record-toggle input,
+.custom-record-option input {
+  width: 16px;
+  height: 16px;
+
+  margin: 0;
+
+  accent-color: #7ecb9c;
+
+  cursor: pointer;
+}
+
+.record-toggle-copy {
+  display: grid;
+
+  line-height: 1.05;
+}
+
+.record-toggle-copy strong {
+  color: #dff6e7;
+
+  font-size: 11px;
+}
+
+.record-toggle-copy small {
+  margin-top: 3px;
+
+  color: #84a18f;
+
+  font-size: 9px;
+}
+
+.recording-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  min-height: 30px;
+
+  padding: 6px 9px;
+
+  border-radius: 999px;
+
+  font-size: 10px;
+
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+.recording-badge.on {
+  border: 1px solid rgba(126, 203, 156, 0.32);
+
+  background: rgba(126, 203, 156, 0.11);
+
+  color: #9fe3b8;
+}
+
+.recording-badge.off {
+  border: 1px solid rgba(220, 132, 117, 0.32);
+
+  background: rgba(220, 132, 117, 0.11);
+
+  color: #efaaa0;
+}
+
+.recording-badge.idle {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: #8fa098;
 }
 
 .deal-button {
@@ -1228,6 +1330,50 @@ select.text-input option {
 }
 
 /* =========================================================
+   RECORDING OPTION
+   ========================================================= */
+
+.custom-record-option {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 10px;
+
+  margin-top: 14px;
+
+  padding: 12px;
+
+  border: 1px solid rgba(126, 203, 156, 0.22);
+
+  border-radius: 11px;
+
+  background: rgba(126, 203, 156, 0.065);
+
+  cursor: pointer;
+}
+
+.custom-record-option span {
+  display: grid;
+
+  gap: 4px;
+}
+
+.custom-record-option strong {
+  color: #e8f5ed;
+
+  font-size: 12px;
+}
+
+.custom-record-option small {
+  color: #8ea197;
+
+  font-size: 10px;
+
+  line-height: 1.45;
+}
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 
@@ -1252,6 +1398,24 @@ select.text-input option {
 
   .icon-button {
     justify-self: end;
+  }
+
+  .top-actions {
+    gap: 7px;
+
+    flex-wrap: wrap;
+  }
+
+  .record-toggle {
+    padding: 7px 8px;
+  }
+
+  .record-toggle-copy small {
+    display: none;
+  }
+
+  .recording-badge {
+    display: none;
   }
 
   .game-area {

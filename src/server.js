@@ -92,7 +92,7 @@ const githubSyncEnabled =
   );
 
 const LOGGER_VERSION =
-  'compact-v7-sorted-hands-team-finish-record-toggle';
+  'compact-v7-team-finish-record-ui-failclosed';
 
 /* =========================================================
    COMPACT HISTORY STORAGE
@@ -2031,6 +2031,27 @@ async function registerNewCompactGame({
   trumpRank,
   startingFinishOrder = [],
 }) {
+  /*
+    Recorded games are fail-closed.
+
+    If GitHub sync is unavailable, do NOT create a local-only
+    game record and do NOT allow the game to start as recorded.
+    This prevents a Render restart from silently losing research data.
+  */
+  if (
+    !githubSyncEnabled
+  ) {
+    historyStatus
+      .lastGitHubSyncSuccess =
+      false;
+
+    historyStatus
+      .lastGitHubError =
+      'GitHub history sync is disabled. Check GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO and related Render environment variables.';
+
+    return null;
+  }
+
   const record =
     buildCompactGameRecord({
       room,
@@ -2197,6 +2218,9 @@ app.get(
           .schemaVersion,
 
       githubSync:
+        githubSyncEnabled,
+
+      recordingReady:
         githubSyncEnabled,
 
       gameCount:
@@ -2427,14 +2451,6 @@ function createRoom(
         written to game-history.json/GitHub.
       */
       recordGame:
-        true,
-
-      /*
-        Host preference for the NEXT Deal or
-        Custom Deal. Frontend can update this
-        with setRecordGamePreference.
-      */
-      recordNextGame:
         true,
 
       winnerTeam:
@@ -3288,10 +3304,6 @@ function buildClientRoomState(
         room.state
           .recordGame,
 
-      recordNextGame:
-        room.state
-          .recordNextGame,
-
       winnerTeam:
         room.state
           .winnerTeam,
@@ -3397,7 +3409,7 @@ async function startGame({
           false,
 
         message:
-          'Deal cancelled because the history could not be written to GitHub. ' +
+          'Game not started: this game was set to be recorded, but GitHub history could not be verified. ' +
           'Check /api/history-status.',
       };
     }
@@ -3411,6 +3423,22 @@ async function startGame({
         new Date()
           .toISOString(),
     };
+  }
+
+  /*
+    Only replace an active game AFTER a recorded replacement
+    has been successfully written to GitHub and read back.
+    If recording fails, the current game remains intact.
+  */
+  if (
+    room.state.hasStarted
+  ) {
+    abortCurrentGame(
+      room,
+      dealSource === 'custom'
+        ? 'host-custom-redeal'
+        : 'host-redeal'
+    );
   }
 
   room.state.hands =
@@ -3463,9 +3491,6 @@ async function startGame({
     dealSource;
 
   room.state.recordGame =
-    shouldRecord;
-
-  room.state.recordNextGame =
     shouldRecord;
 
   room.state.winnerTeam =
@@ -4104,95 +4129,6 @@ io.on(
     );
 
     /* =====================================================
-       HOST RECORDING PREFERENCE
-
-       This controls whether the NEXT game is saved to
-       data/game-history.json and synced to GitHub.
-
-       Only Player 1 may change it.
-       ===================================================== */
-
-    socket.on(
-      'setRecordGamePreference',
-
-      (
-        {
-          recordGame,
-        } = {},
-
-        callback =
-          () => {}
-      ) => {
-        if (
-          !currentRoomCode ||
-          playerSeatIndex !==
-            0
-        ) {
-          callback({
-            success:
-              false,
-
-            message:
-              'Only Player 1 can change the recording setting.',
-          });
-
-          return;
-        }
-
-        const room =
-          rooms.get(
-            currentRoomCode
-          );
-
-        if (!room) {
-          callback({
-            success:
-              false,
-
-            message:
-              'Room not found.',
-          });
-
-          return;
-        }
-
-        if (
-          typeof recordGame !==
-          'boolean'
-        ) {
-          callback({
-            success:
-              false,
-
-            message:
-              'recordGame must be true or false.',
-          });
-
-          return;
-        }
-
-        room.state.recordNextGame =
-          recordGame;
-
-        touchRoom(
-          room
-        );
-
-        emitRoomState(
-          room
-        );
-
-        callback({
-          success:
-            true,
-
-          recordGame:
-            room.state.recordNextGame,
-        });
-      }
-    );
-
-    /* =====================================================
        RANDOM DEAL
        ===================================================== */
 
@@ -4281,25 +4217,28 @@ io.on(
           return;
         }
 
+        /*
+          Every deal is independent.
+          If the frontend omits recordGame, default to TRUE.
+          A previous game can never make a later game unrecorded.
+        */
         const shouldRecord =
-          typeof options.recordGame ===
-          'boolean'
-            ? options.recordGame
-            : room.state
-                .recordNextGame !==
-              false;
-
-        room.state.recordNextGame =
-          shouldRecord;
+          options.recordGame !==
+          false;
 
         if (
-          room.state
-            .hasStarted
+          shouldRecord &&
+          !githubSyncEnabled
         ) {
-          abortCurrentGame(
-            room,
-            'host-redeal'
-          );
+          callback({
+            success:
+              false,
+
+            message:
+              'Game not started: recording is ON, but GitHub history sync is unavailable. Check /api/history-status.',
+          });
+
+          return;
         }
 
         const deal =
@@ -4415,16 +4354,28 @@ io.on(
           return;
         }
 
+        /*
+          Every Custom Deal is independent.
+          Missing recordGame means TRUE.
+        */
         const shouldRecord =
-          typeof recordGame ===
-          'boolean'
-            ? recordGame
-            : room.state
-                .recordNextGame !==
-              false;
+          recordGame !==
+          false;
 
-        room.state.recordNextGame =
-          shouldRecord;
+        if (
+          shouldRecord &&
+          !githubSyncEnabled
+        ) {
+          callback({
+            success:
+              false,
+
+            message:
+              'Custom game not started: recording is ON, but GitHub history sync is unavailable. Check /api/history-status.',
+          });
+
+          return;
+        }
 
         try {
           const finishOrder =
@@ -4487,16 +4438,6 @@ io.on(
             }
           }
 
-          if (
-            room.state
-              .hasStarted
-          ) {
-            abortCurrentGame(
-              room,
-              'host-custom-redeal'
-            );
-          }
-
           const result =
             await startGame({
               room,
@@ -4521,6 +4462,22 @@ io.on(
               recordGame:
                 shouldRecord,
             });
+
+          if (
+            result?.success
+          ) {
+            result.unassignedCardCount =
+              162 -
+              custom.hands.reduce(
+                (
+                  total,
+                  hand
+                ) =>
+                  total +
+                  hand.length,
+                0
+              );
+          }
 
           callback(
             result

@@ -205,6 +205,35 @@ document.querySelector(
       </div>
 
       <div class="top-actions">
+        <label
+          class="record-toggle"
+          id="random-record-control"
+          title="Choose whether the next random Deal is saved to research history"
+        >
+          <input
+            type="checkbox"
+            id="record-game-checkbox"
+            checked
+          />
+
+          <span class="record-toggle-copy">
+            <strong>
+              Record
+            </strong>
+
+            <small>
+              next game
+            </small>
+          </span>
+        </label>
+
+        <div
+          class="recording-badge idle"
+          id="recording-status"
+        >
+          No game
+        </div>
+
         <button
           class="deal-button"
           id="deal-button"
@@ -582,6 +611,27 @@ document.querySelector(
         finished second.
       </p>
 
+      <label
+        class="custom-record-option"
+        for="custom-record-game-checkbox"
+      >
+        <input
+          type="checkbox"
+          id="custom-record-game-checkbox"
+          checked
+        />
+
+        <span>
+          <strong>
+            Record this custom game
+          </strong>
+
+          <small>
+            Save hands, actions, finish order and result to research history.
+          </small>
+        </span>
+      </label>
+
       <button
         class="primary-button full-width"
         id="start-custom-deal-button"
@@ -669,6 +719,21 @@ const dealButton =
 const customDealButton =
   document.querySelector(
     '#custom-deal-button'
+  );
+
+const randomRecordControl =
+  document.querySelector(
+    '#random-record-control'
+  );
+
+const recordGameCheckbox =
+  document.querySelector(
+    '#record-game-checkbox'
+  );
+
+const recordingStatus =
+  document.querySelector(
+    '#recording-status'
   );
 
 const ownCardCountElement =
@@ -778,6 +843,11 @@ const customStartPlayer =
 const customFinishOrder =
   document.querySelector(
     '#custom-finish-order'
+  );
+
+const customRecordGameCheckbox =
+  document.querySelector(
+    '#custom-record-game-checkbox'
   );
 
 const startCustomDealButton =
@@ -1321,7 +1391,9 @@ function renderCenter() {
   ) {
     turnIndicatorElement
       .textContent =
-      'Game finished';
+      state.winnerTeam
+        ? `Team ${state.winnerTeam} wins`
+        : 'Game finished';
   } else if (
     state.paused
   ) {
@@ -1464,10 +1536,11 @@ function updateActionUI() {
     !state?.gameId;
 
   /*
-    Ask is independent of turn.
+    Ask is independent of turn,
+    but only while the game is active.
   */
   askButton.disabled =
-    !state?.gameId;
+    !state?.hasStarted;
 }
 
 /* =========================================================
@@ -1500,6 +1573,45 @@ function renderGame() {
     isHost
       ? ''
       : 'none';
+
+  randomRecordControl.style.display =
+    isHost
+      ? ''
+      : 'none';
+
+  const state =
+    roomState.state;
+
+  if (
+    !state.gameId
+  ) {
+    recordingStatus
+      .textContent =
+      'No game';
+
+    recordingStatus
+      .className =
+      'recording-badge idle';
+  } else if (
+    state.recordGame ===
+    false
+  ) {
+    recordingStatus
+      .textContent =
+      'Not recording';
+
+    recordingStatus
+      .className =
+      'recording-badge off';
+  } else {
+    recordingStatus
+      .textContent =
+      'Recording';
+
+    recordingStatus
+      .className =
+      'recording-badge on';
+  }
 
   renderPlayerSeats();
 
@@ -1762,6 +1874,13 @@ function populateCustomDealModal() {
 
   customFinishOrder.value =
     '';
+
+  /*
+    Every Custom Deal starts with recording ON.
+    A previous game's choice is never inherited.
+  */
+  customRecordGameCheckbox.checked =
+    true;
 }
 
 customDealButton
@@ -1877,6 +1996,10 @@ startCustomDealButton
           finishOrderText:
             customFinishOrder
               .value,
+
+          recordGame:
+            customRecordGameCheckbox
+              .checked,
         },
 
         (response) => {
@@ -1906,9 +2029,21 @@ startCustomDealButton
               'hidden'
             );
 
+          const recordingText =
+            response.recorded ===
+            false
+              ? 'Not recording.'
+              : 'Recording confirmed.';
+
           showToast(
-            `Custom game started. ${response.unassignedCardCount} cards unassigned.`
+            `Custom game started. ${response.unassignedCardCount} cards unassigned. ${recordingText}`
           );
+
+          /*
+            Default the NEXT Custom Deal back to recording ON.
+          */
+          customRecordGameCheckbox.checked =
+            true;
         }
       );
     }
@@ -2243,10 +2378,25 @@ dealButton
         return;
       }
 
+      const shouldRecord =
+        recordGameCheckbox
+          .checked;
+
+      dealButton.disabled =
+        true;
+
       socket.emit(
         'dealCards',
 
+        {
+          recordGame:
+            shouldRecord,
+        },
+
         (response) => {
+          dealButton.disabled =
+            false;
+
           if (
             !response
               ?.success
@@ -2262,6 +2412,19 @@ dealButton
 
           selectedCardIds =
             [];
+
+          showToast(
+            response.recorded ===
+              false
+              ? 'Game started. Not recording.'
+              : 'Game started. Recording confirmed.'
+          );
+
+          /*
+            Every NEXT random Deal defaults back to recording ON.
+          */
+          recordGameCheckbox.checked =
+            true;
         }
       );
     }
