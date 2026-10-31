@@ -92,7 +92,7 @@ const githubSyncEnabled =
   );
 
 const LOGGER_VERSION =
-  'compact-v7-team-finish-record-ui-failclosed';
+  'compact-v7-safe-cardcodes-custom-inventory';
 
 /* =========================================================
    COMPACT HISTORY STORAGE
@@ -683,7 +683,11 @@ function cardCode(
   card
 ) {
   if (
-    card?.isJoker
+    card?.isJoker ||
+    card?.rank ===
+      'small-joker' ||
+    card?.rank ===
+      'big-joker'
   ) {
     const text =
       jokerText(
@@ -691,6 +695,10 @@ function cardCode(
       );
 
     if (
+      card?.rank ===
+        'big-joker' ||
+      card?.jokerType ===
+        'big' ||
       text.includes(
         'big'
       ) ||
@@ -738,6 +746,28 @@ function cardCode(
       '?'
     )
       .toUpperCase();
+
+  /*
+    Historically ordinary cards were stored as
+    suit + rank, for example S3 and H10.
+
+    That creates one collision:
+
+      Spade Jack = SJ
+      Small Joker = SJ
+
+    Keep the existing compact format for every
+    ordinary card EXCEPT Jack of Spades, which is
+    stored as JS. This avoids corrupting the rest
+    of the research-history format while making
+    the two cards unambiguous from now on.
+  */
+  if (
+    suit === 'S' &&
+    rank === 'J'
+  ) {
+    return 'JS';
+  }
 
   return (
     `${suit}${rank}`
@@ -833,13 +863,42 @@ function cardFromCode(
     };
   }
 
-  const suitCode =
-    normalized[0];
+  /*
+    Safe v2 code for Jack of Spades.
+  */
+  if (
+    normalized ===
+    'JS'
+  ) {
+    return {
+      id:
+        `compact-${index}-JS`,
 
-  const rank =
-    normalized.slice(
-      1
-    );
+      deckNumber:
+        1,
+
+      rank:
+        'J',
+
+      displayRank:
+        null,
+
+      suit:
+        'spades',
+
+      symbol:
+        '♠',
+
+      color:
+        'black',
+
+      isJoker:
+        false,
+
+      jokerType:
+        null,
+    };
+  }
 
   const suitMap = {
     S:
@@ -883,39 +942,115 @@ function cardFromCode(
       'black',
   };
 
-  return {
-    id:
-      `compact-${index}-${normalized}`,
+  /*
+    Existing compact history uses suit + rank.
+    Example: S3, H10, DQ, CA.
+  */
+  let match =
+    normalized.match(
+      /^([SHCD])(10|[2-9JQKA])$/
+    );
 
-    deckNumber:
-      1,
+  if (
+    match
+  ) {
+    const suitCode =
+      match[1];
 
-    rank,
+    const rank =
+      match[2];
 
-    displayRank:
-      null,
+    return {
+      id:
+        `compact-${index}-${normalized}`,
 
-    suit:
-      suitMap[
-        suitCode
-      ],
+      deckNumber:
+        1,
 
-    symbol:
-      symbolMap[
-        suitCode
-      ],
+      rank,
 
-    color:
-      colorMap[
-        suitCode
-      ],
+      displayRank:
+        null,
 
-    isJoker:
-      false,
+      suit:
+        suitMap[
+          suitCode
+        ],
 
-    jokerType:
-      null,
-  };
+      symbol:
+        symbolMap[
+          suitCode
+        ],
+
+      color:
+        colorMap[
+          suitCode
+        ],
+
+      isJoker:
+        false,
+
+      jokerType:
+        null,
+    };
+  }
+
+  /*
+    Also accept rank + suit codes for compatibility
+    with Custom Deal input and any manually edited data.
+  */
+  match =
+    normalized.match(
+      /^(10|[2-9JQKA])([SHCD])$/
+    );
+
+  if (
+    match
+  ) {
+    const rank =
+      match[1];
+
+    const suitCode =
+      match[2];
+
+    return {
+      id:
+        `compact-${index}-${normalized}`,
+
+      deckNumber:
+        1,
+
+      rank,
+
+      displayRank:
+        null,
+
+      suit:
+        suitMap[
+          suitCode
+        ],
+
+      symbol:
+        symbolMap[
+          suitCode
+        ],
+
+      color:
+        colorMap[
+          suitCode
+        ],
+
+      isJoker:
+        false,
+
+      jokerType:
+        null,
+    };
+  }
+
+  throw new Error(
+    `Unknown compact card code: ${normalized}`
+  );
 }
 
 function sortCompactHand(
@@ -1135,14 +1270,73 @@ function compactPlayers(
 /*
   IMPORTANT:
 
-  Every hand goes through sortCards()
-  before becoming the one-line string.
+  New compact games use the safe card-code format:
+  - ordinary cards remain S3 / H10 / DQ / CA
+  - Jack of Spades is JS
+  - Small Joker is SJ
+  - Big Joker is BJ
 
-  This applies to:
-  - new games
-  - old schema 3
-  - old compact strings
+  Old compact histories may contain the legacy collision
+  where both Jack of Spades and Small Joker were written
+  as SJ. Those old compact strings must NOT be reparsed
+  and rewritten, because the original meaning cannot be
+  recovered reliably from the string alone.
 */
+function preserveCompactHands(
+  source
+) {
+  const hands = {
+    P1: '',
+    P2: '',
+    P3: '',
+    P4: '',
+    P5: '',
+    P6: '',
+  };
+
+  for (
+    const playerKey of
+    [
+      'P1',
+      'P2',
+      'P3',
+      'P4',
+      'P5',
+      'P6',
+    ]
+  ) {
+    const value =
+      source?.[
+        playerKey
+      ];
+
+    hands[
+      playerKey
+    ] =
+      Array.isArray(
+        value
+      )
+        ? value
+            .map(
+              (item) =>
+                String(
+                  item
+                )
+                  .trim()
+            )
+            .filter(
+              Boolean
+            )
+            .join(',')
+        : String(
+            value ||
+            ''
+          );
+  }
+
+  return hands;
+}
+
 function compactHands(
   game
 ) {
@@ -1155,41 +1349,52 @@ function compactHands(
     P6: '',
   };
 
-  /*
-    Already compact.
-  */
   if (
     game.hands &&
     !Array.isArray(
       game.hands
     )
   ) {
-    for (
-      const playerKey of
-      [
-        'P1',
-        'P2',
-        'P3',
-        'P4',
-        'P5',
-        'P6',
-      ]
+    /*
+      Safe-format games can be reparsed and sorted.
+      Legacy compact games are preserved exactly.
+    */
+    if (
+      game.cardCodeFormat ===
+      'safe-v2'
     ) {
-      hands[
-        playerKey
-      ] =
-        sortCompactHand(
-          game.hands[
-            playerKey
-          ]
-        );
+      for (
+        const playerKey of
+        [
+          'P1',
+          'P2',
+          'P3',
+          'P4',
+          'P5',
+          'P6',
+        ]
+      ) {
+        hands[
+          playerKey
+        ] =
+          sortCompactHand(
+            game.hands[
+              playerKey
+            ]
+          );
+      }
+
+      return hands;
     }
 
-    return hands;
+    return preserveCompactHands(
+      game.hands
+    );
   }
 
   /*
-    Old schema with real card objects.
+    Old verbose schemas still contain real card objects,
+    so they can be converted safely without ambiguity.
   */
   if (
     Array.isArray(
@@ -1553,9 +1758,10 @@ function compactGameRecord(
   /*
     Already compact.
 
-    Still run the hands through
-    compactHands() so an old compact
-    file with unsorted strings gets fixed.
+    New safe-v2 games may be reparsed and sorted.
+    Older compact games are preserved without attempting
+    to reinterpret legacy SJ values, because legacy SJ
+    could mean either Small Joker or Jack of Spades.
   */
   if (
     game &&
@@ -1613,6 +1819,9 @@ function compactGameRecord(
       game?.trump ||
       game?.trumpRank ||
       null,
+
+    cardCodeFormat:
+      'safe-v2',
 
     starter,
 
@@ -1715,13 +1924,6 @@ function compactifyHistory(
 function historyNeedsCompaction(
   history
 ) {
-  /*
-    Bumping to schema 7 is deliberate.
-
-    Even schema 6 compact files need
-    one more migration because their
-    hand strings may not be sorted.
-  */
   if (
     Number(
       history?.schemaVersion
@@ -1949,13 +2151,6 @@ function buildCompactGameRecord({
           player.team,
       };
 
-      /*
-        IMPORTANT:
-
-        Sort first.
-        Then convert to S3/H4/etc.
-        Then join onto ONE line.
-      */
       compactHands[key] =
         sortCards(
           [
@@ -1981,6 +2176,9 @@ function buildCompactGameRecord({
 
     trump:
       trumpRank,
+
+    cardCodeFormat:
+      'safe-v2',
 
     starter:
       playerKeyFromSeat(
@@ -2033,10 +2231,8 @@ async function registerNewCompactGame({
 }) {
   /*
     Recorded games are fail-closed.
-
-    If GitHub sync is unavailable, do NOT create a local-only
-    game record and do NOT allow the game to start as recorded.
-    This prevents a Render restart from silently losing research data.
+    If GitHub sync is unavailable, do not pretend that
+    a local-only Render file is a safely recorded game.
   */
   if (
     !githubSyncEnabled
@@ -2047,7 +2243,7 @@ async function registerNewCompactGame({
 
     historyStatus
       .lastGitHubError =
-      'GitHub history sync is disabled. Check GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO and related Render environment variables.';
+      'GitHub history sync is disabled. Check the Render GitHub environment variables.';
 
     return null;
   }
@@ -2106,11 +2302,6 @@ function markGameEnded(
   reason,
   winnerTeam = null
 ) {
-  /*
-    Unrecorded games deliberately do not
-    exist in gameHistory. In that case this
-    function becomes a no-op.
-  */
   const game =
     getCompactGame(
       room
@@ -2446,10 +2637,6 @@ function createRoom(
       dealSource:
         null,
 
-      /*
-        Whether the CURRENT game is being
-        written to game-history.json/GitHub.
-      */
       recordGame:
         true,
 
@@ -2502,12 +2689,6 @@ function activeCount(
 
 /* =========================================================
    TEAM COMPLETION
-
-   Team A = P1, P3, P5
-   Team B = P2, P4, P6
-
-   The game ends immediately when all three
-   members of either team have finished.
    ========================================================= */
 
 function getCompletedTeam(
@@ -2550,13 +2731,6 @@ function getCompletedTeam(
     return completedTeams[0];
   }
 
-  /*
-    This can only realistically happen in a
-    Custom Deal checkpoint where both teams
-    are entered as finished. Use finishOrder
-    to identify which team's third player
-    finished first.
-  */
   const counts = {
     A: 0,
     B: 0,
@@ -2976,7 +3150,7 @@ function parseCardToken(
 
   throw new Error(
     `Invalid card token "${token}". ` +
-    `Use S3, H10, DQ, CA, BJ, or SJ.`
+    `Use S3/3S, H10/10H, JS for Jack of Spades, BJ for Big Joker, or SJ for Small Joker.`
   );
 }
 
@@ -2998,48 +3172,82 @@ function suitCodeToName(
   }[code];
 }
 
-function cardMatchesRequest(
-  card,
+function requestToCardCode(
   request
 ) {
   if (
     request.kind ===
     'big-joker'
   ) {
-    return (
-      cardCode(
-        card
-      ) ===
-      'BJ'
-    );
+    return 'BJ';
   }
 
   if (
     request.kind ===
     'small-joker'
   ) {
-    return (
-      cardCode(
-        card
-      ) ===
-      'SJ'
+    return 'SJ';
+  }
+
+  if (
+    request.kind !==
+    'ordinary'
+  ) {
+    throw new Error(
+      'Unknown Custom Deal card request.'
     );
   }
 
-  return (
-    String(
-      card.rank
-    )
-      .toUpperCase() ===
-      request.rank &&
+  if (
+    request.rank === 'J' &&
+    request.suitCode === 'S'
+  ) {
+    return 'JS';
+  }
 
-    String(
-      card.suit
-    )
-      .toLowerCase() ===
-      suitCodeToName(
-        request.suitCode
-      )
+  return (
+    `${request.suitCode}${request.rank}`
+  );
+}
+
+function describeCardRequest(
+  request
+) {
+  if (
+    request.kind ===
+    'big-joker'
+  ) {
+    return 'Big Joker';
+  }
+
+  if (
+    request.kind ===
+    'small-joker'
+  ) {
+    return 'Small Joker';
+  }
+
+  const suitName = {
+    S: 'Spades',
+    H: 'Hearts',
+    C: 'Clubs',
+    D: 'Diamonds',
+  }[
+    request.suitCode
+  ];
+
+  const rankName = {
+    J: 'Jack',
+    Q: 'Queen',
+    K: 'King',
+    A: 'Ace',
+  }[
+    request.rank
+  ] ||
+    request.rank;
+
+  return (
+    `${rankName} of ${suitName}`
   );
 }
 
@@ -3058,13 +3266,44 @@ function buildCustomHands(
     );
   }
 
+  /*
+    Use the COMPLETE physical 162-card deck directly.
+  */
   const pool =
     createNewDeal()
-      .hands
-      .flat();
+      .deck;
 
-  const usedIds =
-    new Set();
+  const inventory =
+    new Map();
+
+  for (
+    const card of
+    pool
+  ) {
+    const code =
+      cardCode(
+        card
+      );
+
+    if (
+      !inventory.has(
+        code
+      )
+    ) {
+      inventory.set(
+        code,
+        []
+      );
+    }
+
+    inventory
+      .get(
+        code
+      )
+      .push(
+        card
+      );
+  }
 
   const hands =
     Array.from(
@@ -3076,6 +3315,9 @@ function buildCustomHands(
       () =>
         []
     );
+
+  const requestedCounts =
+    new Map();
 
   for (
     let seatIndex = 0;
@@ -3095,29 +3337,43 @@ function buildCustomHands(
           token
         );
 
-      const card =
-        pool.find(
-          (candidate) =>
-            !usedIds.has(
-              candidate.id
-            ) &&
-
-            cardMatchesRequest(
-              candidate,
-              request
-            )
+      const code =
+        requestToCardCode(
+          request
         );
 
-      if (!card) {
+      const nextRequestedCount =
+        (
+          requestedCounts.get(
+            code
+          ) ||
+          0
+        ) + 1;
+
+      requestedCounts.set(
+        code,
+        nextRequestedCount
+      );
+
+      const availableCards =
+        inventory.get(
+          code
+        ) ||
+        [];
+
+      if (
+        availableCards.length ===
+        0
+      ) {
         throw new Error(
           `Player ${seatIndex + 1}: ` +
-          `${token} is unavailable or used too many times.`
+          `${token} (${describeCardRequest(request)}) exceeds the 3 available copies. ` +
+          `Requested ${nextRequestedCount} total across all six hands.`
         );
       }
 
-      usedIds.add(
-        card.id
-      );
+      const card =
+        availableCards.shift();
 
       hands[
         seatIndex
@@ -3372,14 +3628,6 @@ async function startGame({
   const shouldRecord =
     recordGame !== false;
 
-  /*
-    Recorded games are created in history and
-    immediately synced to GitHub exactly as before.
-
-    Unrecorded games still need a runtime gameId and
-    dealtAt value so all normal multiplayer logic can
-    run, but NOTHING is appended to gameHistory.
-  */
   let record;
 
   if (
@@ -3409,7 +3657,7 @@ async function startGame({
           false,
 
         message:
-          'Game not started: this game was set to be recorded, but GitHub history could not be verified. ' +
+          'Game not started: recording is ON, but the GitHub history write could not be verified. ' +
           'Check /api/history-status.',
       };
     }
@@ -3425,11 +3673,6 @@ async function startGame({
     };
   }
 
-  /*
-    Only replace an active game AFTER a recorded replacement
-    has been successfully written to GitHub and read back.
-    If recording fails, the current game remains intact.
-  */
   if (
     room.state.hasStarted
   ) {
@@ -3508,11 +3751,6 @@ async function startGame({
     }
   );
 
-  /*
-    Custom Deal can load a checkpoint where a team
-    has already completely finished. Such a state is
-    already game-over and must not continue playing.
-  */
   const completedTeam =
     getCompletedTeam(
       room
@@ -3625,11 +3863,6 @@ function abortCurrentGame(
     room
   );
 
-  /*
-    A completed game may later be replaced by a new
-    Deal. Do not overwrite its real endReason with
-    host-redeal / host-custom-redeal.
-  */
   if (
     room.state.phase ===
     'finished'
@@ -3717,16 +3950,6 @@ function scheduleAdvanceAfterPlay(
           .turnLockedUntil =
           null;
 
-        /*
-          PRIMARY END CONDITION:
-
-          As soon as all three members of Team A or
-          Team B have finished, the game is over.
-
-          The last successful play remains visible for
-          the normal two-second display before this
-          block runs.
-        */
         const completedTeam =
           getCompletedTeam(
             currentRoom
@@ -3787,11 +4010,6 @@ function scheduleAdvanceAfterPlay(
           return;
         }
 
-        /*
-          Safety fallback for malformed checkpoint states.
-          Under normal rules the team-finish condition above
-          should end the game before this is ever necessary.
-        */
         if (
           activeCount(
             currentRoom
@@ -4140,19 +4358,6 @@ io.on(
         maybeCallback =
           () => {}
       ) => {
-        /*
-          Backward-compatible with the OLD frontend:
-
-          socket.emit('dealCards', callback)
-
-          and supports the NEW frontend:
-
-          socket.emit(
-            'dealCards',
-            { recordGame: false },
-            callback
-          )
-        */
         const options =
           typeof optionsOrCallback ===
           'function'
@@ -4217,11 +4422,6 @@ io.on(
           return;
         }
 
-        /*
-          Every deal is independent.
-          If the frontend omits recordGame, default to TRUE.
-          A previous game can never make a later game unrecorded.
-        */
         const shouldRecord =
           options.recordGame !==
           false;
@@ -4354,10 +4554,6 @@ io.on(
           return;
         }
 
-        /*
-          Every Custom Deal is independent.
-          Missing recordGame means TRUE.
-        */
         const shouldRecord =
           recordGame !==
           false;
@@ -4850,12 +5046,6 @@ io.on(
           .consecutivePasses =
           0;
 
-        /*
-          Played cards stay on ONE line.
-
-          Example:
-          ["P4","play","S7,H7,C7"]
-        */
         addRoundAction(
           room,
           [
