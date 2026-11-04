@@ -4924,6 +4924,11 @@
               "P3",
               "play",
               "H10,D10,SQ,HQ,DQ"
+            ],
+            [
+              "P6",
+              "play",
+              "H7,SK,DK,SJ,SJ"
             ]
           ]
         }
