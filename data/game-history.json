@@ -4723,9 +4723,25 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C4,D4,D4,H2,C2"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P4"
+      ]
     }
   ]
 }
