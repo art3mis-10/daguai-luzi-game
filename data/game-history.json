@@ -5615,6 +5615,11 @@
               "P1",
               "play",
               "S9,H10,DJ,CQ,DK"
+            ],
+            [
+              "P2",
+              "play",
+              "C10,SA,SA,CA,DA"
             ]
           ]
         }
