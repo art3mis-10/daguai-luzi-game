@@ -6079,6 +6079,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SK,DK"
+            ]
+          ]
         }
       ],
       "finishOrder": [
