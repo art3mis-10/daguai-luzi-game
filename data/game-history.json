@@ -4976,6 +4976,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S4"
+            ]
+          ]
         }
       ],
       "finishOrder": [
