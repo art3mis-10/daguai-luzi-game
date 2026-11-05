@@ -8607,6 +8607,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 25,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "SK,HK,DK"
+            ]
+          ]
         }
       ],
       "finishOrder": [
