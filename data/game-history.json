@@ -6996,7 +6996,9 @@
         "P6": "S3,S3,C3,D3,S4,H4,D4,S6,S6,D6,S7,H8,H8,S9,S10,C10,C10,HJ,CJ,DQ,HK,CK,CK,SA,CA,SJ,BJ"
       },
       "rounds": [],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-05T09:26:00.215Z",
+      "endReason": "host-custom-redeal"
     },
     {
       "gameId": "K8XF9F-64f53e8f-2854-4a41-b278-0a89ac689e7e",
