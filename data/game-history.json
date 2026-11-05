@@ -6837,6 +6837,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "SA,CA,CA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
