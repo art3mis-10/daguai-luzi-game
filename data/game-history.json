@@ -8957,11 +8957,22 @@
               "P2",
               "play",
               "C4,D4,S8,S8,H8"
+            ],
+            [
+              "P3",
+              "play",
+              "HJ,HJ,SA,HA,CA"
+            ],
+            [
+              "P3",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P3"
+      ]
     }
   ]
 }
