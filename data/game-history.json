@@ -10385,6 +10385,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
