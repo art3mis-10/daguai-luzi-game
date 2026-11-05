@@ -6903,8 +6903,13 @@
               "P1",
               "play",
               "SJ"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
