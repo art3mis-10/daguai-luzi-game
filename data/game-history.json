@@ -8390,6 +8390,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C4,C4,S10,S10,D10"
+            ]
+          ]
         }
       ],
       "finishOrder": [
