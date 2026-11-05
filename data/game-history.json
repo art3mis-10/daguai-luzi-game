@@ -9384,6 +9384,11 @@
               "P1",
               "play",
               "SQ,SQ,HQ,DQ,DQ"
+            ],
+            [
+              "P2",
+              "play",
+              "SK,CK,DK,SJ,BJ"
             ]
           ]
         }
