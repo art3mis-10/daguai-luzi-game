@@ -7698,6 +7698,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "D9,S10,JS,CQ,DK"
+            ]
+          ]
         }
       ],
       "finishOrder": []
