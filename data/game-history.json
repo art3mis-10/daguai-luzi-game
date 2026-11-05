@@ -7654,6 +7654,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "JS,JS,CJ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
