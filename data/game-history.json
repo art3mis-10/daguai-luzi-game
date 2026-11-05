@@ -8552,6 +8552,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 23,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S2,C2"
+            ]
+          ]
         }
       ],
       "finishOrder": [
