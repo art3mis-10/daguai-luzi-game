@@ -7396,8 +7396,13 @@
               "P5",
               "play",
               "H3,D3,SA,HA,CA"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
