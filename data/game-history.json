@@ -8989,6 +8989,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H9,C9"
+            ]
+          ]
         }
       ],
       "finishOrder": [
