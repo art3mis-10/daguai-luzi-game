@@ -7290,6 +7290,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "SJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
