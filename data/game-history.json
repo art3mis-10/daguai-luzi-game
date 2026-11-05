@@ -10456,6 +10456,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 21,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HQ,CQ,DQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
