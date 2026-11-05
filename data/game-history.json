@@ -7042,8 +7042,25 @@
         "P5": "H3,D3,SA,HA,CA,DA,SJ",
         "P6": "S10,C10,C10,HJ,CJ,HK,CK,CK"
       },
-      "rounds": [],
-      "finishOrder": []
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H9,H9,C9,D9,SQ"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
+        }
+      ],
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
