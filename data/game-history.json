@@ -8615,8 +8615,13 @@
               "P4",
               "play",
               "SK,HK,DK"
+            ],
+            [
+              "P5",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
