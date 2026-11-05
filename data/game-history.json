@@ -9571,7 +9571,18 @@
         "P5": "H3,D3,S4,H5,C5,C5,H7,D7,S9,H9,C9,D9,D9,S10,S10,C10,D10,D10,DJ,DQ,HK,DK,SA,DA,H2,H2,BJ",
         "P6": "D3,S4,H4,H4,C4,H5,D5,C6,S7,H8,C8,D8,C9,H10,C10,JS,HJ,CJ,SQ,SK,HK,HK,CK,CA,H2,SJ,BJ"
       },
-      "rounds": [],
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C4"
+            ]
+          ]
+        }
+      ],
       "finishOrder": []
     }
   ]
