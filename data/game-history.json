@@ -12442,6 +12442,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "SK,HK,HK,DK,SJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
