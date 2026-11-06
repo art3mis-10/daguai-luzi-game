@@ -11487,9 +11487,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CA"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
