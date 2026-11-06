@@ -12002,7 +12002,9 @@
       ],
       "finishOrder": [
         "P4"
-      ]
+      ],
+      "ended": "2026-11-06T08:17:50.211Z",
+      "endReason": "host-custom-redeal"
     },
     {
       "gameId": "5YPI5X-4678031a-a581-4d58-b8b0-9933953094d3",
