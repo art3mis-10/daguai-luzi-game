@@ -11330,7 +11330,18 @@
         "P5": "H4,C4,D4,S10,S10,CA,DA,S2",
         "P6": "H4,S7,SK,SK,S2,C2,BJ"
       },
-      "rounds": [],
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H4,C4,D4"
+            ]
+          ]
+        }
+      ],
       "finishOrder": []
     }
   ]
