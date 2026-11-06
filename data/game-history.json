@@ -12783,8 +12783,13 @@
               "P6",
               "play",
               "JS,H2,C2,C2,SJ"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
