@@ -12798,8 +12798,13 @@
               "P6",
               "play",
               "HQ,CQ,DQ"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
