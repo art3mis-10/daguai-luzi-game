@@ -14670,8 +14670,13 @@
               "P4",
               "play",
               "H5,HK,CK,DK,DK"
+            ],
+            [
+              "P5",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
