@@ -13298,10 +13298,25 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "JS,HJ,CJ,DJ,CK"
+            ],
+            [
+              "P1",
+              "out"
+            ]
+          ]
         }
       ],
       "finishOrder": [
-        "P6"
+        "P6",
+        "P1"
       ]
     }
   ]
