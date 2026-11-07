@@ -13942,9 +13942,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CQ"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
