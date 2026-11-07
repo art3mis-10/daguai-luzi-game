@@ -13209,9 +13209,25 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SK,SK,BJ"
+            ],
+            [
+              "P6",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P6"
+      ]
     }
   ]
 }
