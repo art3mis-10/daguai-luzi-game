@@ -14278,10 +14278,25 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "SQ,SQ,CQ,SA,CA"
+            ],
+            [
+              "P3",
+              "out"
+            ]
+          ]
         }
       ],
       "finishOrder": [
-        "P2"
+        "P2",
+        "P3"
       ]
     }
   ]
