@@ -14518,6 +14518,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 21,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HQ,CQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
