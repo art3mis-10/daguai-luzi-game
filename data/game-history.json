@@ -18504,8 +18504,13 @@
               "P4",
               "play",
               "S2"
+            ],
+            [
+              "P5",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
