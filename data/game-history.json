@@ -17365,6 +17365,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "JS,JS,CJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
