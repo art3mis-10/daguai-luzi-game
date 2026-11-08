@@ -18434,8 +18434,13 @@
               "P4",
               "play",
               "HK"
+            ],
+            [
+              "P5",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
