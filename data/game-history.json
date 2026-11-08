@@ -18511,6 +18511,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 25,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "SA,CA,DA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
