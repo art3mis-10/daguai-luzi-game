@@ -92,7 +92,7 @@ const githubSyncEnabled =
   );
 
 const LOGGER_VERSION =
-  'compact-v7-safe-cardcodes-custom-inventory';
+  'compact-v8-remote-merge-no-data-loss';
 
 /* =========================================================
    COMPACT HISTORY STORAGE
@@ -171,6 +171,15 @@ const historyStatus = {
 
   lastGitHubError:
     null,
+
+  lastRemoteGameCount:
+    null,
+
+  lastMergedGameCount:
+    null,
+
+  preventedDataLoss:
+    false,
 };
 
 let gameHistory =
@@ -333,6 +342,293 @@ async function readRemoteHistory() {
   };
 }
 
+function countGameActions(
+  game
+) {
+  if (
+    !Array.isArray(
+      game?.rounds
+    )
+  ) {
+    return 0;
+  }
+
+  return game.rounds.reduce(
+    (
+      total,
+      round
+    ) =>
+      total +
+      (
+        Array.isArray(
+          round?.actions
+        )
+          ? round.actions.length
+          : 0
+      ),
+    0
+  );
+}
+
+function compareGameCompleteness(
+  first,
+  second
+) {
+  /*
+    Returns:
+      > 0 when first is more complete
+      < 0 when second is more complete
+      0 when they appear equally complete
+
+    For the same gameId, one copy is normally
+    a prefix/older snapshot of the other.
+  */
+  const firstVector = [
+    countGameActions(
+      first
+    ),
+
+    Array.isArray(
+      first?.finishOrder
+    )
+      ? first.finishOrder.length
+      : 0,
+
+    first?.ended
+      ? 1
+      : 0,
+
+    first?.winnerTeam
+      ? 1
+      : 0,
+
+    Array.isArray(
+      first?.rounds
+    )
+      ? first.rounds.length
+      : 0,
+
+    JSON.stringify(
+      first ||
+      {}
+    ).length,
+  ];
+
+  const secondVector = [
+    countGameActions(
+      second
+    ),
+
+    Array.isArray(
+      second?.finishOrder
+    )
+      ? second.finishOrder.length
+      : 0,
+
+    second?.ended
+      ? 1
+      : 0,
+
+    second?.winnerTeam
+      ? 1
+      : 0,
+
+    Array.isArray(
+      second?.rounds
+    )
+      ? second.rounds.length
+      : 0,
+
+    JSON.stringify(
+      second ||
+      {}
+    ).length,
+  ];
+
+  for (
+    let index = 0;
+    index < firstVector.length;
+    index += 1
+  ) {
+    if (
+      firstVector[index] >
+      secondVector[index]
+    ) {
+      return 1;
+    }
+
+    if (
+      firstVector[index] <
+      secondVector[index]
+    ) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+function chooseMoreCompleteGame(
+  remoteGame,
+  incomingGame
+) {
+  const comparison =
+    compareGameCompleteness(
+      incomingGame,
+      remoteGame
+    );
+
+  /*
+    If the two versions look equally complete,
+    prefer incoming so harmless metadata updates
+    from the live server are not discarded.
+  */
+  return comparison >= 0
+    ? incomingGame
+    : remoteGame;
+}
+
+function mergeHistories(
+  remoteHistory,
+  incomingHistory
+) {
+  const remote =
+    compactifyHistory(
+      remoteHistory ||
+      emptyHistory()
+    );
+
+  const incoming =
+    compactifyHistory(
+      incomingHistory ||
+      emptyHistory()
+    );
+
+  const gamesById =
+    new Map();
+
+  const orderedIds =
+    [];
+
+  function addGame(
+    game,
+    source
+  ) {
+    if (
+      !game?.gameId
+    ) {
+      return;
+    }
+
+    if (
+      !gamesById.has(
+        game.gameId
+      )
+    ) {
+      gamesById.set(
+        game.gameId,
+        game
+      );
+
+      orderedIds.push(
+        game.gameId
+      );
+
+      return;
+    }
+
+    const existing =
+      gamesById.get(
+        game.gameId
+      );
+
+    gamesById.set(
+      game.gameId,
+      source ===
+        'incoming'
+        ? chooseMoreCompleteGame(
+            existing,
+            game
+          )
+        : chooseMoreCompleteGame(
+            game,
+            existing
+          )
+    );
+  }
+
+  for (
+    const game of
+    remote.games
+  ) {
+    addGame(
+      game,
+      'remote'
+    );
+  }
+
+  for (
+    const game of
+    incoming.games
+  ) {
+    addGame(
+      game,
+      'incoming'
+    );
+  }
+
+  return {
+    schemaVersion:
+      7,
+
+    games:
+      orderedIds.map(
+        (gameId) =>
+          gamesById.get(
+            gameId
+          )
+      ),
+  };
+}
+
+function missingGameIds(
+  expectedHistory,
+  actualHistory
+) {
+  const actualIds =
+    new Set(
+      (
+        actualHistory?.games ||
+        []
+      )
+        .map(
+          (game) =>
+            game?.gameId
+        )
+        .filter(
+          Boolean
+        )
+    );
+
+  return (
+    expectedHistory?.games ||
+    []
+  )
+    .map(
+      (game) =>
+        game?.gameId
+    )
+    .filter(
+      Boolean
+    )
+    .filter(
+      (gameId) =>
+        !actualIds.has(
+          gameId
+        )
+    );
+}
+
 async function pushHistorySnapshot(
   snapshot,
   verifyGameId = null
@@ -349,113 +645,255 @@ async function pushHistorySnapshot(
       .toISOString();
 
   try {
-    const remote =
-      await readRemoteHistory();
-
-    const body = {
-      message:
-        `Update compact Daguai history ` +
-        new Date()
-          .toISOString(),
-
-      branch:
-        GITHUB_BRANCH,
-
-      content:
-        Buffer
-          .from(
-            JSON.stringify(
-              snapshot,
-              null,
-              2
-            ),
-
-            'utf8'
-          )
-          .toString(
-            'base64'
-          ),
-    };
-
-    if (
-      remote?.sha
+    /*
+      A Contents API write can conflict if another writer
+      updates the file between our GET and PUT. Retry by
+      fetching the newest remote file and merging again.
+    */
+    for (
+      let attempt = 1;
+      attempt <= 3;
+      attempt += 1
     ) {
-      body.sha =
-        remote.sha;
-    }
+      const remote =
+        await readRemoteHistory();
 
-    const response =
-      await fetch(
-        githubWriteUrl(),
-        {
-          method:
-            'PUT',
+      const remoteHistory =
+        remote?.history ||
+        emptyHistory();
 
-          headers: {
-            ...githubHeaders(),
+      const mergedHistory =
+        mergeHistories(
+          remoteHistory,
+          snapshot
+        );
 
-            'Content-Type':
-              'application/json',
-          },
+      historyStatus
+        .lastRemoteGameCount =
+        remoteHistory
+          .games
+          .length;
 
-          body:
-            JSON.stringify(
-              body
+      historyStatus
+        .lastMergedGameCount =
+        mergedHistory
+          .games
+          .length;
+
+      const missingBeforeWrite =
+        missingGameIds(
+          remoteHistory,
+          mergedHistory
+        );
+
+      if (
+        missingBeforeWrite.length >
+          0 ||
+        mergedHistory.games.length <
+          remoteHistory.games.length
+      ) {
+        historyStatus
+          .preventedDataLoss =
+          true;
+
+        throw new Error(
+          `REFUSING HISTORY WRITE: ` +
+          `the merged file would remove remote games. ` +
+          `Missing gameIds: ` +
+          `${missingBeforeWrite.join(', ')}`
+        );
+      }
+
+      const body = {
+        message:
+          `Update compact Daguai history ` +
+          new Date()
+            .toISOString(),
+
+        branch:
+          GITHUB_BRANCH,
+
+        content:
+          Buffer
+            .from(
+              JSON.stringify(
+                mergedHistory,
+                null,
+                2
+              ),
+
+              'utf8'
+            )
+            .toString(
+              'base64'
             ),
+      };
+
+      if (
+        remote?.sha
+      ) {
+        body.sha =
+          remote.sha;
+      }
+
+      const response =
+        await fetch(
+          githubWriteUrl(),
+          {
+            method:
+              'PUT',
+
+            headers: {
+              ...githubHeaders(),
+
+              'Content-Type':
+                'application/json',
+            },
+
+            body:
+              JSON.stringify(
+                body
+              ),
+          }
+        );
+
+      if (
+        !response.ok
+      ) {
+        const responseBody =
+          await response.text();
+
+        if (
+          (
+            response.status ===
+              409 ||
+            response.status ===
+              422
+          ) &&
+          attempt < 3
+        ) {
+          console.warn(
+            `GitHub history write conflict on attempt ${attempt}; retrying with latest remote history.`
+          );
+
+          continue;
         }
-      );
 
-    if (
-      !response.ok
-    ) {
-      const responseBody =
-        await response.text();
+        throw new Error(
+          `GitHub PUT failed: ` +
+          `${response.status} ` +
+          `${responseBody}`
+        );
+      }
 
-      throw new Error(
-        `GitHub PUT failed: ` +
-        `${response.status} ` +
-        `${responseBody}`
-      );
-    }
+      /*
+        Read the file back immediately.
 
-    if (
-      verifyGameId
-    ) {
+        We verify not only the newly created gameId,
+        but EVERY gameId that existed in the merged
+        history. A silent rollback therefore cannot be
+        reported as a successful save.
+      */
       const verifiedRemote =
         await readRemoteHistory();
 
-      const exists =
-        verifiedRemote
-          ?.history
-          ?.games
-          ?.some(
-            (game) =>
-              game.gameId ===
-              verifyGameId
-          );
-
-      if (!exists) {
+      if (
+        !verifiedRemote?.history
+      ) {
         throw new Error(
-          `GitHub write succeeded but game ` +
-          `${verifyGameId} was not found when read back.`
+          'GitHub write succeeded but the history file could not be read back.'
         );
       }
+
+      const missingAfterWrite =
+        missingGameIds(
+          mergedHistory,
+          verifiedRemote.history
+        );
+
+      if (
+        missingAfterWrite.length >
+        0
+      ) {
+        historyStatus
+          .preventedDataLoss =
+          true;
+
+        throw new Error(
+          `GitHub verification failed: ` +
+          `${missingAfterWrite.length} game(s) disappeared after write. ` +
+          `Missing gameIds: ` +
+          `${missingAfterWrite.join(', ')}`
+        );
+      }
+
+      if (
+        verifyGameId
+      ) {
+        const exists =
+          verifiedRemote
+            .history
+            .games
+            .some(
+              (game) =>
+                game.gameId ===
+                verifyGameId
+            );
+
+        if (!exists) {
+          throw new Error(
+            `GitHub write succeeded but game ` +
+            `${verifyGameId} was not found when read back.`
+          );
+        }
+      }
+
+      /*
+        Absorb remote-only games into the live in-memory
+        history WITHOUT losing any actions that may have
+        been added locally while the network request was
+        in progress.
+      */
+      gameHistory =
+        mergeHistories(
+          verifiedRemote.history,
+          gameHistory
+        );
+
+      writeLocalHistory();
+
+      historyStatus
+        .lastGitHubSync =
+        new Date()
+          .toISOString();
+
+      historyStatus
+        .lastGitHubSyncSuccess =
+        true;
+
+      historyStatus
+        .lastGitHubError =
+        null;
+
+      historyStatus
+        .lastRemoteGameCount =
+        verifiedRemote
+          .history
+          .games
+          .length;
+
+      historyStatus
+        .lastMergedGameCount =
+        gameHistory
+          .games
+          .length;
+
+      return true;
     }
 
-    historyStatus
-      .lastGitHubSync =
-      new Date()
-        .toISOString();
-
-    historyStatus
-      .lastGitHubSyncSuccess =
-      true;
-
-    historyStatus
-      .lastGitHubError =
-      null;
-
-    return true;
+    throw new Error(
+      'GitHub history write failed after 3 merge retries.'
+    );
   } catch (error) {
     historyStatus
       .lastGitHubSyncSuccess =
@@ -578,9 +1016,21 @@ async function saveHistory(
    ========================================================= */
 
 async function initializeHistory() {
+  /*
+    gameHistory already contains the local file loaded at
+    process startup. Never throw that copy away blindly.
+  */
+  const localAtStartup =
+    compactifyHistory(
+      gameHistory
+    );
+
   if (
     !githubSyncEnabled
   ) {
+    gameHistory =
+      localAtStartup;
+
     writeLocalHistory();
 
     return;
@@ -598,46 +1048,93 @@ async function initializeHistory() {
           remote.history
         );
 
+      const remoteCount =
+        remote.history
+          .games
+          .length;
+
       gameHistory =
-        compactifyHistory(
-          remote.history
+        mergeHistories(
+          remote.history,
+          localAtStartup
         );
 
       writeLocalHistory();
 
+      historyStatus
+        .lastRemoteGameCount =
+        remoteCount;
+
+      historyStatus
+        .lastMergedGameCount =
+        gameHistory
+          .games
+          .length;
+
+      /*
+        If local startup data contains games missing from
+        GitHub, restore them by pushing the MERGED history.
+        This is safe because pushHistorySnapshot() performs
+        another fresh remote merge before writing.
+      */
+      const localAddedGames =
+        gameHistory
+          .games
+          .length >
+        remoteCount;
+
       if (
-        needsMigration
+        needsMigration ||
+        localAddedGames
       ) {
         console.log(
-          'Migrating old game history to compact sorted-hand schema...'
+          localAddedGames
+            ? `Startup merge recovered ${gameHistory.games.length - remoteCount} game(s) missing from remote history.`
+            : 'Migrating old game history to compact schema...'
         );
 
-        const migrated =
+        const merged =
           await saveHistory({
             immediate:
               true,
           });
 
         if (
-          !migrated
+          !merged
         ) {
           console.error(
-            'Compact history migration could not be pushed to GitHub.'
+            'Merged history could not be pushed to GitHub.'
           );
         }
       }
 
       console.log(
-        `Loaded ${gameHistory.games.length} compact game(s) from GitHub.`
+        `Loaded/merged ${gameHistory.games.length} compact game(s).`
       );
     } else {
+      /*
+        Remote file does not exist.
+        Preserve any local history and create the remote
+        file from that local copy rather than starting empty.
+      */
       gameHistory =
-        emptyHistory();
+        localAtStartup;
 
-      await saveHistory({
-        immediate:
-          true,
-      });
+      writeLocalHistory();
+
+      const created =
+        await saveHistory({
+          immediate:
+            true,
+        });
+
+      if (
+        !created
+      ) {
+        console.error(
+          'Could not create GitHub history from local startup data.'
+        );
+      }
     }
   } catch (error) {
     historyStatus
@@ -652,6 +1149,13 @@ async function initializeHistory() {
       'Could not initialize history from GitHub:',
       error
     );
+
+    /*
+      Keep the local startup copy.
+      Never replace it with empty history on a network error.
+    */
+    gameHistory =
+      localAtStartup;
 
     writeLocalHistory();
   }
@@ -2439,6 +2943,21 @@ app.get(
         historyStatus
           .lastGitHubError,
 
+      lastRemoteGameCount:
+        historyStatus
+          .lastRemoteGameCount,
+
+      lastMergedGameCount:
+        historyStatus
+          .lastMergedGameCount,
+
+      preventedDataLoss:
+        historyStatus
+          .preventedDataLoss,
+
+      mergeProtection:
+        true,
+
       githubRepository:
         `${GITHUB_OWNER}/${GITHUB_REPO}`,
 
@@ -3751,6 +4270,33 @@ async function startGame({
     }
   );
 
+  /*
+    If a Custom Deal checkpoint already has a first
+    finisher, that player is the head player for the
+    next normal game.
+  */
+  if (
+    finishOrder.length >
+    0
+  ) {
+    const headPlayerId =
+      finishOrder[0];
+
+    const headIndex =
+      room.players.findIndex(
+        (player) =>
+          player.id ===
+          headPlayerId
+      );
+
+    if (
+      headIndex >= 0
+    ) {
+      room.previousHeadPlayerIndex =
+        headIndex;
+    }
+  }
+
   const completedTeam =
     getCompletedTeam(
       room
@@ -4010,6 +4556,11 @@ function scheduleAdvanceAfterPlay(
           return;
         }
 
+        /*
+          Safety fallback only.
+          Normal games should already end above when
+          one team has all three finishers.
+        */
         if (
           activeCount(
             currentRoom
