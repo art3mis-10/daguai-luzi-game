@@ -6952,6 +6952,9289 @@
       "ended": "2026-11-05T08:29:48.570Z",
       "endReason": "team-finished",
       "winnerTeam": "A"
+    },
+    {
+      "gameId": "K8XF9F-826c1a51-08b7-46f5-94bd-968b411acdab",
+      "time": "2026-11-05T09:09:49.639Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P6",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,C3,C3,H4,C4,D4,C5,D5,S6,C6,S7,S7,C7,S8,S8,C8,D8,H9,C9,DJ,CQ,CQ,SK,HA,DA,H2,SJ",
+        "P2": "H3,S4,H4,S5,H5,H5,D5,D5,H6,C7,C8,D8,H9,H9,C9,D9,HJ,HJ,CJ,SQ,SK,HK,SA,HA,S2,S2,H2",
+        "P3": "S4,S5,H6,D6,D6,H7,H7,H7,D7,D7,S8,C8,D8,S9,C9,D9,H10,D10,JS,DJ,HQ,DQ,CK,DK,CA,C2,C2",
+        "P4": "H3,D3,C4,D4,H5,C5,C6,C6,S9,D9,C10,D10,JS,CJ,SQ,HQ,HQ,CQ,DQ,HK,DK,DA,S2,C2,D2,BJ,BJ",
+        "P5": "H3,D3,C4,S5,C5,H6,C7,D7,H8,S10,S10,H10,H10,D10,JS,DJ,SQ,SK,DK,SA,HA,CA,DA,H2,D2,D2,SJ",
+        "P6": "S3,S3,C3,D3,S4,H4,D4,S6,S6,D6,S7,H8,H8,S9,S10,C10,C10,HJ,CJ,DQ,HK,CK,CK,SA,CA,SJ,BJ"
+      },
+      "rounds": [],
+      "finishOrder": [],
+      "ended": "2026-11-05T09:26:00.215Z",
+      "endReason": "host-custom-redeal"
+    },
+    {
+      "gameId": "K8XF9F-64f53e8f-2854-4a41-b278-0a89ac689e7e",
+      "time": "2026-11-05T09:25:56.974Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P2",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,C3,H4,C4,D4,D5,S6,S7,S7,C7,S8,S8,C8,D8,H9,C9,SK,H2,SJ",
+        "P2": "H9,H9,C9,D9,SQ",
+        "P3": "S5,H6,D6,D6,S8,C8,D8,S9,C9,D9,HQ,DQ,CK,DK,C2",
+        "P4": "C4,D4,C5,C6,C6,CJ,BJ,BJ",
+        "P5": "H3,D3,SA,HA,CA,DA,SJ",
+        "P6": "S10,C10,C10,HJ,CJ,HK,CK,CK"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H9,H9,C9,D9,SQ"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S5"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "HK"
+            ],
+            [
+              "P1",
+              "play",
+              "H2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "BJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "D4"
+            ],
+            [
+              "P5",
+              "play",
+              "DA"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "BJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C4,C5,C6,C6,CJ"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S10,C10,C10,HJ,CJ"
+            ],
+            [
+              "P1",
+              "play",
+              "C3,S8,S8,C8,D8"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S3,S6,S7,S7,SK"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H4,C4,D4,H9,C9"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "C7"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "SJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "D5"
+            ],
+            [
+              "P1",
+              "out"
+            ],
+            [
+              "P3",
+              "play",
+              "C2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H6,D6,D6,HQ,DQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S8,C8,D8"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S9,C9,D9,CK,DK"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P5",
+              "play",
+              "H3,D3,SA,HA,CA"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "SJ"
+            ],
+            [
+              "P5",
+              "out"
+            ]
+          ],
+          "winner": "P5"
+        }
+      ],
+      "finishOrder": [
+        "P2",
+        "P4",
+        "P1",
+        "P3",
+        "P5"
+      ],
+      "ended": "2026-11-05T09:38:56.598Z",
+      "endReason": "team-finished",
+      "winnerTeam": "A"
+    },
+    {
+      "gameId": "K8XF9F-8faeb033-5563-44fa-b5b3-229693a4bb88",
+      "time": "2026-11-05T09:48:54.585Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P1",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "H3,H4,D4,S5,H5,C5,C5,D6,C7,D7,H8,D8,S9,C10,D10,HJ,DJ,CQ,DQ,SK,CK,DA,S2,C2,D2,SJ,SJ",
+        "P2": "H3,H3,C4,C4,H5,S6,H6,C6,D6,S7,H7,S8,D8,D8,C9,S10,S10,D10,CJ,DJ,SQ,DQ,HK,DK,HA,DA,D2",
+        "P3": "D3,S5,S5,D5,H6,S8,H8,S9,S9,H9,C9,H10,C10,C10,D10,JS,JS,CJ,SQ,HQ,DQ,CK,SA,SA,H2,SJ,BJ",
+        "P4": "S3,D3,D3,S4,C4,D4,C5,D5,D6,S7,H7,S8,C8,C8,D9,D9,H10,HQ,HQ,SK,HK,DK,HA,CA,DA,H2,C2",
+        "P5": "S3,C3,S4,H4,H4,D5,S6,C6,C7,D7,C8,H9,C9,H10,HJ,CJ,DJ,SQ,CQ,CK,SA,S2,H2,C2,D2,BJ,BJ",
+        "P6": "S3,C3,C3,S4,D4,H5,S6,H6,C6,S7,H7,C7,D7,H8,H9,D9,S10,JS,HJ,CQ,SK,HK,DK,HA,CA,CA,S2"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H3"
+            ],
+            [
+              "P2",
+              "play",
+              "H5"
+            ],
+            [
+              "P3",
+              "play",
+              "CK"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "D2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "SJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H4,D4"
+            ],
+            [
+              "P2",
+              "play",
+              "S7,H7"
+            ],
+            [
+              "P3",
+              "play",
+              "SA,SA"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S5,S5,D5,S8,H8"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "H3,H3,S8,D8,D8"
+            ],
+            [
+              "P3",
+              "play",
+              "D3,S9,S9,H9,C9"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "JS,JS,CJ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "HA,CA,CA"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "D9,S10,JS,CQ,DK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H6,H10,C10,C10,D10"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "H5,H6,H7,H8,H9"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "S3,C3,C3,S4,D4"
+            ],
+            [
+              "P1",
+              "play",
+              "S5,H5,C5,C5,C7"
+            ],
+            [
+              "P2",
+              "play",
+              "S6,H6,C6,D6,C9"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CJ,DJ"
+            ],
+            [
+              "P3",
+              "play",
+              "SQ,HQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "SK,HK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H2,SJ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "BJ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "DQ"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "CK"
+            ],
+            [
+              "P6",
+              "play",
+              "S2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "HJ"
+            ],
+            [
+              "P1",
+              "play",
+              "CQ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "CA"
+            ],
+            [
+              "P5",
+              "play",
+              "S2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "C3"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "H8"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "H10"
+            ],
+            [
+              "P5",
+              "play",
+              "DJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "HA"
+            ],
+            [
+              "P5",
+              "play",
+              "D2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S6"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "S9"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "DA"
+            ],
+            [
+              "P5",
+              "play",
+              "H2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D7"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "C10"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "HQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "DA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "C2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S3,D3,D3,C5,D5"
+            ],
+            [
+              "P5",
+              "play",
+              "C6,C7,C8,C9,BJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D5"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "HJ"
+            ],
+            [
+              "P2",
+              "play",
+              "DQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "SA"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S3"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "DQ"
+            ],
+            [
+              "P2",
+              "play",
+              "HA"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "SQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "CK"
+            ],
+            [
+              "P2",
+              "play",
+              "DA"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H4"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "HK"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C4,C4,S10,S10,D10"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "D6,D7,D8,D10,SJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "SK"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "H2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 21,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S4,C4,D4,S7,H7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S6,C6,S7,C7,D7"
+            ],
+            [
+              "P6",
+              "out"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S8,C8,C8,D9,D9"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 22,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "D6"
+            ],
+            [
+              "P5",
+              "play",
+              "H9"
+            ],
+            [
+              "P1",
+              "play",
+              "D2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 23,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 24,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "DJ"
+            ],
+            [
+              "P1",
+              "out"
+            ],
+            [
+              "P2",
+              "play",
+              "DK"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 25,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "SK,HK,DK"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 26,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HQ"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ],
+          "winner": "P4"
+        }
+      ],
+      "finishOrder": [
+        "P3",
+        "P6",
+        "P1",
+        "P2",
+        "P4"
+      ],
+      "ended": "2026-11-05T10:22:38.760Z",
+      "endReason": "team-finished",
+      "winnerTeam": "B"
+    },
+    {
+      "gameId": "JEM7C9-b333b532-d424-411c-a661-58f3e4965ec8",
+      "time": "2026-11-05T13:31:25.683Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P2",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,S3,S4,C4,D5,S7,H7,D7,H9,C10,D10,JS,HJ,CJ,SQ,SQ,HQ,HQ,DQ,DQ,SK,CK,CA,S2,H2,SJ,SJ",
+        "P2": "H3,C3,D3,C4,D4,C5,C5,S6,C6,D6,H7,S8,S8,H8,S9,S9,D9,H10,C10,CJ,CQ,SK,CK,DK,H2,SJ,BJ",
+        "P3": "S3,C3,D3,H4,D4,S5,H5,H6,S7,H7,D7,H8,D8,H9,C9,D9,S10,H10,H10,C10,HJ,HJ,SA,HA,CA,H2,D2",
+        "P4": "H3,S4,C4,C6,C6,D6,D6,S7,C7,C8,C8,D8,H9,C9,S10,D10,JS,CJ,DJ,DJ,CQ,DK,CA,DA,S2,C2,D2",
+        "P5": "H3,D3,H4,S5,S5,H5,H5,D5,D5,S6,S6,H6,C7,H8,D8,CQ,HK,HK,HK,SA,SA,HA,DA,C2,D2,BJ,BJ",
+        "P6": "C3,S4,H4,D4,C5,H6,C7,D7,S8,C8,S9,C9,D9,S10,D10,JS,DJ,SQ,HQ,DQ,SK,CK,DK,HA,DA,S2,C2"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H7"
+            ],
+            [
+              "P3",
+              "play",
+              "D2"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S3,C3,D3,H4,D4"
+            ],
+            [
+              "P4",
+              "play",
+              "S4,C4,C8,C8,D8"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "S5,H5,H9,C9,D9"
+            ],
+            [
+              "P4",
+              "play",
+              "H3,C6,C6,D6,D6"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H6,S10,H10,H10,C10"
+            ],
+            [
+              "P4",
+              "play",
+              "JS,CJ,DJ,DJ,CQ"
+            ],
+            [
+              "P5",
+              "play",
+              "S5,S5,H5,D5,D5"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D8"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "H9"
+            ],
+            [
+              "P2",
+              "play",
+              "H2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "SJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "D5"
+            ],
+            [
+              "P2",
+              "play",
+              "H10"
+            ],
+            [
+              "P3",
+              "play",
+              "H2"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S7,H7,D7,H8,D8"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "C4,D4,S8,S8,H8"
+            ],
+            [
+              "P3",
+              "play",
+              "HJ,HJ,SA,HA,CA"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H9,C9"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S10,D10"
+            ],
+            [
+              "P1",
+              "play",
+              "SK,CK"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "CA,DA"
+            ],
+            [
+              "P5",
+              "play",
+              "C2,D2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H4,H5,S6,C7,H8"
+            ],
+            [
+              "P6",
+              "play",
+              "S4,H4,S9,C9,D9"
+            ],
+            [
+              "P1",
+              "play",
+              "S3,S3,JS,HJ,CJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S8,C8,SQ,HQ,DQ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "H3,D3,HK,HK,HK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "CQ"
+            ],
+            [
+              "P6",
+              "play",
+              "C2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "C7"
+            ],
+            [
+              "P1",
+              "play",
+              "CA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S2"
+            ],
+            [
+              "P5",
+              "play",
+              "BJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H6"
+            ],
+            [
+              "P6",
+              "play",
+              "S2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "JS,DJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "C3,D4,C5,H6,D7"
+            ],
+            [
+              "P1",
+              "play",
+              "S7,H7,D7,C10,D10"
+            ],
+            [
+              "P2",
+              "play",
+              "H3,D3,S9,S9,D9"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "SA,SA,HA,DA,BJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S6"
+            ],
+            [
+              "P5",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "HQ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "DK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S10,D10"
+            ],
+            [
+              "P6",
+              "play",
+              "HA,DA"
+            ],
+            [
+              "P1",
+              "play",
+              "S2,H2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "SQ,SQ,HQ,DQ,DQ"
+            ],
+            [
+              "P2",
+              "play",
+              "SK,CK,DK,SJ,BJ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C3,C6,C10,CJ,CQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S6,D6"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C5,C5"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P4",
+              "play",
+              "S7,C7"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C2,D2"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SK,CK,DK"
+            ],
+            [
+              "P6",
+              "out"
+            ]
+          ],
+          "winner": "P6"
+        }
+      ],
+      "finishOrder": [
+        "P3",
+        "P5",
+        "P2",
+        "P4",
+        "P6"
+      ],
+      "ended": "2026-11-05T13:56:56.504Z",
+      "endReason": "team-finished",
+      "winnerTeam": "B"
+    },
+    {
+      "gameId": "JEM7C9-457bb221-4468-4508-b692-7b400d71b7cd",
+      "time": "2026-11-05T14:12:15.830Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P3",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,S3,S6,H6,D6,D6,S7,H7,C7,H8,D8,S9,S9,H9,C9,S10,H10,D10,HJ,DJ,SQ,CQ,CQ,SK,HA,CA,D2",
+        "P2": "S3,H3,C3,S4,D4,D4,S5,C5,S6,S6,H6,C6,D6,C7,S8,D8,D9,C10,HJ,DJ,HQ,CQ,DQ,SA,DA,D2,SJ",
+        "P3": "H3,D3,C4,S5,D5,D5,H6,C6,S7,D7,D7,C8,C8,H10,JS,SQ,HQ,DQ,CK,CK,DK,HA,CA,S2,C2,D2,SJ",
+        "P4": "C3,C3,H4,C4,D4,S5,H5,H7,C7,S8,S8,H8,H9,JS,CJ,CJ,HQ,SK,DK,SA,HA,DA,S2,S2,C2,C2,BJ",
+        "P5": "H3,D3,S4,H5,C5,C5,H7,D7,S9,H9,C9,D9,D9,S10,S10,C10,D10,D10,DJ,DQ,HK,DK,SA,DA,H2,H2,BJ",
+        "P6": "D3,S4,H4,H4,C4,H5,D5,C6,S7,H8,C8,D8,C9,H10,C10,JS,HJ,CJ,SQ,SK,HK,HK,CK,CA,H2,SJ,BJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C4"
+            ],
+            [
+              "P4",
+              "play",
+              "H9"
+            ],
+            [
+              "P5",
+              "play",
+              "HK"
+            ],
+            [
+              "P6",
+              "play",
+              "CA"
+            ],
+            [
+              "P1",
+              "play",
+              "D2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S3,S3,S7,H7,C7"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S5,H5,S8,S8,H8"
+            ],
+            [
+              "P5",
+              "play",
+              "S4,S9,H9,C9,D9"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H3,D3,H5,C5,C5"
+            ],
+            [
+              "P6",
+              "play",
+              "D3,S4,H4,H4,C4"
+            ],
+            [
+              "P1",
+              "play",
+              "S6,H6,D6,D6,H8"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "H5,SK,HK,HK,CK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "D9,D10,DJ,DQ,DK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H7,D7"
+            ],
+            [
+              "P6",
+              "play",
+              "H8,C8"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "HA,CA"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H3,D3,S5,D5,D5"
+            ],
+            [
+              "P4",
+              "play",
+              "C3,C3,JS,CJ,CJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "D8,S9,S9,H9,C9"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "HQ,SA,HA,DA,BJ"
+            ],
+            [
+              "P5",
+              "play",
+              "S10,S10,C10,D10,BJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H2,H2"
+            ],
+            [
+              "P6",
+              "play",
+              "SJ,BJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SQ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "D2"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H6,C6"
+            ],
+            [
+              "P4",
+              "play",
+              "SK,DK"
+            ],
+            [
+              "P5",
+              "play",
+              "SA,DA"
+            ],
+            [
+              "P5",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "H2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "SJ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H10"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "SK"
+            ],
+            [
+              "P2",
+              "play",
+              "SA"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "D8"
+            ],
+            [
+              "P3",
+              "play",
+              "JS"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "DA"
+            ],
+            [
+              "P3",
+              "play",
+              "S2"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S7,D7,D7"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "JS,HJ,CJ"
+            ],
+            [
+              "P1",
+              "play",
+              "SQ,CQ,CQ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "HA,CA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H7,C7"
+            ],
+            [
+              "P6",
+              "play",
+              "H10,C10"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "SQ,HQ"
+            ],
+            [
+              "P4",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H4,C4,D4"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "CK,CK,DK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "DQ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "D2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C7,S8,D9,C10,HJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "S10,H10,D10,HJ,DJ"
+            ],
+            [
+              "P1",
+              "out"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "DJ"
+            ],
+            [
+              "P3",
+              "play",
+              "C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "SJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S3,H3,C3,S5,C5"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S6,S6,H6,C6,D6"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 21,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HQ,CQ,DQ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 22,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S4,D4,D4"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 23,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C8,C8"
+            ],
+            [
+              "P3",
+              "out"
+            ]
+          ],
+          "winner": "P3"
+        }
+      ],
+      "finishOrder": [
+        "P5",
+        "P4",
+        "P1",
+        "P2",
+        "P3"
+      ],
+      "ended": "2026-11-05T14:35:46.763Z",
+      "endReason": "team-finished",
+      "winnerTeam": "A"
+    },
+    {
+      "gameId": "5YPI5X-efcfcbba-5c90-4588-919a-45203bb78046",
+      "time": "2026-11-06T06:52:24.111Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P4",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "C3,S4,H4,S5,H5,H5,C5,S6,H6,H7,S8,S8,H8,C8,S9,H9,H10,H10,C10,JS,HJ,CJ,DJ,SQ,HK,HK,DA",
+        "P2": "H3,C3,D3,D4,D4,S5,D5,H6,D6,D6,D6,H7,D7,D7,D9,D10,DJ,CQ,CQ,CK,CK,DK,CA,DA,C2,SJ,BJ",
+        "P3": "S4,S4,C4,H5,C5,S7,C7,C7,S8,C8,D8,H9,C9,C9,H10,D10,CQ,DQ,SK,HK,CK,DK,CA,S2,H2,C2,D2",
+        "P4": "S3,D3,H7,H8,C8,D8,D8,S9,H9,D9,D9,S10,D10,JS,HJ,CJ,SQ,SQ,HQ,DQ,DQ,DK,SA,SA,HA,HA,BJ",
+        "P5": "S3,H3,H3,H4,C4,D4,S6,S6,H6,C6,C6,S7,C7,D7,H8,S9,S10,S10,C10,DJ,CA,DA,S2,H2,H2,D2,D2",
+        "P6": "S3,C3,D3,H4,C4,S5,C5,D5,D5,C6,S7,C9,C10,JS,HJ,CJ,HQ,HQ,SK,SK,SA,HA,S2,C2,SJ,SJ,BJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S3,D3,JS,HJ,CJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "C3,S5,H5,H5,C5"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "H7,H8,C8,D8,D8"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "H7,JS,HJ,CJ,DJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "DK,SA,SA,HA,HA"
+            ],
+            [
+              "P5",
+              "play",
+              "S6,S6,H6,C6,C6"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SQ,SQ,HQ,DQ,DQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "D10"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "SQ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "CA"
+            ],
+            [
+              "P4",
+              "play",
+              "BJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S9,H9,D9,D9,S10"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S3,H3,H3,C7,D7"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "S4,H4,H10,H10,C10"
+            ],
+            [
+              "P2",
+              "play",
+              "H6,D6,CK,CK,DK"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H3"
+            ],
+            [
+              "P3",
+              "play",
+              "C5"
+            ],
+            [
+              "P5",
+              "play",
+              "D2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S7,H8,S9,S10,DJ"
+            ],
+            [
+              "P6",
+              "play",
+              "C3,C4,C6,C9,C10"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "D7,D9,D10,DJ,DA"
+            ],
+            [
+              "P3",
+              "play",
+              "S4,S4,C4,H10,D10"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S3,D3,JS,HJ,CJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H5,SK,HK,CK,DK"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S5,C5,D5,D5,SJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "HQ,HQ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S7,C7,C7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "SA,HA,SJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "H2,H2,D2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D4"
+            ],
+            [
+              "P6",
+              "play",
+              "S7"
+            ],
+            [
+              "P1",
+              "play",
+              "H9"
+            ],
+            [
+              "P2",
+              "play",
+              "C2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C3,D4,S5,D6,H7"
+            ],
+            [
+              "P3",
+              "play",
+              "S8,C8,D8,CQ,DQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "D3,D4,D5,D6,D7"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CQ,CQ"
+            ],
+            [
+              "P3",
+              "play",
+              "H2,D2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "SJ,BJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CA"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "C2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "S2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "H4"
+            ],
+            [
+              "P1",
+              "play",
+              "S9"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "BJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SK,SK"
+            ],
+            [
+              "P6",
+              "out"
+            ]
+          ],
+          "winner": "P6"
+        }
+      ],
+      "finishOrder": [
+        "P4",
+        "P2",
+        "P6"
+      ],
+      "ended": "2026-11-06T07:24:36.877Z",
+      "endReason": "team-finished",
+      "winnerTeam": "B"
+    },
+    {
+      "gameId": "5YPI5X-2f0d4a67-23c1-4ba7-b69d-83d75d53e0b8",
+      "time": "2026-11-06T07:25:27.803Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P5",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S6,H6,H7,S8,S8,H8,C8,S9,H9,HK,HK,DA",
+        "P2": "C3,D3,D4,D4,S5,D5,D6,D6,H7,D7,CQ,CQ,CA,C2,SJ,BJ",
+        "P3": "S8,C8,D8,H9,C9,C9,CQ,DQ,H2,D2",
+        "P4": "",
+        "P5": "H4,C4,D4,S10,S10,CA,DA,S2",
+        "P6": "H4,S7,SK,SK,S2,C2,BJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H4,C4,D4"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "S8,C8,D8"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "CQ,CQ,SJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C3,D4,S5,D6,H7"
+            ],
+            [
+              "P3",
+              "play",
+              "H9,C9,C9,CQ,DQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "D3,D4,D5,D6,D7"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C2,BJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CA"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H2,D2"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        }
+      ],
+      "finishOrder": [
+        "P2",
+        "P3"
+      ],
+      "ended": "2026-11-06T07:53:29.796Z",
+      "endReason": "host-custom-redeal"
+    },
+    {
+      "gameId": "5YPI5X-d96a00f9-15c6-442a-bf3e-6972afccf33a",
+      "time": "2026-11-06T07:53:25.737Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P5",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "C3,C3,D3,D3,H5,D5,D5,C6,D6,S7,S9,H9,H9,CJ,CJ,DJ,HQ,CQ,CQ,HK,SA,HA,CA,CA,H2,H2,D2",
+        "P2": "H3,C3,H4,H4,C4,D4,S5,C5,H6,D6,D7,S8,S8,H8,D8,S9,C9,H10,H10,D10,JS,JS,HQ,SK,CK,S2,SJ",
+        "P3": "H3,H4,C4,H5,C5,S6,C7,D7,S8,H8,C8,D8,D8,C9,S10,H10,HJ,CJ,DJ,DQ,CK,DK,DA,S2,C2,BJ,BJ",
+        "P4": "S3,S3,S3,H3,D4,S6,C6,S7,H7,H7,C9,D9,D9,C10,D10,D10,SQ,SQ,DQ,CK,DK,SA,HA,HA,CA,D2,BJ",
+        "P5": "D3,S4,S4,C4,D4,H5,S6,H6,S7,H7,C7,C7,C8,S9,S10,S10,HJ,DJ,SQ,SK,HK,HK,DK,SA,DA,D2",
+        "P6": "S4,S5,S5,C5,D5,H6,C6,D6,D7,H8,C8,H9,D9,C10,C10,JS,HJ,HQ,CQ,DQ,SK,DA,S2,H2,C2,C2,SJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S10"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "DQ"
+            ],
+            [
+              "P4",
+              "play",
+              "D2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S7,H7,H7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "CJ,CJ,DJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SQ,SQ,DQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S6,C6,C9,D9,D9"
+            ],
+            [
+              "P5",
+              "play",
+              "D3,S4,S4,C4,D4"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "HJ"
+            ],
+            [
+              "P6",
+              "play",
+              "SK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H3,C3,H10,H10,D10"
+            ],
+            [
+              "P3",
+              "play",
+              "C7,D7,HJ,CJ,DJ"
+            ],
+            [
+              "P4",
+              "play",
+              "S3,S3,S3,H3,D4"
+            ],
+            [
+              "P5",
+              "play",
+              "H5,S7,H7,C7,C7"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SA,HA,HA,CA,BJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C10,D10,D10,CK,DK"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "H4,H4,C4,D4,D7"
+            ],
+            [
+              "P3",
+              "play",
+              "S8,H8,C8,D8,D8"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H3"
+            ],
+            [
+              "P5",
+              "play",
+              "D2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S6,H6"
+            ],
+            [
+              "P6",
+              "play",
+              "H8,C8"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S9,C9"
+            ],
+            [
+              "P3",
+              "play",
+              "S10,H10"
+            ],
+            [
+              "P5",
+              "play",
+              "SA,DA"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        }
+      ],
+      "finishOrder": [
+        "P4"
+      ],
+      "ended": "2026-11-06T08:17:50.211Z",
+      "endReason": "host-custom-redeal"
+    },
+    {
+      "gameId": "5YPI5X-4678031a-a581-4d58-b8b0-9933953094d3",
+      "time": "2026-11-06T08:17:45.663Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P5",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "C3,C3,D3,D3,H5,D5,D5,C6,D6,S7,S9,H9,H9,CJ,CJ,DJ,HQ,CQ,CQ,HK,SA,HA,CA,CA,H2,H2,D2",
+        "P2": "H3,C3,H4,H4,C4,D4,S5,C5,H6,D6,D7,S8,S8,H8,D8,S9,C9,H10,H10,D10,JS,JS,HQ,SK,CK,S2,SJ",
+        "P3": "H3,H4,C4,H5,C5,S6,C7,D7,S8,H8,C8,D8,D8,C9,S10,H10,HJ,CJ,DJ,DQ,CK,DK,DA,S2,C2,BJ,BJ",
+        "P4": "S3,S3,S3,H3,D4,S6,C6,S7,H7,H7,C9,D9,D9,C10,D10,D10,SQ,SQ,DQ,CK,DK,SA,HA,HA,CA,D2,BJ",
+        "P5": "D3,S4,S4,C4,D4,H5,S6,H6,S7,H7,C7,C7,C8,S9,S10,S10,HJ,DJ,SQ,SK,HK,HK,DK,SA,DA,D2,SJ",
+        "P6": "S4,S5,S5,C5,D5,H6,C6,D6,D7,H8,C8,H9,D9,C10,C10,JS,HJ,HQ,CQ,DQ,SK,DA,S2,H2,C2,C2,SJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S10"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "DQ"
+            ],
+            [
+              "P4",
+              "play",
+              "D2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S7,H7,H7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "CJ,CJ,DJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SQ,SQ,DQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S6,C6,C9,D9,D9"
+            ],
+            [
+              "P5",
+              "play",
+              "D3,S4,S4,C4,D4"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "HJ"
+            ],
+            [
+              "P6",
+              "play",
+              "SK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H3,C3,H10,H10,D10"
+            ],
+            [
+              "P3",
+              "play",
+              "C7,D7,HJ,CJ,DJ"
+            ],
+            [
+              "P4",
+              "play",
+              "S3,S3,S3,H3,D4"
+            ],
+            [
+              "P5",
+              "play",
+              "H5,S7,H7,C7,C7"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SA,HA,HA,CA,BJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C10,D10,D10,CK,DK"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "H4,H4,C4,D4,D7"
+            ],
+            [
+              "P3",
+              "play",
+              "S8,H8,C8,D8,D8"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H3"
+            ],
+            [
+              "P5",
+              "play",
+              "D2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S6,H6"
+            ],
+            [
+              "P6",
+              "play",
+              "H8,C8"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S9,C9"
+            ],
+            [
+              "P3",
+              "play",
+              "S10,H10"
+            ],
+            [
+              "P5",
+              "play",
+              "SA,DA"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "SK,HK,HK,DK,SJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "C8,S9,S10,DJ,SQ"
+            ],
+            [
+              "P5",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "H5,D5,D5,C6,D6"
+            ],
+            [
+              "P2",
+              "play",
+              "S8,S8,H8,D8,HQ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S5,C5"
+            ],
+            [
+              "P3",
+              "play",
+              "CK,DK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S6"
+            ],
+            [
+              "P6",
+              "play",
+              "D7"
+            ],
+            [
+              "P1",
+              "play",
+              "HK"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "DA"
+            ],
+            [
+              "P6",
+              "play",
+              "S2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "BJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H4,C4"
+            ],
+            [
+              "P6",
+              "play",
+              "H9,D9"
+            ],
+            [
+              "P1",
+              "play",
+              "CQ,CQ"
+            ],
+            [
+              "P2",
+              "play",
+              "SK,CK"
+            ],
+            [
+              "P3",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C9"
+            ],
+            [
+              "P6",
+              "play",
+              "DA"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "BJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H5,C5"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "H6,D6"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "H2,D2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S9,H9,H9"
+            ],
+            [
+              "P2",
+              "play",
+              "JS,JS,SJ"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "H6,C6,D6,C10,C10"
+            ],
+            [
+              "P1",
+              "play",
+              "C3,C3,D3,D3,S7"
+            ],
+            [
+              "P6",
+              "play",
+              "S4,S5,S5,C5,D5"
+            ],
+            [
+              "P1",
+              "play",
+              "HQ,SA,HA,CA,CA"
+            ],
+            [
+              "P6",
+              "play",
+              "JS,H2,C2,C2,SJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "HQ,CQ,DQ"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "HJ"
+            ],
+            [
+              "P6",
+              "out"
+            ]
+          ],
+          "winner": "P6"
+        }
+      ],
+      "finishOrder": [
+        "P4",
+        "P5",
+        "P3",
+        "P2",
+        "P6"
+      ],
+      "ended": "2026-11-06T08:37:56.515Z",
+      "endReason": "team-finished",
+      "winnerTeam": "B"
+    },
+    {
+      "gameId": "ABPMOU-23d7ecd4-bab1-4488-83e1-570981f420b0",
+      "time": "2026-11-07T10:22:17.733Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P6",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "H3,C3,D3,C4,D4,H5,C5,D5,D5,H6,H7,C7,S8,C8,D8,D8,S9,JS,HJ,CJ,DJ,CK,HA,HA,CA,DA,C2",
+        "P2": "S3,H3,S5,S5,S6,H7,D7,C8,S9,H9,C9,H10,H10,C10,D10,JS,CJ,CJ,SQ,HQ,CQ,HK,DK,S2,H2,D2,SJ",
+        "P3": "S3,C3,C3,H4,D4,D5,S6,C6,S7,D7,H8,S10,H10,D10,D10,HJ,DJ,DJ,SQ,HQ,HQ,CQ,HK,CK,DK,CA,S2",
+        "P4": "D3,S4,S4,S4,C4,H5,H5,H6,C6,D6,S7,C7,D7,H9,H9,C9,D9,S10,DQ,DQ,SK,HK,DK,SA,HA,H2,C2",
+        "P5": "S3,H3,D3,H4,C4,D4,S5,H6,S8,H8,C8,D8,S9,C9,S10,C10,HJ,SQ,CQ,DQ,CK,SA,CA,DA,C2,SJ,BJ",
+        "P6": "H4,C5,C5,S6,C6,D6,D6,S7,H7,C7,S8,H8,D9,D9,C10,JS,SK,SK,SA,DA,S2,H2,D2,D2,SJ,BJ,BJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "C5,C5"
+            ],
+            [
+              "P1",
+              "play",
+              "H7,C7"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S8,H8"
+            ],
+            [
+              "P1",
+              "play",
+              "HA,HA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H3,C3,D3,C4,D4"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H4,D4,HJ,DJ,DJ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "H4,S6,C6,D6,D6"
+            ],
+            [
+              "P1",
+              "play",
+              "H6,S8,C8,D8,D8"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "D3,H9,H9,C9,D9"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "D5,S10,H10,D10,D10"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S3,C3,C3,S6,C6"
+            ],
+            [
+              "P4",
+              "play",
+              "H5,H5,H6,C6,D6"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S7,H7,C7,D9,D9"
+            ],
+            [
+              "P1",
+              "play",
+              "H5,C5,D5,D5,S9"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "C10,S2,H2,D2,D2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "C9,C10,CQ,CK,SJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D3,D4,S5,H6,C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S3,S5,S5,S6,S9"
+            ],
+            [
+              "P3",
+              "play",
+              "S7,D7,HK,CK,DK"
+            ],
+            [
+              "P4",
+              "play",
+              "S4,S4,S4,C4,S10"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H8,SQ,HQ,HQ,CQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "JS,SA,DA,SJ,BJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SK,SK,BJ"
+            ],
+            [
+              "P6",
+              "out"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "CA,DA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "C2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "JS,HJ,CJ,DJ,CK"
+            ],
+            [
+              "P1",
+              "out"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H3"
+            ],
+            [
+              "P3",
+              "play",
+              "CA"
+            ],
+            [
+              "P4",
+              "play",
+              "C2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H2"
+            ],
+            [
+              "P5",
+              "play",
+              "BJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S9"
+            ],
+            [
+              "P2",
+              "play",
+              "D2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H7,D7"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C8,H9,D10,JS,SQ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S7,C7,D7,DQ,DQ"
+            ],
+            [
+              "P5",
+              "play",
+              "S8,H8,C8,D8,S10"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "HJ"
+            ],
+            [
+              "P2",
+              "play",
+              "S2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C9,C10,CJ,CJ,CQ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SK,HK,DK,SA,HA"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H3"
+            ],
+            [
+              "P2",
+              "play",
+              "H2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H10,H10"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "SQ,DQ"
+            ],
+            [
+              "P2",
+              "play",
+              "HK,DK"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "SA,DA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S3"
+            ],
+            [
+              "P2",
+              "play",
+              "SJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HQ"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ],
+          "winner": "P2"
+        }
+      ],
+      "finishOrder": [
+        "P6",
+        "P1",
+        "P4",
+        "P2"
+      ],
+      "ended": "2026-11-07T10:47:34.986Z",
+      "endReason": "team-finished",
+      "winnerTeam": "B"
+    },
+    {
+      "gameId": "ABPMOU-9671816d-f6ba-41b5-9066-6775562bb5de",
+      "time": "2026-11-07T13:20:32.638Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P1",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,C3,D3,H4,C4,H5,D6,S7,H7,S8,D8,D8,D8,H9,C9,D9,H10,C10,JS,HJ,HQ,DQ,CK,HA,CA,DA,S2",
+        "P2": "D3,S4,H4,S5,C5,D5,D5,S6,C6,C6,C9,C9,D9,D9,S10,JS,HJ,HJ,CJ,CJ,DJ,CQ,S2,C2,BJ,BJ,BJ",
+        "P3": "H4,D4,D4,S5,H5,D5,S6,D6,D6,H7,C7,D7,C8,H9,H10,C10,SQ,SQ,CQ,SK,SK,HK,SA,CA,H2,D2",
+        "P4": "S3,H3,H3,C3,S4,C4,H5,S7,C7,H8,H8,H8,S9,HQ,CQ,HK,CK,DK,DK,SA,SA,HA,HA,DA,S2,C2,SJ",
+        "P5": "C3,S5,S6,H6,S7,H7,D7,D7,S8,S8,C8,S9,H9,C10,D10,JS,DJ,DQ,SK,CK,DK,CA,DA,H2,C2,D2,SJ",
+        "P6": "S3,H3,D3,S4,D4,C5,C5,H6,H6,C6,C7,C8,S9,S10,S10,H10,D10,D10,CJ,DJ,SQ,HQ,DQ,HK,H2,D2,SJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H5"
+            ],
+            [
+              "P2",
+              "play",
+              "S10"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "JS"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "S2"
+            ],
+            [
+              "P2",
+              "play",
+              "BJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S4,H4,S6,C6,C6"
+            ],
+            [
+              "P3",
+              "play",
+              "H7,C7,D7,H10,C10"
+            ],
+            [
+              "P4",
+              "play",
+              "S4,C4,H8,H8,H8"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "D6,S8,D8,D8,D8"
+            ],
+            [
+              "P2",
+              "play",
+              "D3,C9,C9,D9,D9"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "S5,S6,S7,S8,S9"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "HJ,HJ,CJ,CJ,DJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S5,C5,D5,D5,JS"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S2,C2,BJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "BJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CQ"
+            ],
+            [
+              "P2",
+              "out"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "HK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H2"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H9"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "C10"
+            ],
+            [
+              "P6",
+              "play",
+              "DJ"
+            ],
+            [
+              "P1",
+              "play",
+              "CK"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H4,C4"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "SK,CK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H6"
+            ],
+            [
+              "P6",
+              "play",
+              "S9"
+            ],
+            [
+              "P1",
+              "play",
+              "C10"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "CJ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "D2"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S5,H5,D5"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "SQ,HQ,DQ"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "SK,SK,HK"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S6,D6,D6"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H4,D4,D4"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C8"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "SQ,SQ,CQ,SA,CA"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S7,C7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "HQ,DQ"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S3,C3,D3"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H10"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "CA"
+            ],
+            [
+              "P6",
+              "play",
+              "D2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "C5,C5,C6,C7,C8"
+            ],
+            [
+              "P1",
+              "play",
+              "S7,H7,H9,C9,D9"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S10,S10,H10,D10,D10"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "S4,D4"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "H2,C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H9"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 21,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HQ,CQ"
+            ],
+            [
+              "P5",
+              "play",
+              "D2,SJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 22,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H7,D7,D7,S8,C8"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "JS,HJ,HA,CA,DA"
+            ],
+            [
+              "P1",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "D10,DJ,DQ,DK,DA"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "SA,SA,HA,HA,DA"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 23,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S3,C3"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "H6,H6"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 24,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "S3,H3,D3,H2,SJ"
+            ],
+            [
+              "P6",
+              "out"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 25,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H3,H3"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 26,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H5,HK,CK,DK,DK"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 27,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C2,SJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 28,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S9"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ],
+          "winner": "P4"
+        }
+      ],
+      "finishOrder": [
+        "P2",
+        "P3",
+        "P1",
+        "P6",
+        "P4"
+      ],
+      "ended": "2026-11-07T13:51:35.976Z",
+      "endReason": "team-finished",
+      "winnerTeam": "B"
+    },
+    {
+      "gameId": "2E96WC-fcb2d944-5c42-4e25-ad1b-856f26891868",
+      "time": "2026-11-08T06:14:01.768Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P2",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "H3,C3,H5,C6,H7,C7,D7,S8,H8,C8,D8,S9,S9,C9,D9,S10,D10,HK,HK,CK,CK,DK,SA,CA,D2,D2,SJ",
+        "P2": "H3,D3,H4,H4,C4,S5,C5,D5,S6,S6,C6,D6,D6,D7,S8,C8,H9,S10,C10,D10,D10,HJ,CJ,SQ,HQ,CK,HA",
+        "P3": "S3,C3,D3,D3,S4,S4,S5,C5,D5,H7,D7,H8,D8,S9,D9,C10,JS,CJ,DJ,DJ,SQ,DQ,DQ,SK,SA,CA,S2",
+        "P4": "D4,D5,H6,H6,C6,S7,H7,C7,S8,D9,S10,H10,JS,DJ,HQ,CQ,DQ,DK,SA,CA,S2,S2,H2,C2,SJ,BJ,BJ",
+        "P5": "S3,H3,C3,H4,D4,D4,S5,H5,H5,S6,H6,S7,H8,H9,JS,HJ,CJ,HQ,CQ,SK,HA,DA,DA,H2,H2,C2,BJ",
+        "P6": "S3,S4,C4,C4,C5,D6,S7,C7,C8,D8,H9,C9,C9,H10,H10,C10,HJ,SQ,CQ,SK,HK,DK,HA,DA,C2,D2,SJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "D7"
+            ],
+            [
+              "P3",
+              "play",
+              "C10"
+            ],
+            [
+              "P4",
+              "play",
+              "DK"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "D2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H3,C3,H7,C7,D7"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S4,C4,H10,H10,C10"
+            ],
+            [
+              "P1",
+              "play",
+              "H5,S8,H8,C8,D8"
+            ],
+            [
+              "P2",
+              "play",
+              "H9,S10,C10,D10,D10"
+            ],
+            [
+              "P3",
+              "play",
+              "JS,CJ,DJ,DJ,SK"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S4,S4,S5,C5,D5"
+            ],
+            [
+              "P4",
+              "play",
+              "H6,H6,C6,H7,C7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "C8,D8,H9,C9,C9"
+            ],
+            [
+              "P1",
+              "play",
+              "C6,S9,S9,C9,D9"
+            ],
+            [
+              "P2",
+              "play",
+              "S6,S6,C6,D6,D6"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H3,D3"
+            ],
+            [
+              "P3",
+              "play",
+              "H7,D7"
+            ],
+            [
+              "P4",
+              "play",
+              "HQ,CQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "SA,CA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "D4,D5,D9,DJ,DQ"
+            ],
+            [
+              "P5",
+              "play",
+              "S3,C3,JS,HJ,CJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "HK,HK,CK,CK,DK"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S10,D10"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "S2,H2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S7,S8,S10,JS,SA"
+            ],
+            [
+              "P5",
+              "play",
+              "H3,H4,H5,H6,H2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D4,D4"
+            ],
+            [
+              "P6",
+              "play",
+              "C2,D2"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "S3,C4,C5,D6,S7"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "S3,C3,D3,D3,H8"
+            ],
+            [
+              "P4",
+              "play",
+              "H10,CA,SJ,BJ,BJ"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S5"
+            ],
+            [
+              "P6",
+              "play",
+              "C7"
+            ],
+            [
+              "P1",
+              "play",
+              "D2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "SJ"
+            ],
+            [
+              "P1",
+              "out"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HA"
+            ],
+            [
+              "P3",
+              "play",
+              "S2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "D8"
+            ],
+            [
+              "P5",
+              "play",
+              "SK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "CQ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "CK"
+            ],
+            [
+              "P3",
+              "play",
+              "CA"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "SA"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S9,D9,SQ,DQ,DQ"
+            ],
+            [
+              "P3",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H2,C2"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H5,S6,S7,H8,H9"
+            ],
+            [
+              "P6",
+              "play",
+              "HJ,SK,HK,DK,SJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "HQ,HA,DA,DA,BJ"
+            ],
+            [
+              "P5",
+              "out"
+            ]
+          ],
+          "winner": "P5"
+        }
+      ],
+      "finishOrder": [
+        "P4",
+        "P1",
+        "P3",
+        "P5"
+      ],
+      "ended": "2026-11-08T06:40:01.871Z",
+      "endReason": "team-finished",
+      "winnerTeam": "A"
+    },
+    {
+      "gameId": "2E96WC-db938cbc-f79e-41e5-b1b9-e12cd7113f53",
+      "time": "2026-11-08T06:54:01.129Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P3",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "娄一辰",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "张勇",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "黄翌",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "C3,H4,H4,D4,C5,D5,D5,H6,S7,H8,C8,H9,C10,C10,HJ,CJ,DJ,DQ,DQ,SK,CK,CK,DA,S2,C2,C2,SJ",
+        "P2": "H3,D3,S4,S6,D6,C7,D7,S8,C8,D8,S9,C9,D9,JS,JS,CJ,SQ,HQ,CQ,CQ,SK,SK,HA,CA,S2,BJ,BJ",
+        "P3": "S3,C3,D3,S4,D4,D4,H5,C5,H6,C6,D6,D7,C8,C9,D9,D9,H10,H10,D10,HJ,HJ,SQ,HK,DK,CA,C2,D2",
+        "P4": "S3,S3,S5,S6,H6,C6,S7,H7,H7,C7,S8,S8,H8,D8,H9,JS,CJ,CQ,HK,CK,SA,SA,CA,S2,H2,D2,SJ",
+        "P5": "H3,H4,H5,H5,C5,D5,S6,S7,C7,D8,S9,H9,S10,S10,S10,H10,D10,D10,DJ,SQ,HQ,DQ,DK,SA,HA,H2,BJ",
+        "P6": "H3,C3,D3,S4,C4,C4,C4,S5,S5,C6,D6,H7,D7,H8,S9,C9,C10,DJ,HQ,HK,DK,HA,DA,DA,H2,D2,SJ"
+      },
+      "rounds": [
+        {
+          "r": 1,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S3,C3,D3,H6,C6"
+            ],
+            [
+              "P4",
+              "play",
+              "S3,S3,S6,H6,C6"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "H3,D3,S8,C8,D8"
+            ],
+            [
+              "P3",
+              "play",
+              "S4,D4,C9,D9,D9"
+            ],
+            [
+              "P4",
+              "play",
+              "S5,S7,H7,H7,C7"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H9"
+            ],
+            [
+              "P5",
+              "play",
+              "DJ"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "DA"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P4",
+              "play",
+              "D2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "JS,CJ,SA,SA,CA"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S8,S8,H8,D8,CQ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HK,CK,S2,H2,SJ"
+            ],
+            [
+              "P4",
+              "out"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P4"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S7"
+            ],
+            [
+              "P6",
+              "play",
+              "C9"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "SQ"
+            ],
+            [
+              "P5",
+              "play",
+              "DK"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S2"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S6,D6"
+            ],
+            [
+              "P3",
+              "play",
+              "HJ,HJ"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "HK,DK"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "SA,HA"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S9"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "CA"
+            ],
+            [
+              "P3",
+              "play",
+              "D2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C5"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "D6"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "HA"
+            ],
+            [
+              "P3",
+              "play",
+              "C2"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ]
+          ],
+          "winner": "P3"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "D4,H5,D6,D7,C8"
+            ],
+            [
+              "P5",
+              "play",
+              "H5,C5,SQ,HQ,DQ"
+            ],
+            [
+              "P6",
+              "play",
+              "S4,C4,C4,C4,C6"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "play",
+              "D5,S10,S10,D10,D10"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "play",
+              "S4,SQ,HQ,CQ,CQ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C7,D7"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "DQ,DQ"
+            ],
+            [
+              "P2",
+              "play",
+              "SK,SK"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "S2,C2"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H4,H4,D4,D5,D5"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "H10,H10,D10,HK,DK"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "play",
+              "S5,S5,HA,DA,DA"
+            ],
+            [
+              "P1",
+              "pass"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ]
+          ],
+          "winner": "P6"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "H8,S9,C10,DJ,HQ"
+            ],
+            [
+              "P1",
+              "play",
+              "C10,C10,HJ,CJ,DJ"
+            ],
+            [
+              "P2",
+              "pass"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ],
+          "winner": "P1"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H8"
+            ],
+            [
+              "P2",
+              "play",
+              "BJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ],
+            [
+              "P1",
+              "pass"
+            ]
+          ],
+          "winner": "P2"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "JS,JS,CJ"
+            ],
+            [
+              "P3",
+              "pass"
+            ],
+            [
+              "P5",
+              "pass"
+            ],
+            [
+              "P6",
+              "pass"
+            ]
+          ]
+        }
+      ],
+      "finishOrder": [
+        "P4"
+      ]
     }
   ]
 }
