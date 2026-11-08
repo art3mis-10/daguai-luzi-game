@@ -15005,6 +15005,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "D4,D5,D9,DJ,DQ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
