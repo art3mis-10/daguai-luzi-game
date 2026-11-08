@@ -16461,9 +16461,25 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HK,CK,S2,H2,SJ"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P4"
+      ]
     }
   ]
 }
