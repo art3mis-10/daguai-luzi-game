@@ -18044,6 +18044,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "C3"
+            ]
+          ]
         }
       ],
       "finishOrder": []
