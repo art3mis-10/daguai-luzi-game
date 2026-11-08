@@ -18519,8 +18519,13 @@
               "P4",
               "play",
               "SA,CA,DA"
+            ],
+            [
+              "P5",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
