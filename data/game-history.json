@@ -15287,6 +15287,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
