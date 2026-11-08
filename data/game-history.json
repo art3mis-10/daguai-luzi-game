@@ -18304,6 +18304,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "HJ,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
