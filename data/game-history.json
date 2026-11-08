@@ -15653,6 +15653,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "JS,CJ,SA,SA,CA"
+            ]
+          ]
         }
       ],
       "finishOrder": []
