@@ -17459,6 +17459,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "SK,CK,CK,C2,SJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
