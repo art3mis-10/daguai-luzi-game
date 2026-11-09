@@ -21260,6 +21260,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S3,S3,D3"
+            ]
+          ]
         }
       ],
       "finishOrder": [
