@@ -22010,9 +22010,25 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HJ"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P4"
+      ]
     }
   ]
 }
