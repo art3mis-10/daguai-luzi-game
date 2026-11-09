@@ -19766,9 +19766,25 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D6,JS,HJ,HJ,DJ"
+            ],
+            [
+              "P5",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P5"
+      ]
     }
   ]
 }
