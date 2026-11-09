@@ -20758,9 +20758,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "JS,DJ,S2,SJ,BJ"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
