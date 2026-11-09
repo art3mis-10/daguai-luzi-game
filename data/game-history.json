@@ -22177,6 +22177,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H6"
+            ]
+          ]
         }
       ],
       "finishOrder": [
