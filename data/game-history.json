@@ -19963,6 +19963,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H4"
+            ]
+          ]
         }
       ],
       "finishOrder": [
