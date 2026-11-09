@@ -22887,6 +22887,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HJ,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
