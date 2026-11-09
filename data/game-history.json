@@ -20409,8 +20409,13 @@
               "P4",
               "play",
               "H7,C7,D7,H10,C10"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
