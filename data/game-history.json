@@ -19110,9 +19110,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "JS,HJ,DJ,DJ,HA"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
