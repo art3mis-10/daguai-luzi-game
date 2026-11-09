@@ -20665,6 +20665,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "SK,HK"
+            ]
+          ]
         }
       ],
       "finishOrder": []
