@@ -19417,8 +19417,13 @@
               "P6",
               "play",
               "D2"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
