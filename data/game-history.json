@@ -19801,6 +19801,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "JS,JS"
+            ]
+          ]
         }
       ],
       "finishOrder": [
