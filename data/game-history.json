@@ -21297,6 +21297,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "DQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
