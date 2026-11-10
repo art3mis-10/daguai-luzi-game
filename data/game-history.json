@@ -24306,8 +24306,13 @@
               "P6",
               "play",
               "S4,C4,D4,C7,D7"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
