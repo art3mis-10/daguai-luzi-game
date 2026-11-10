@@ -32561,8 +32561,13 @@
               "P5",
               "play",
               "S3,D3,SQ,HQ,CQ"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
