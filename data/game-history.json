@@ -27622,9 +27622,25 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S2,S2,H2"
+            ],
+            [
+              "P3",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P3"
+      ]
     }
   ]
 }
