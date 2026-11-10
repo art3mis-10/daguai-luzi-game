@@ -30466,8 +30466,13 @@
               "P1",
               "play",
               "JS,SK,HK,HK,DK"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
