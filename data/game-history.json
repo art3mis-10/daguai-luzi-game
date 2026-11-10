@@ -25334,8 +25334,13 @@
               "P4",
               "play",
               "SA,CA"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
