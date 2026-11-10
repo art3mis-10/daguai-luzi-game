@@ -29727,8 +29727,13 @@
               "P1",
               "play",
               "HA,DA"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
