@@ -32553,6 +32553,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 24,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "S3,D3,SQ,HQ,CQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
