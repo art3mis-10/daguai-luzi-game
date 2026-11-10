@@ -23996,11 +23996,22 @@
             [
               "P2",
               "pass"
+            ],
+            [
+              "P3",
+              "play",
+              "D2"
+            ],
+            [
+              "P3",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P3"
+      ]
     }
   ]
 }
