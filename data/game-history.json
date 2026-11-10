@@ -31417,8 +31417,13 @@
               "P3",
               "play",
               "H2"
+            ],
+            [
+              "P4",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
