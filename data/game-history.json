@@ -27192,8 +27192,13 @@
               "P6",
               "play",
               "CQ,CQ"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
