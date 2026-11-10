@@ -32207,11 +32207,22 @@
               "P6",
               "play",
               "S7,S8,H8,C8,D8"
+            ],
+            [
+              "P1",
+              "play",
+              "D8,D9,D10,DJ,DQ"
+            ],
+            [
+              "P1",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P1"
+      ]
     }
   ]
 }
