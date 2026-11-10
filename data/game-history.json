@@ -32186,6 +32186,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S3,C3,C3,SK,HK"
+            ]
+          ]
         }
       ],
       "finishOrder": []
