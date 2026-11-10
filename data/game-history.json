@@ -30998,6 +30998,11 @@
               "P2",
               "play",
               "SQ,HQ,CQ,DQ,CK"
+            ],
+            [
+              "P3",
+              "play",
+              "S3,SA,SA,CA,DA"
             ]
           ]
         }
