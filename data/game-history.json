@@ -28111,8 +28111,13 @@
               "P1",
               "play",
               "HA"
+            ],
+            [
+              "P2",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
