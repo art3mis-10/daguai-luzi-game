@@ -26619,9 +26619,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "D3,D4,DK,DK,DA"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
