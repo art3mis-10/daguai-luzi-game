@@ -24193,6 +24193,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "CJ,CJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
