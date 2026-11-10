@@ -32014,6 +32014,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H7,C8,C9,C10,CJ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
