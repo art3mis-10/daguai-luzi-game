@@ -31104,9 +31104,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C5,C5,JS,CJ,CJ"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
