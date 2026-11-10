@@ -27760,10 +27760,25 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "SA,CA,DA,H2,SJ"
+            ],
+            [
+              "P5",
+              "out"
+            ]
+          ]
         }
       ],
       "finishOrder": [
-        "P3"
+        "P3",
+        "P5"
       ]
     }
   ]
