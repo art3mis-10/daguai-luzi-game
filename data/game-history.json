@@ -30428,8 +30428,13 @@
             [
               "P6",
               "pass"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
