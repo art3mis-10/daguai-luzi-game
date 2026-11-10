@@ -30416,6 +30416,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 12,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "D6,D6,HK,CK,CK"
+            ]
+          ]
         }
       ],
       "finishOrder": [
