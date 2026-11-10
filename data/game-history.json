@@ -24286,8 +24286,13 @@
               "P1",
               "play",
               "HK"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
