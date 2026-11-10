@@ -24166,11 +24166,26 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "JS,HJ,CJ,DK,DK"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ]
         }
       ],
       "finishOrder": [
         "P3",
-        "P2"
+        "P2",
+        "P4"
       ]
     }
   ]
