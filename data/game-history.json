@@ -25940,9 +25940,25 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "C9,C9"
+            ],
+            [
+              "P6",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P6"
+      ]
     }
   ]
 }
