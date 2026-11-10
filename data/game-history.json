@@ -30481,8 +30481,13 @@
               "P1",
               "play",
               "S2,H2"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
