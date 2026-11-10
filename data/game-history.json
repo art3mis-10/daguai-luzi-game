@@ -32345,6 +32345,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "JS,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
