@@ -28917,6 +28917,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "SK"
+            ]
+          ]
         }
       ],
       "finishOrder": [
