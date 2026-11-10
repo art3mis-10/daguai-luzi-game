@@ -29319,9 +29319,25 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "HJ,CJ,CJ,DJ,DQ"
+            ],
+            [
+              "P2",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
