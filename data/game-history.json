@@ -24212,6 +24212,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "HQ,HQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
