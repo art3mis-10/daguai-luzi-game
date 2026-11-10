@@ -24513,6 +24513,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H6,H6"
+            ]
+          ]
         }
       ],
       "finishOrder": []
