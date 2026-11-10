@@ -29440,6 +29440,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "H4,C4,D4,SQ,HQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
