@@ -29707,8 +29707,13 @@
               "P6",
               "play",
               "CA,CA"
+            ],
+            [
+              "P1",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
