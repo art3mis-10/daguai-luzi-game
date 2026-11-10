@@ -28267,6 +28267,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C5,D5"
+            ]
+          ]
         }
       ],
       "finishOrder": []
