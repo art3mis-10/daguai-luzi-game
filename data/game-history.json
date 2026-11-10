@@ -32318,6 +32318,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "H3,S5,H5,D5,D5"
+            ]
+          ]
         }
       ],
       "finishOrder": [
