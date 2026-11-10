@@ -25364,8 +25364,13 @@
               "P1",
               "play",
               "BJ"
+            ],
+            [
+              "P4",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
