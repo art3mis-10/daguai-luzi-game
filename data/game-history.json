@@ -28078,6 +28078,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "DA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
