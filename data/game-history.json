@@ -38005,11 +38005,22 @@
               "P1",
               "play",
               "S4,C4,SK,CK,DK"
+            ],
+            [
+              "P2",
+              "play",
+              "S10,S10,H10,C10,DQ"
+            ],
+            [
+              "P2",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
