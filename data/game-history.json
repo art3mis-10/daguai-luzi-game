@@ -37090,9 +37090,25 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "C9,D9,SQ,HQ,DQ"
+            ],
+            [
+              "P5",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P5"
+      ]
     }
   ]
 }
