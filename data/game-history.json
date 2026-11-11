@@ -35522,7 +35522,9 @@
       ],
       "finishOrder": [
         "P2"
-      ]
+      ],
+      "ended": "2026-11-11T13:28:21.713Z",
+      "endReason": "host-custom-redeal"
     },
     {
       "gameId": "DVMD35-4d44af12-49e8-4739-b209-b7750bde32c5",
