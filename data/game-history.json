@@ -35357,11 +35357,22 @@
               "P1",
               "play",
               "C9,D9"
+            ],
+            [
+              "P2",
+              "play",
+              "S2,H2"
+            ],
+            [
+              "P2",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P2"
+      ]
     }
   ]
 }
