@@ -33808,6 +33808,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "CK,CK"
+            ]
+          ]
         }
       ],
       "finishOrder": []
