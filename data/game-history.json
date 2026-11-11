@@ -33220,7 +33220,9 @@
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-11T10:19:43.767Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
