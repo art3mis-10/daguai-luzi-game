@@ -34768,6 +34768,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "HQ,DQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
