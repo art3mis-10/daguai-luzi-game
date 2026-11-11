@@ -36512,8 +36512,13 @@
               "P5",
               "play",
               "C2"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
