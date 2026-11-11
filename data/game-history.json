@@ -38314,6 +38314,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "S8"
+            ]
+          ]
         }
       ],
       "finishOrder": [
