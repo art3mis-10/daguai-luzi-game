@@ -42125,6 +42125,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "JS,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
