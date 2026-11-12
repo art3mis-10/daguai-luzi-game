@@ -46442,8 +46442,13 @@
               "P2",
               "play",
               "HK,CK"
+            ],
+            [
+              "P5",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P2"
         }
       ],
       "finishOrder": [
