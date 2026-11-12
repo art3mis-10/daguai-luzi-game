@@ -40781,11 +40781,22 @@
               "P6",
               "play",
               "S3,H3,C3,D3,C5"
+            ],
+            [
+              "P1",
+              "play",
+              "S4,S4,H4,H4,C4"
+            ],
+            [
+              "P1",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P1"
+      ]
     }
   ]
 }
