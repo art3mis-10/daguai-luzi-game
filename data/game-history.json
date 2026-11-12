@@ -46358,6 +46358,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "C7,D7"
+            ]
+          ]
         }
       ],
       "finishOrder": [
