@@ -45397,7 +45397,9 @@
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-12T15:35:28.433Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
