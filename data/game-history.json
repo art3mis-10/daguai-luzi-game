@@ -42152,6 +42152,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "SA,CA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
