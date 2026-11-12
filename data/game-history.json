@@ -40813,6 +40813,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "D4"
+            ]
+          ]
         }
       ],
       "finishOrder": [
