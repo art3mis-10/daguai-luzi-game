@@ -46424,6 +46424,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S7,H7"
+            ]
+          ]
         }
       ],
       "finishOrder": [
