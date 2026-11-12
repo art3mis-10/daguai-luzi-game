@@ -46267,10 +46267,25 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "HQ,HQ,CQ,DQ,DQ"
+            ],
+            [
+              "P3",
+              "out"
+            ]
+          ]
         }
       ],
       "finishOrder": [
-        "P4"
+        "P4",
+        "P3"
       ]
     }
   ]
