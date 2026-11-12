@@ -41373,6 +41373,51 @@
       "ended": "2026-11-12T07:31:27.515Z",
       "endReason": "team-finished",
       "winnerTeam": "A"
+    },
+    {
+      "gameId": "NGTFD7-6dc3bfb7-40cb-4be7-8d16-91abcfac152e",
+      "time": "2026-11-12T07:44:52.127Z",
+      "deal": "custom",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P3",
+      "starterReason": "custom",
+      "players": {
+        "P1": {
+          "name": "桑春荣",
+          "team": "A"
+        },
+        "P2": {
+          "name": "叶峰",
+          "team": "B"
+        },
+        "P3": {
+          "name": "沈铭",
+          "team": "A"
+        },
+        "P4": {
+          "name": "俞伟平",
+          "team": "B"
+        },
+        "P5": {
+          "name": "方言",
+          "team": "A"
+        },
+        "P6": {
+          "name": "顾建忠",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,D3,D3,H4,H5,C5,D5,D5,C8,S9,H9,C9,H10,D10,D10,CJ,HQ,HQ,CQ,DQ,CK,HA,S2,H2,D2,SJ,BJ",
+        "P2": "H3,C3,C3,H4,H5,S6,D6,H8,D8,D8,S9,H9,S10,HJ,DJ,HK,DK,HA,HA,CA,CA,DA,DA,C2,C2,C2,D2",
+        "P3": "S4,S4,D5,S6,H6,C6,D6,H7,D8,S9,S10,CJ,CJ,SQ,SQ,HQ,CQ,CQ,DQ,SK,HK,DK,SA,SA,DA,D2,SJ",
+        "P4": "S3,H4,D4,D4,S5,S5,H5,C5,S6,H6,C6,S7,S7,H7,H7,C7,D7,S8,C8,C10,D10,HJ,HJ,HK,CK,H2,H2",
+        "P5": "S3,C3,S4,C4,C4,D4,H6,C6,D6,C7,D7,D7,S8,H8,C8,H9,D9,S10,H10,H10,JS,JS,DJ,DK,S2,BJ,BJ",
+        "P6": "H3,H3,D3,C4,S5,C5,S7,C7,S8,H8,C9,C9,D9,D9,C10,C10,JS,DJ,SQ,DQ,SK,SK,CK,SA,CA,S2,SJ"
+      },
+      "rounds": [],
+      "finishOrder": []
     }
   ]
 }
