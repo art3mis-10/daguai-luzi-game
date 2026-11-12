@@ -40300,6 +40300,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "S3,H3,C3,C3,C9"
+            ]
+          ]
         }
       ],
       "finishOrder": [
