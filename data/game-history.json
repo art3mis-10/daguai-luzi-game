@@ -45075,6 +45075,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "D8"
+            ]
+          ]
         }
       ],
       "finishOrder": []
