@@ -39672,6 +39672,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 2,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S5,S5,S10,JS,JS"
+            ]
+          ]
         }
       ],
       "finishOrder": []
