@@ -42327,8 +42327,13 @@
               "P3",
               "play",
               "SQ,HQ,CQ,CQ,DQ"
+            ],
+            [
+              "P4",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
