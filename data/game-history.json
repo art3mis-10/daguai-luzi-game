@@ -42832,7 +42832,9 @@
       ],
       "finishOrder": [
         "P5"
-      ]
+      ],
+      "ended": "2026-11-12T12:58:12.722Z",
+      "endReason": "host-custom-redeal"
     },
     {
       "gameId": "NGTFD7-91b28d91-d8db-4ceb-9dab-6fe0aa07a1bf",
