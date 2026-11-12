@@ -40967,6 +40967,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CJ,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
