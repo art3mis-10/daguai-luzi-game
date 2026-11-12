@@ -43153,6 +43153,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H7,D7"
+            ]
+          ]
         }
       ],
       "finishOrder": []
