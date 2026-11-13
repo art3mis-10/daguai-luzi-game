@@ -49503,6 +49503,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H5,SK,DK,DK,SJ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
