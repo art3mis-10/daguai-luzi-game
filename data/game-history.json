@@ -52181,9 +52181,25 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "S6,S10,H10,D10,D10"
+            ],
+            [
+              "P4",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P4"
+      ]
     }
   ]
 }
