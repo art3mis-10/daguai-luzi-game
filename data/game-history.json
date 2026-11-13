@@ -48507,11 +48507,32 @@
             [
               "P3",
               "pass"
+            ],
+            [
+              "P4",
+              "pass"
+            ]
+          ],
+          "winner": "P5"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "C7,C7,SJ"
+            ],
+            [
+              "P5",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P5"
+      ]
     }
   ]
 }
