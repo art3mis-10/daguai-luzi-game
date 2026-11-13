@@ -54318,6 +54318,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C2,C2,BJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
