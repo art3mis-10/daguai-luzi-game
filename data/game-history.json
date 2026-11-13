@@ -52478,6 +52478,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 15,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "C9,C9"
+            ]
+          ]
         }
       ],
       "finishOrder": [
