@@ -50906,6 +50906,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 20,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "JS,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
