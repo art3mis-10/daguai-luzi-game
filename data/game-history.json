@@ -50001,8 +50001,13 @@
               "P3",
               "play",
               "D8,H9,D10,DJ,SQ"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
