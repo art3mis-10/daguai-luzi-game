@@ -54663,8 +54663,13 @@
               "P1",
               "play",
               "S6,D6,SQ,DQ,BJ"
+            ],
+            [
+              "P2",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P1"
         }
       ],
       "finishOrder": [
