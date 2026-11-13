@@ -46691,6 +46691,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S8,H8,C8,HJ,HJ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
