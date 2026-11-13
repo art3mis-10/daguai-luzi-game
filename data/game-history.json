@@ -50914,8 +50914,13 @@
               "P3",
               "play",
               "JS,DJ"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
