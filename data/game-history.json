@@ -53816,6 +53816,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 25,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "CA,CA,CA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
