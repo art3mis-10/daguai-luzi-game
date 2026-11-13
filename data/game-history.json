@@ -50884,8 +50884,13 @@
               "P3",
               "play",
               "HA"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
