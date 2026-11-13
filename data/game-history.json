@@ -49993,6 +49993,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "D8,H9,D10,DJ,SQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
