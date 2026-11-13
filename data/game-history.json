@@ -47128,6 +47128,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 13,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H4,H4,D4"
+            ]
+          ]
         }
       ],
       "finishOrder": [
