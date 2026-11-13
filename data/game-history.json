@@ -52591,6 +52591,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 18,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C4"
+            ]
+          ]
         }
       ],
       "finishOrder": [
