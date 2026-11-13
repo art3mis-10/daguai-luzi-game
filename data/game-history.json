@@ -49209,7 +49209,9 @@
           "winner": "P5"
         }
       ],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-13T09:02:18.800Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
