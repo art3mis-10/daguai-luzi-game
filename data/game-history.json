@@ -54591,6 +54591,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "JS,JS"
+            ]
+          ]
         }
       ],
       "finishOrder": [
