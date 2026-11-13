@@ -51710,8 +51710,13 @@
               "P2",
               "play",
               "CK"
+            ],
+            [
+              "P3",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P2"
         }
       ],
       "finishOrder": [
