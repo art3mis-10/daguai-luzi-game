@@ -50899,8 +50899,13 @@
               "P3",
               "play",
               "S3,C4,H5,C6,BJ"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
