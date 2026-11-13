@@ -51770,8 +51770,13 @@
               "P3",
               "play",
               "D2"
+            ],
+            [
+              "P2",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
