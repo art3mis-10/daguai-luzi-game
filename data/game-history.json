@@ -54976,6 +54976,16 @@
             ]
           ],
           "winner": "P5"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P5",
+              "play",
+              "C7,D7,D7"
+            ]
+          ]
         }
       ],
       "finishOrder": []
