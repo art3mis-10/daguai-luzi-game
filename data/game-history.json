@@ -55429,6 +55429,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 14,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "HQ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
