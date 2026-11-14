@@ -55565,7 +55565,8 @@
               "P3",
               "out"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
@@ -55573,7 +55574,10 @@
         "P1",
         "P2",
         "P3"
-      ]
+      ],
+      "ended": "2026-11-14T11:07:20.191Z",
+      "endReason": "team-finished",
+      "winnerTeam": "A"
     }
   ]
 }
