@@ -44,7 +44,9 @@
         "P6": "H4,H4,C4,D4,C5,S6,C6,S7,H7,C7,H8,D8,S9,C9,D10,D10,JS,HJ,CJ,CQ,DQ,HK,DK,CA,DA,D2,SJ"
       },
       "rounds": [],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-23T16:20:15.077Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
