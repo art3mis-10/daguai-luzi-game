@@ -1,4 +1,50 @@
 {
   "schemaVersion": 7,
-  "games": []
+  "games": [
+    {
+      "gameId": "W7U58S-f6a0b76d-e3d7-4ccc-bf29-f435f509f97f",
+      "time": "2026-11-23T14:22:59.326Z",
+      "deal": "random",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P3",
+      "starterReason": "spade-tiebreak",
+      "players": {
+        "P1": {
+          "name": "Player 1",
+          "team": "A"
+        },
+        "P2": {
+          "name": "Player 2",
+          "team": "B"
+        },
+        "P3": {
+          "name": "Player 3",
+          "team": "A"
+        },
+        "P4": {
+          "name": "Player 4",
+          "team": "B"
+        },
+        "P5": {
+          "name": "Player 5",
+          "team": "A"
+        },
+        "P6": {
+          "name": "Player 6",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "H3,C3,S4,H4,C4,S5,H5,D5,D6,D6,C7,D7,H8,C8,D9,CJ,SQ,CQ,CQ,CK,CK,SA,HA,CA,H2,H2,BJ",
+        "P2": "H3,C3,D4,S5,S5,H5,C5,C6,S7,H7,D7,D7,D8,H9,H9,H10,HJ,SQ,SQ,HQ,SK,HK,SA,HA,C2,SJ,BJ",
+        "P3": "S3,H3,D3,S4,D4,C5,H6,H6,S7,S8,C8,C8,H9,S10,S10,C10,C10,JS,CJ,HK,DK,DK,DA,DA,S2,C2,C2",
+        "P4": "S3,C3,D3,S4,C4,H5,D5,C6,D6,C7,D8,C9,C9,H10,D10,HJ,DJ,DJ,HQ,DQ,DQ,SK,SK,CK,HA,S2,SJ",
+        "P5": "S3,D3,D5,S6,S6,H6,H7,S8,S8,H8,S9,S9,D9,D9,S10,H10,C10,JS,DJ,HQ,SA,CA,S2,H2,D2,D2,BJ",
+        "P6": "H4,H4,C4,D4,C5,S6,C6,S7,H7,C7,H8,D8,S9,C9,D10,D10,JS,HJ,CJ,CQ,DQ,HK,DK,CA,DA,D2,SJ"
+      },
+      "rounds": [],
+      "finishOrder": []
+    }
+  ]
 }
