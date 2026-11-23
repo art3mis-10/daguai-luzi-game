@@ -53,12 +53,6 @@ const dataDir =
     'data'
   );
 
-const historyFile =
-  path.join(
-    dataDir,
-    'game-history.json'
-  );
-
 /* =========================================================
    GITHUB CONFIG
    ========================================================= */
@@ -79,20 +73,68 @@ const GITHUB_BRANCH =
   process.env.GITHUB_BRANCH ||
   'main';
 
-const GITHUB_HISTORY_PATH =
-  process.env
-    .GITHUB_HISTORY_PATH ||
+const FROZEN_HISTORY_PATH =
   'data/game-history.json';
 
-const githubSyncEnabled =
+const DEFAULT_HISTORY_PATH =
+  'data/game-history-2.json';
+
+function normalizeRepoPath(
+  value
+) {
+  return String(
+    value ||
+    ''
+  )
+    .trim()
+    .replace(
+      /\\/g,
+      '/'
+    )
+    .replace(
+      /^\/+/, 
+      ''
+    );
+}
+
+const GITHUB_HISTORY_PATH =
+  normalizeRepoPath(
+    process.env
+      .GITHUB_HISTORY_PATH ||
+    DEFAULT_HISTORY_PATH
+  );
+
+const historyTargetIsFrozen =
+  GITHUB_HISTORY_PATH ===
+  FROZEN_HISTORY_PATH;
+
+/*
+  IMPORTANT:
+  The local Render cache follows the active remote
+  history filename. Therefore History 2 can never
+  accidentally load History 1 from data/game-history.json.
+*/
+const historyFile =
+  path.join(
+    dataDir,
+    path.basename(
+      GITHUB_HISTORY_PATH
+    )
+  );
+
+const githubSyncConfigured =
   Boolean(
     GITHUB_TOKEN &&
     GITHUB_OWNER &&
     GITHUB_REPO
   );
 
+const githubSyncEnabled =
+  githubSyncConfigured &&
+  !historyTargetIsFrozen;
+
 const LOGGER_VERSION =
-  'compact-v8-remote-merge-no-data-loss';
+  'compact-v9-history2-isolated';
 
 /* =========================================================
    COMPACT HISTORY STORAGE
@@ -222,10 +264,13 @@ function writeLocalHistory() {
    GITHUB API
    ========================================================= */
 
-function githubHeaders() {
+function githubHeaders(
+  accept =
+    'application/vnd.github+json'
+) {
   return {
     Accept:
-      'application/vnd.github+json',
+      accept,
 
     Authorization:
       `Bearer ${GITHUB_TOKEN}`,
@@ -276,6 +321,10 @@ async function readRemoteHistory() {
     return null;
   }
 
+  /*
+    First request metadata/object form so we always get
+    the current blob SHA required by the Contents API PUT.
+  */
   const response =
     await fetch(
       githubReadUrl(),
@@ -308,20 +357,81 @@ async function readRemoteHistory() {
   const data =
     await response.json();
 
-  const text =
-    Buffer
-      .from(
-        data.content || '',
-        'base64'
-      )
-      .toString(
-        'utf8'
+  let text = '';
+
+  /*
+    For normal-size files GitHub returns Base64 content.
+    For larger files the Contents API can return
+    encoding:"none" with no inline content. In that case
+    request the same file using the raw media type.
+  */
+  if (
+    data?.encoding ===
+      'base64' &&
+    typeof data?.content ===
+      'string' &&
+    data.content.length >
+      0
+  ) {
+    text =
+      Buffer
+        .from(
+          data.content,
+          'base64'
+        )
+        .toString(
+          'utf8'
+        );
+  } else {
+    const rawResponse =
+      await fetch(
+        githubReadUrl(),
+        {
+          headers:
+            githubHeaders(
+              'application/vnd.github.raw+json'
+            ),
+        }
       );
 
-  const parsed =
-    JSON.parse(
-      text
+    if (
+      !rawResponse.ok
+    ) {
+      const rawBody =
+        await rawResponse.text();
+
+      throw new Error(
+        `GitHub raw GET failed: ` +
+        `${rawResponse.status} ` +
+        `${rawBody}`
+      );
+    }
+
+    text =
+      await rawResponse.text();
+  }
+
+  if (
+    !text ||
+    !text.trim()
+  ) {
+    throw new Error(
+      `GitHub history file is empty: ${GITHUB_HISTORY_PATH}`
     );
+  }
+
+  let parsed;
+
+  try {
+    parsed =
+      JSON.parse(
+        text
+      );
+  } catch (error) {
+    throw new Error(
+      `GitHub history JSON is invalid at ${GITHUB_HISTORY_PATH}: ${error.message}`
+    );
+  }
 
   if (
     !parsed ||
@@ -329,7 +439,9 @@ async function readRemoteHistory() {
       parsed.games
     )
   ) {
-    return null;
+    throw new Error(
+      `GitHub history has an invalid schema at ${GITHUB_HISTORY_PATH}.`
+    );
   }
 
   return {
@@ -2747,7 +2859,9 @@ async function registerNewCompactGame({
 
     historyStatus
       .lastGitHubError =
-      'GitHub history sync is disabled. Check the Render GitHub environment variables.';
+      historyTargetIsFrozen
+        ? `Recording refused: ${FROZEN_HISTORY_PATH} is frozen. Set GITHUB_HISTORY_PATH=${DEFAULT_HISTORY_PATH}.`
+        : 'GitHub history sync is disabled. Check the Render GitHub environment variables.';
 
     return null;
   }
@@ -2915,8 +3029,24 @@ app.get(
       githubSync:
         githubSyncEnabled,
 
+      githubSyncConfigured:
+        githubSyncConfigured,
+
       recordingReady:
         githubSyncEnabled,
+
+      historyTargetIsFrozen,
+
+      activeHistory:
+        GITHUB_HISTORY_PATH,
+
+      frozenHistory:
+        FROZEN_HISTORY_PATH,
+
+      localHistoryFile:
+        path.basename(
+          historyFile
+        ),
 
       gameCount:
         gameHistory
@@ -6047,7 +6177,9 @@ httpServer.listen(
     console.log(
       githubSyncEnabled
         ? `GitHub history sync enabled: ${GITHUB_OWNER}/${GITHUB_REPO}/${GITHUB_HISTORY_PATH}`
-        : 'GitHub history sync disabled.'
+        : historyTargetIsFrozen
+          ? `GitHub history sync blocked because ${FROZEN_HISTORY_PATH} is frozen. Set GITHUB_HISTORY_PATH=${DEFAULT_HISTORY_PATH}.`
+          : 'GitHub history sync disabled.'
     );
   }
 );
