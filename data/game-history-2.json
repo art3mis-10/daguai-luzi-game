@@ -47,6 +47,51 @@
       "finishOrder": [],
       "ended": "2026-11-23T16:20:15.077Z",
       "endReason": "host-disconnected"
+    },
+    {
+      "gameId": "VIF2FJ-f5c59e54-370e-4fd9-8624-71ac2109927a",
+      "time": "2026-11-24T08:06:05.707Z",
+      "deal": "random",
+      "trump": "2",
+      "cardCodeFormat": "safe-v2",
+      "starter": "P1",
+      "starterReason": "spade-tiebreak",
+      "players": {
+        "P1": {
+          "name": "yeeran",
+          "team": "A"
+        },
+        "P2": {
+          "name": "Player 2",
+          "team": "B"
+        },
+        "P3": {
+          "name": "飞",
+          "team": "A"
+        },
+        "P4": {
+          "name": "Jenny",
+          "team": "B"
+        },
+        "P5": {
+          "name": "Joyce",
+          "team": "A"
+        },
+        "P6": {
+          "name": "Julia",
+          "team": "B"
+        }
+      },
+      "hands": {
+        "P1": "S3,S4,H4,D4,S5,C5,C5,S6,H6,H7,D7,S8,H8,S9,S10,H10,D10,CQ,CQ,HK,CK,SA,S2,D2,SJ,SJ,BJ",
+        "P2": "S3,D3,H4,S6,H6,D6,D6,H7,H7,C7,D7,S8,D8,H9,C9,D9,D10,CJ,HQ,HQ,CQ,DQ,HK,CK,SA,H2,BJ",
+        "P3": "H3,H3,C3,C4,C4,D5,D5,D5,H6,C6,C8,H9,D9,C10,JS,CJ,DJ,DJ,SQ,SK,SK,DK,DK,HA,H2,D2,BJ",
+        "P4": "S4,H4,D4,D4,H5,H5,S6,C6,S7,C7,S8,H8,C8,D8,D8,S9,S10,C10,JS,JS,HJ,HK,CA,H2,C2,C2,D2",
+        "P5": "S3,C4,S5,C5,C6,D6,S7,S7,D7,H8,H9,C9,H10,C10,D10,SQ,HQ,DQ,DQ,CK,DK,SA,HA,HA,DA,S2,S2",
+        "P6": "H3,C3,C3,D3,D3,S4,S5,H5,C7,C8,S9,C9,D9,S10,H10,HJ,HJ,CJ,DJ,SQ,SK,CA,CA,DA,DA,C2,SJ"
+      },
+      "rounds": [],
+      "finishOrder": []
     }
   ]
 }
