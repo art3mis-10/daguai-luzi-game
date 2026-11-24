@@ -2118,11 +2118,22 @@
               "P2",
               "play",
               "CA"
+            ],
+            [
+              "P3",
+              "play",
+              "BJ"
+            ],
+            [
+              "P3",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P3"
+      ]
     }
   ]
 }
