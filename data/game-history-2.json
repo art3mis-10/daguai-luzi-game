@@ -1999,6 +1999,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "C5,D5,SQ,SQ,HQ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
