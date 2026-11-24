@@ -2990,6 +2990,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 10,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "D3,D6,D10,DK,DK"
+            ]
+          ]
         }
       ],
       "finishOrder": [
