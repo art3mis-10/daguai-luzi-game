@@ -565,11 +565,22 @@
             [
               "P6",
               "pass"
+            ],
+            [
+              "P1",
+              "play",
+              "SA"
+            ],
+            [
+              "P1",
+              "out"
             ]
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P1"
+      ]
     }
   ]
 }
