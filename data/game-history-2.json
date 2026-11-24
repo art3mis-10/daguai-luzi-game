@@ -1187,9 +1187,25 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S5,S5,C5,S9,C9"
+            ],
+            [
+              "P1",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P1"
+      ]
     }
   ]
 }
