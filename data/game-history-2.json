@@ -1958,6 +1958,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "S8,C8"
+            ]
+          ]
         }
       ],
       "finishOrder": []
