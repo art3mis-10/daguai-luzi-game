@@ -2105,6 +2105,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "HQ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
