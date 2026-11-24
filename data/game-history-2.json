@@ -1543,6 +1543,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "D4"
+            ]
+          ]
         }
       ],
       "finishOrder": [
