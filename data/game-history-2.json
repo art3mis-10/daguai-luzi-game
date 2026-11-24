@@ -3022,6 +3022,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 11,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "CJ,SA,CA,DA,DA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
