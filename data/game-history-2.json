@@ -868,8 +868,13 @@
               "P5",
               "play",
               "SA"
+            ],
+            [
+              "P2",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
