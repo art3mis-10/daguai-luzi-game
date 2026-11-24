@@ -419,6 +419,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 7,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S8,C9,CJ,CQ,BJ"
+            ]
+          ]
         }
       ],
       "finishOrder": []
