@@ -3204,8 +3204,13 @@
               "P4",
               "play",
               "C2,D2"
+            ],
+            [
+              "P3",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P4"
         }
       ],
       "finishOrder": [
