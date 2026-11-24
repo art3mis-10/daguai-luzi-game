@@ -2727,6 +2727,11 @@
               "P5",
               "play",
               "H6,D6,SK,CK,CK"
+            ],
+            [
+              "P6",
+              "play",
+              "C3,HJ,HJ,CJ,DJ"
             ]
           ]
         }
