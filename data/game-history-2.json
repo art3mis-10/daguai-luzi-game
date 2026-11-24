@@ -1591,8 +1591,13 @@
               "P5",
               "play",
               "H3,SQ,SQ,CQ,CQ"
+            ],
+            [
+              "P4",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
