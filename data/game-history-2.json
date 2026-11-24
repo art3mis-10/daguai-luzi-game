@@ -1800,6 +1800,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 4,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "C3"
+            ]
+          ]
         }
       ],
       "finishOrder": []
