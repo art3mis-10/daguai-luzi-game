@@ -4034,8 +4034,13 @@
               "P6",
               "play",
               "DA"
+            ],
+            [
+              "P3",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P6"
         }
       ],
       "finishOrder": [
