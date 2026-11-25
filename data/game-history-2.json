@@ -4127,7 +4127,9 @@
         "P6": "S4,C4,S5,H5,H6,H6,D6,S7,H7,C7,C7,D7,S8,H8,C8,D8,H9,H9,D9,D9,H10,C10,D10,D10,DQ,SJ,SJ"
       },
       "rounds": [],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-25T08:58:37.327Z",
+      "endReason": "host-disconnected"
     }
   ]
 }
