@@ -7519,6 +7519,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 17,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
