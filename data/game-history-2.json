@@ -6584,8 +6584,13 @@
               "P3",
               "play",
               "CK,DK,DK"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
