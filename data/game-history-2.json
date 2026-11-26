@@ -6599,8 +6599,13 @@
               "P3",
               "play",
               "H9,C9,D9"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
