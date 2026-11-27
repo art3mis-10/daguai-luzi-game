@@ -10731,6 +10731,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 23,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "H10,CJ,SQ,CK,HA"
+            ]
+          ]
         }
       ],
       "finishOrder": [
