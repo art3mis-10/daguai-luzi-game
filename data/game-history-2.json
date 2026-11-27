@@ -8280,6 +8280,16 @@
             ]
           ],
           "winner": "P6"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P6",
+              "play",
+              "DK"
+            ]
+          ]
         }
       ],
       "finishOrder": []
