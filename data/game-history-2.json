@@ -9717,6 +9717,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 19,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "HK"
+            ]
+          ]
         }
       ],
       "finishOrder": [
