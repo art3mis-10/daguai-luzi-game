@@ -11110,9 +11110,25 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 5,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "H5,C5,D5,S2,H2"
+            ],
+            [
+              "P1",
+              "out"
+            ]
+          ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [
+        "P1"
+      ]
     }
   ]
 }
