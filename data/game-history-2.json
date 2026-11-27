@@ -8369,7 +8369,9 @@
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-27T08:07:00.380Z",
+      "endReason": "host-custom-redeal"
     },
     {
       "gameId": "62DM03-1df40bdc-0dc6-4959-a524-21aaa59cfd1b",
