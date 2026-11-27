@@ -9643,6 +9643,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 16,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
