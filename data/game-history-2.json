@@ -10214,6 +10214,16 @@
             ]
           ],
           "winner": "P2"
+        },
+        {
+          "r": 9,
+          "actions": [
+            [
+              "P2",
+              "play",
+              "S10,H10,D10,DJ,DJ"
+            ]
+          ]
         }
       ],
       "finishOrder": [
