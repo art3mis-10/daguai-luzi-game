@@ -10739,8 +10739,13 @@
               "P3",
               "play",
               "H10,CJ,SQ,CK,HA"
+            ],
+            [
+              "P6",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P3"
         }
       ],
       "finishOrder": [
