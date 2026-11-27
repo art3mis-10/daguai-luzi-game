@@ -11232,6 +11232,16 @@
             ]
           ],
           "winner": "P4"
+        },
+        {
+          "r": 8,
+          "actions": [
+            [
+              "P4",
+              "play",
+              "H8,C8"
+            ]
+          ]
         }
       ],
       "finishOrder": [
