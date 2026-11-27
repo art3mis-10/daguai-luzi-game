@@ -10676,8 +10676,13 @@
             [
               "P6",
               "pass"
+            ],
+            [
+              "P3",
+              "pass"
             ]
-          ]
+          ],
+          "winner": "P5"
         }
       ],
       "finishOrder": [
