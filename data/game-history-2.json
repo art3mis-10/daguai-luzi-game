@@ -10103,6 +10103,16 @@
             ]
           ],
           "winner": "P3"
+        },
+        {
+          "r": 6,
+          "actions": [
+            [
+              "P3",
+              "play",
+              "SK,DK,DK"
+            ]
+          ]
         }
       ],
       "finishOrder": []
