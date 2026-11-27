@@ -10000,6 +10000,16 @@
             ]
           ],
           "winner": "P1"
+        },
+        {
+          "r": 3,
+          "actions": [
+            [
+              "P1",
+              "play",
+              "CA"
+            ]
+          ]
         }
       ],
       "finishOrder": []
