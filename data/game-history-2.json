@@ -11392,7 +11392,9 @@
           ]
         }
       ],
-      "finishOrder": []
+      "finishOrder": [],
+      "ended": "2026-11-28T12:10:06.450Z",
+      "endReason": "host-custom-redeal"
     }
   ]
 }
